@@ -1,0 +1,5 @@
+fifo_generator_vlog_beh.v,verilog,fifo_generator_v13_2_7,../../../ipstatic/simulation/fifo_generator_vlog_beh.v,
+fifo_generator_v13_2_rfs.vhd,vhdl,fifo_generator_v13_2_7,../../../ipstatic/hdl/fifo_generator_v13_2_rfs.vhd,
+fifo_generator_v13_2_rfs.v,verilog,fifo_generator_v13_2_7,../../../ipstatic/hdl/fifo_generator_v13_2_rfs.v,
+fifo_pipe_in_w32_1024_r32_1024_k160.v,verilog,xil_defaultlib,../../../../TUT_EGSE_EP.gen/sources_1/ip/fifo_pipe_in_w32_1024_r32_1024_k160/sim/fifo_pipe_in_w32_1024_r32_1024_k160.v,
+glbl.v,Verilog,xil_defaultlib,glbl.v

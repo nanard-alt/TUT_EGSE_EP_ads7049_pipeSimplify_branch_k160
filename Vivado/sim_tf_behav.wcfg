@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="sim_tf_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="frontpanel" />
+            <top_module name="glbl" />
+            <top_module name="mappings" />
+            <top_module name="parameters" />
+            <top_module name="sim_tf" />
+            <top_module name="ut_egse_ep_package" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="8.157994750 ms"></ZoomStartTime>
+      <ZoomEndTime time="22.797407744 ms"></ZoomEndTime>
+      <Cursor1Time time="27.928124000 ms"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="348"></NameColumnWidth>
+      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="114" />
+   <wvobject fp_name="/sim_tf/inst_DUT/i_gain" type="array">
+      <obj_property name="ElementShortName">i_gain[0:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain[0:1][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/i_gain_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_gain_high_frequency[0:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain_high_frequency[0:1][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/ep01wire" type="array">
+      <obj_property name="ElementShortName">ep01wire[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ep01wire[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/TH_rise" type="array">
+      <obj_property name="ElementShortName">TH_rise[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TH_rise[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/TH_fall" type="array">
+      <obj_property name="ElementShortName">TH_fall[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TH_fall[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/TH_ADC" type="array">
+      <obj_property name="ElementShortName">TH_ADC[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TH_ADC[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/TH_rise_high_frequency" type="array">
+      <obj_property name="ElementShortName">TH_rise_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TH_rise_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/TH_fall_high_frequency" type="array">
+      <obj_property name="ElementShortName">TH_fall_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">TH_fall_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider18">
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_filter_number" type="array">
+      <obj_property name="ElementShortName">i_filter_number[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_filter_number[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_clk_synchro_spectrum" type="logic">
+      <obj_property name="ElementShortName">i_clk_synchro_spectrum</obj_property>
+      <obj_property name="ObjectShortName">i_clk_synchro_spectrum</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_detector_number" type="array">
+      <obj_property name="ElementShortName">i_detector_number[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_detector_number[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_set_synchro_spectrum" type="array">
+      <obj_property name="ElementShortName">i_set_synchro_spectrum[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_set_synchro_spectrum[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_we" type="logic">
+      <obj_property name="ElementShortName">o_we</obj_property>
+      <obj_property name="ObjectShortName">o_we</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_en" type="logic">
+      <obj_property name="ElementShortName">o_en</obj_property>
+      <obj_property name="ObjectShortName">o_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_addr" type="array">
+      <obj_property name="ElementShortName">o_addr[9:0]</obj_property>
+      <obj_property name="ObjectShortName">o_addr[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_di" type="array">
+      <obj_property name="ElementShortName">o_di[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_di[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_do" type="array">
+      <obj_property name="ElementShortName">i_do[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_do[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_ready_energy_level_max" type="logic">
+      <obj_property name="ElementShortName">i_ready_energy_level_max</obj_property>
+      <obj_property name="ObjectShortName">i_ready_energy_level_max</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/i_energy_level_max" type="array">
+      <obj_property name="ElementShortName">i_energy_level_max[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_energy_level_max[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_pipe_out_spectrum_din" type="array">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_pipe_out_spectrum_wr_en" type="logic">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_wr_en</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(1)\/label_Ep/\generate_lable_spectrum(1)\/lable_spectrum/\generate_label_spectrum_FSM(0)\/label_spectrum_FSM/o_spectrum_count_pulse" type="array">
+      <obj_property name="ElementShortName">o_spectrum_count_pulse[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_spectrum_count_pulse[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider35">
+      <obj_property name="label">injection</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/i_clk_fast" type="logic">
+      <obj_property name="ElementShortName">i_clk_fast</obj_property>
+      <obj_property name="ObjectShortName">i_clk_fast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/i_continuous_injection" type="logic">
+      <obj_property name="ElementShortName">i_continuous_injection</obj_property>
+      <obj_property name="ObjectShortName">i_continuous_injection</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/o_pipe_in_rd_en" type="logic">
+      <obj_property name="ElementShortName">o_pipe_in_rd_en</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_in_rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/i_pipe_in_empty" type="logic">
+      <obj_property name="ElementShortName">i_pipe_in_empty</obj_property>
+      <obj_property name="ObjectShortName">i_pipe_in_empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/i_pipe_in_valid" type="logic">
+      <obj_property name="ElementShortName">i_pipe_in_valid</obj_property>
+      <obj_property name="ObjectShortName">i_pipe_in_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/i_pipe_in_dout" type="array">
+      <obj_property name="ElementShortName">i_pipe_in_dout[11:0]</obj_property>
+      <obj_property name="ObjectShortName">i_pipe_in_dout[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/o_injection_started" type="logic">
+      <obj_property name="ElementShortName">o_injection_started</obj_property>
+      <obj_property name="ObjectShortName">o_injection_started</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/o_data" type="array">
+      <obj_property name="ElementShortName">o_data[11:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/o_ready" type="logic">
+      <obj_property name="ElementShortName">o_ready</obj_property>
+      <obj_property name="ObjectShortName">o_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/count" type="array">
+      <obj_property name="ElementShortName">count[5:0]</obj_property>
+      <obj_property name="ObjectShortName">count[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/count_wait_valid" type="array">
+      <obj_property name="ElementShortName">count_wait_valid[5:0]</obj_property>
+      <obj_property name="ObjectShortName">count_wait_valid[5:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/pipe_in_rd_en" type="logic">
+      <obj_property name="ElementShortName">pipe_in_rd_en</obj_property>
+      <obj_property name="ObjectShortName">pipe_in_rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/label_Injection/wait_one_cycle" type="logic">
+      <obj_property name="ElementShortName">wait_one_cycle</obj_property>
+      <obj_property name="ObjectShortName">wait_one_cycle</obj_property>
+   </wvobject>
+   <wvobject fp_name="group51" type="group">
+      <obj_property name="label">wehn else injection adc</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/sim_tf/inst_DUT/i_data_CDC" type="array">
+         <obj_property name="ElementShortName">i_data_CDC[15:0]</obj_property>
+         <obj_property name="ObjectShortName">i_data_CDC[15:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider54">
+      <obj_property name="label">wehn else injection adc</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/i_data_CDC" type="array">
+      <obj_property name="ElementShortName">i_data_CDC[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_CDC[15:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/data_rx_keeped" type="array">
+      <obj_property name="ElementShortName">data_rx_keeped[15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_rx_keeped[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/data_fast_injection" type="array">
+      <obj_property name="ElementShortName">data_fast_injection[11:0]</obj_property>
+      <obj_property name="ObjectShortName">data_fast_injection[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/reg_global" type="array">
+      <obj_property name="ElementShortName">reg_global[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_global[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_data_before_filter" type="array">
+      <obj_property name="ElementShortName">o_data_before_filter[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_before_filter[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider59">
+      <obj_property name="label">data_before_filter</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/i_coef_fir" type="array">
+      <obj_property name="ElementShortName">i_coef_fir[0:31][15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_coef_fir[0:31][15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/i_coef_fir_ready" type="logic">
+      <obj_property name="ElementShortName">i_coef_fir_ready</obj_property>
+      <obj_property name="ObjectShortName">i_coef_fir_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/i_data" type="array">
+      <obj_property name="ElementShortName">i_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/i_ready" type="logic">
+      <obj_property name="ElementShortName">i_ready</obj_property>
+      <obj_property name="ObjectShortName">i_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/o_data" type="array">
+      <obj_property name="ElementShortName">o_data[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_FIR_filter(0)\/label_FIR_filter/o_ready" type="logic">
+      <obj_property name="ElementShortName">o_ready</obj_property>
+      <obj_property name="ObjectShortName">o_ready</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider68">
+      <obj_property name="label">gain</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/i_gain" type="array">
+      <obj_property name="ElementShortName">i_gain[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/i_data_after_filter" type="array">
+      <obj_property name="ElementShortName">i_data_after_filter[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_after_filter[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/i_ready_after_filter" type="logic">
+      <obj_property name="ElementShortName">i_ready_after_filter</obj_property>
+      <obj_property name="ObjectShortName">i_ready_after_filter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/o_data_after_gain" type="array">
+      <obj_property name="ElementShortName">o_data_after_gain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_after_gain[15:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/o_ready_after_gain" type="logic">
+      <obj_property name="ElementShortName">o_ready_after_gain</obj_property>
+      <obj_property name="ObjectShortName">o_ready_after_gain</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/data_after_gain" type="array">
+      <obj_property name="ElementShortName">data_after_gain[20:0]</obj_property>
+      <obj_property name="ObjectShortName">data_after_gain[20:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/ready_after_gain" type="logic">
+      <obj_property name="ElementShortName">ready_after_gain</obj_property>
+      <obj_property name="ObjectShortName">ready_after_gain</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/data_after_gain_resize" type="array">
+      <obj_property name="ElementShortName">data_after_gain_resize[20:0]</obj_property>
+      <obj_property name="ObjectShortName">data_after_gain_resize[20:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_gain(0)\/label_gain/ready_after_gain_resize" type="logic">
+      <obj_property name="ElementShortName">ready_after_gain_resize</obj_property>
+      <obj_property name="ObjectShortName">ready_after_gain_resize</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider80">
+      <obj_property name="label">energy</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_data_before_filter" type="array">
+      <obj_property name="ElementShortName">i_data_before_filter[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_before_filter[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_data_after_filter" type="array">
+      <obj_property name="ElementShortName">i_data_after_filter[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_after_filter[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_ADC" type="array">
+      <obj_property name="ElementShortName">i_TH_ADC[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_ADC[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise" type="array">
+      <obj_property name="ElementShortName">i_TH_rise[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_rise[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="vbus128" type="vbus">
+      <obj_property name="label">New Virtual Bus</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[15]" type="logic">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[14]" type="logic">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[13]" type="logic">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[12]" type="logic">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[11]" type="logic">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[10]" type="logic">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[9]" type="logic">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[8]" type="logic">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[7]" type="logic">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[6]" type="logic">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[5]" type="logic">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[4]" type="logic">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[3]" type="logic">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[2]" type="logic">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[1]" type="logic">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_rise[0]" type="logic">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_TH_fall" type="array">
+      <obj_property name="ElementShortName">i_TH_fall[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_fall[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/o_Energy_level_max" type="array">
+      <obj_property name="ElementShortName">o_Energy_level_max[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_Energy_level_max[15:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/o_readyEnergy_level_max" type="logic">
+      <obj_property name="ElementShortName">o_readyEnergy_level_max</obj_property>
+      <obj_property name="ObjectShortName">o_readyEnergy_level_max</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/i_data_after_gain" type="array">
+      <obj_property name="ElementShortName">i_data_after_gain[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_after_gain[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/o_data_after_energy_level" type="array">
+      <obj_property name="ElementShortName">o_data_after_energy_level[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_after_energy_level[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/max_research" type="array">
+      <obj_property name="ElementShortName">max_research[15:0]</obj_property>
+      <obj_property name="ObjectShortName">max_research[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/\generate_label_energy_level(0)\/label_energy_level/count_event_saturating_waiting" type="array">
+      <obj_property name="ElementShortName">count_event_saturating_waiting[15:0]</obj_property>
+      <obj_property name="ObjectShortName">count_event_saturating_waiting[15:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider95">
+      <obj_property name="label">trigger</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/fifo_data_count_spectrum" type="array">
+      <obj_property name="ElementShortName">fifo_data_count_spectrum[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_data_count_spectrum[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/fifo_data_count_spectrum_sd" type="array">
+      <obj_property name="ElementShortName">fifo_data_count_spectrum_sd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_data_count_spectrum_sd[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/pipe_out_spectrum_dout" type="array">
+      <obj_property name="ElementShortName">pipe_out_spectrum_dout[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pipe_out_spectrum_dout[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/pipe_out_spectrum_sd_dout" type="array">
+      <obj_property name="ElementShortName">pipe_out_spectrum_sd_dout[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pipe_out_spectrum_sd_dout[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider108">
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/dout_fifo_pipe_out_raw_data" type="array">
+      <obj_property name="ElementShortName">dout_fifo_pipe_out_raw_data[0:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">dout_fifo_pipe_out_raw_data[0:1][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/fifo_count_raw_data" type="array">
+      <obj_property name="ElementShortName">fifo_count_raw_data[0:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_count_raw_data[0:1][31:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/i_level_trigger" type="array">
+      <obj_property name="ElementShortName">i_level_trigger[1:0]</obj_property>
+      <obj_property name="ObjectShortName">i_level_trigger[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider130">
+      <obj_property name="label">FSM_raw_data</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_continuous_injection" type="logic">
+      <obj_property name="ElementShortName">i_continuous_injection</obj_property>
+      <obj_property name="ObjectShortName">i_continuous_injection</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_level_trigger" type="logic">
+      <obj_property name="ElementShortName">i_level_trigger</obj_property>
+      <obj_property name="ObjectShortName">i_level_trigger</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_Start_Capture" type="logic">
+      <obj_property name="ElementShortName">i_Start_Capture</obj_property>
+      <obj_property name="ObjectShortName">i_Start_Capture</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_din_fifo_raw_data" type="array">
+      <obj_property name="ElementShortName">i_din_fifo_raw_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_din_fifo_raw_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_ready" type="logic">
+      <obj_property name="ElementShortName">i_ready</obj_property>
+      <obj_property name="ObjectShortName">i_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/o_din_fifo_pipe_out_raw_data" type="array">
+      <obj_property name="ElementShortName">o_din_fifo_pipe_out_raw_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_din_fifo_pipe_out_raw_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/o_wr_en_fifo_pipe_out_raw_data" type="logic">
+      <obj_property name="ElementShortName">o_wr_en_fifo_pipe_out_raw_data</obj_property>
+      <obj_property name="ObjectShortName">o_wr_en_fifo_pipe_out_raw_data</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/i_empty_fifo_pipe_out_raw_data" type="logic">
+      <obj_property name="ElementShortName">i_empty_fifo_pipe_out_raw_data</obj_property>
+      <obj_property name="ObjectShortName">i_empty_fifo_pipe_out_raw_data</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/Initial_Fill_Count" type="array">
+      <obj_property name="ElementShortName">Initial_Fill_Count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Initial_Fill_Count[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/Raw_Sample_Count" type="array">
+      <obj_property name="ElementShortName">Raw_Sample_Count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Raw_Sample_Count[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/Delay_Count" type="array">
+      <obj_property name="ElementShortName">Delay_Count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">Delay_Count[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_label_FSM_raw_data(0)\/label_FSM_raw_data/dout" type="array">
+      <obj_property name="ElementShortName">dout[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dout[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider139">
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/empty_fifo_pipe_out_raw_data" type="array">
+      <obj_property name="ElementShortName">empty_fifo_pipe_out_raw_data[1:0]</obj_property>
+      <obj_property name="ObjectShortName">empty_fifo_pipe_out_raw_data[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/rd_fifo_pipe_out_data_count_raw_data" type="array">
+      <obj_property name="ElementShortName">rd_fifo_pipe_out_data_count_raw_data[1:0][10:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_fifo_pipe_out_data_count_raw_data[1:0][10:0]</obj_property>
+   </wvobject>
+</wave_config>
