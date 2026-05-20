@@ -1,10 +1,10 @@
 // Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
-// Date        : Tue Dec  9 08:29:07 2025
+// Date        : Wed May 20 17:42:24 2026
 // Host        : IRLW245164 running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode funcsim
-//               c:/3utransat-k160/TUT_EGSE_EP_ads7049_pipeSimplify_branch_k160/Vivado/TUT_EGSE_EP.gen/sources_1/ip/clk_wiz_0_k160/clk_wiz_0_k160_sim_netlist.v
+//               c:/3utransat-k160/TUT_EGSE_EP_ads7049_pipeSimplify_branch_k160_clone/Vivado/TUT_EGSE_EP.gen/sources_1/ip/clk_wiz_0_k160/clk_wiz_0_k160_sim_netlist.v
 // Design      : clk_wiz_0_k160
 // Purpose     : This verilog netlist is a functional simulation representation of the design and should not be modified
 //               or synthesized. This netlist cannot be used for SDF annotated simulation.
