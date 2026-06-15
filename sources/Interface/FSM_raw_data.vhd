@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

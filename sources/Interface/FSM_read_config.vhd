@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -21,7 +33,7 @@ entity FSM_read_config is
         --output reg 
         o_reg_config            : out Array_config_32stdx8_type;
         -- output gain
-        o_gain                  : out Array_Array_config_32stdx2_type
+        o_gain                  : out Array_Array_config_32stdxDetector_Number_type
         -- output gain
         --o_gain_high_frequency   : out Array_Array_config_32stdx2_type
     );
@@ -31,12 +43,13 @@ architecture RTL of FSM_read_config is
 
     --    type state_type is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, read_low_frequency, valid_low_frequency, read_trigger, valid_trigger);
     --    signal state    : state_type;
+    constant Config_Read_Word_Count : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + 1;
     signal add_coef : integer;
 
     type state_type_config is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, valid_high_frequency, read_trigger, valid_read_trigger,
                                read_TH_rise, valid_read_TH_rise, read_TL_fall, valid_read_TL_fall, read_TH_ADC, valid_read_TH_ADC, read_gain, valid_read_gain, read_gain_high_frequency,
                                valid_read_gain_high_frequency, read_level_DAC, valid_read_level_DAC, read_TH_rise_high_frequency, read_end_usb_buffer, valid_read_end_usb_buffer,
-                               read_TH_fall_high_frequency, valid_read_TH_fall_high_frequency, valid_read_TH_rise_high_frequency);
+                               read_TH_fall_high_frequency, valid_read_TH_fall_high_frequency, valid_read_TH_rise_high_frequency,stop);
 
     signal state_config            : state_type_config;
     signal cnt_number_detector     : integer;
@@ -53,15 +66,13 @@ begin
     begin
         if i_reset = '1' then
 
-            state_config            <= IDLE;
-            o_pipe_in_config_rd_en  <= '0';
-            add_coef                <= 0;
-            o_coef_fir(0)(0)        <= (others => (others => '0'));
-            o_coef_fir(0)(1)        <= (others => (others => '0'));
-            o_coef_fir(1)(0)        <= (others => (others => '0'));
-            o_coef_fir(1)(1)        <= (others => (others => '0'));
-            o_gain(0)               <= (others => (others => '0'));
-            o_gain(1)               <= (others => (others => '0'));
+            state_config           <= IDLE;
+            o_pipe_in_config_rd_en <= '0';
+            add_coef               <= 0;
+            o_coef_fir             <= (others => (others => (others => (others => '0'))));
+            o_gain                 <= (others => (others => (others => '0')));
+
+
             --o_gain_high_frequency(0) <= (others => (others => '0'));
             --o_gain_high_frequency(1) <= (others => (others => '0'));
             o_coef_fir_ready        <= '0';
@@ -76,16 +87,13 @@ begin
 
                 when IDLE =>
 
-                    if i_pipe_in_config_empty = '0' and To_integer(unsigned(i_pipe_in_rd_data_count)) >= (7 + 64 * Dectector_Number + 2 * Dectector_Number + 1) then
+                    if i_pipe_in_config_empty = '0' and To_integer(unsigned(i_pipe_in_rd_data_count)) >= Config_Read_Word_Count then
                         state_config            <= read_low_frequency;
                         o_pipe_in_config_rd_en  <= '0';
                         add_coef                <= 0;
-                        o_coef_fir(0)(0)        <= (others => (others => '0'));
-                        o_coef_fir(0)(1)        <= (others => (others => '0'));
-                        o_coef_fir(1)(0)        <= (others => (others => '0'));
-                        o_coef_fir(1)(1)        <= (others => (others => '0'));
-                        o_gain(0)               <= (others => (others => '0'));
-                        o_gain(1)               <= (others => (others => '0'));
+                        o_coef_fir              <= (others => (others => (others => (others => '0'))));
+                        o_gain                  <= (others => (others => (others => '0')));
+                       
                         --o_gain_high_frequency(0) <= (others => (others => '0'));
                         --o_gain_high_frequency(1) <= (others => (others => '0'));
                         o_coef_fir_ready        <= '0';
@@ -94,20 +102,6 @@ begin
                         o_reg_config            <= (others => (others => '0'));
                         count_wait_valid        <= (others => '0');
                     end if;
-                --  read coef HD
-
-                --                when read_main_reg =>
-                --
-                --                    o_pipe_in_config_rd_en <= '1';
-                --                    state_config           <= valid_read_main_reg;
-                --
-                --                when valid_read_main_reg =>
-                --
-                --                    o_pipe_in_config_rd_en <= '0';
-                --                    if i_pipe_in_config_valid = '1' then
-                --                        state_config    <= read_low_frequency;
-                --                        o_reg_config(0) <= std_logic_vector(i_pipe_in_config_dout);
-                --                    end if;
 
                 when read_low_frequency =>
 
@@ -116,10 +110,22 @@ begin
                         state_config           <= valid_low_frequency;
 
                     else
-                        state_config           <= read_high_frequency;
-                        o_pipe_in_config_rd_en <= '0';
-                        --o_coef_fir_ready       <= '1';
-                        add_coef               <= 0;
+                        cnt_number_detector <= cnt_number_detector + 1;
+
+                        if cnt_number_detector = Detector_Number - 1 then
+                            state_config           <= read_high_frequency;
+                            o_pipe_in_config_rd_en <= '0';
+                            --o_coef_fir_ready       <= '1';
+                            add_coef               <= 0;
+                            cnt_number_detector    <= 0;
+
+                        else
+                            state_config           <= read_low_frequency;
+                            o_pipe_in_config_rd_en <= '0';
+                            --o_coef_fir_ready       <= '1';
+                            add_coef               <= 0;
+                        end if;
+
                     end if;
 
                 when valid_low_frequency =>
@@ -132,7 +138,9 @@ begin
                         state_config                                 <= read_low_frequency;
                     end if;
 
+
                 when read_high_frequency =>
+
 
                     if add_coef < 32 then
                         o_pipe_in_config_rd_en <= '1';
@@ -140,15 +148,16 @@ begin
 
                     else
                         cnt_number_detector <= cnt_number_detector + 1;
-                        if cnt_number_detector = Dectector_Number - 1 then
+
+                        if cnt_number_detector = Detector_Number - 1 then
                             state_config           <= read_trigger;
                             o_pipe_in_config_rd_en <= '0';
-                            --o_coef_fir_ready       <= '1';
+                            o_coef_fir_ready       <= '1';
                             add_coef               <= 0;
                             cnt_number_detector    <= 0;
-                            o_coef_fir_ready       <= '1';
+
                         else
-                            state_config           <= read_low_frequency;
+                            state_config           <= read_high_frequency;
                             o_pipe_in_config_rd_en <= '0';
                             --o_coef_fir_ready       <= '1';
                             add_coef               <= 0;
@@ -157,14 +166,15 @@ begin
                     end if;
 
                 when valid_high_frequency =>
-
+                
                     o_pipe_in_config_rd_en <= '0';
-
+                
                     if i_pipe_in_config_valid = '1' then
                         o_coef_fir(cnt_number_detector)(1)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
                         add_coef                                     <= add_coef + 1;
                         state_config                                 <= read_high_frequency;
-                    end if;
+                end if;
+
 
                 when read_trigger =>
 
@@ -264,7 +274,7 @@ begin
                 --------------------------------------------------------------------------------------------------
                 when read_gain =>
 
-                    if cnt_number_detector = Dectector_Number then
+                    if cnt_number_detector = Detector_Number then
                         state_config           <= read_gain_high_frequency;
                         o_pipe_in_config_rd_en <= '0';
                         cnt_number_detector    <= 0;
@@ -282,13 +292,13 @@ begin
 
                     if i_pipe_in_config_valid = '1' then
                         cnt_number_detector            <= cnt_number_detector + 1;
-                        o_gain(cnt_number_detector)(0) <= std_logic_vector(unsigned(i_pipe_in_config_dout)); -- set all detector for low frequency filter
+                        o_gain(cnt_number_detector)(0) <= unsigned(i_pipe_in_config_dout); -- set all detector for low frequency filter
                         state_config                   <= read_gain;
                     end if;
 
                 when read_gain_high_frequency =>
 
-                    if cnt_number_detector = Dectector_Number then
+                    if cnt_number_detector = Detector_Number then
                         state_config           <= read_end_usb_buffer;
                         o_pipe_in_config_rd_en <= '0';
                         cnt_number_detector    <= 0;
@@ -306,7 +316,7 @@ begin
 
                     if i_pipe_in_config_valid = '1' then
                         cnt_number_detector            <= cnt_number_detector + 1;
-                        o_gain(cnt_number_detector)(1) <= std_logic_vector(i_pipe_in_config_dout); -- set all detector high_frequency
+                        o_gain(cnt_number_detector)(1) <= unsigned(i_pipe_in_config_dout); -- set all detector high_frequency
                         state_config                   <= read_gain_high_frequency;
                     end if;
 
@@ -347,84 +357,11 @@ begin
 
                     end if;
 
+                when others =>
+
             end case;
 
         end if;
     end process;
-
-    --    ------------------------------------------------------------------------------------------------
-    --    -- Raw buffer read
-    --    ------------------------------------------------------------------------------------------------        
-    --
-    --    Raw_Capture_FSM : process(i_clk_slow, i_reset) is
-    --    begin
-    --        if i_reset = '1' then
-    --            state                  <= IDLE;
-    --            o_pipe_in_config_rd_en <= '0';
-    --            add_coef               <= 0;
-    --            o_coef_fir(0)          <= (others => (others => '0'));
-    --            o_coef_fir(1)          <= (others => (others => '0'));
-    --            o_coef_fir_ready       <= '0';
-    --        elsif rising_edge(i_clk_slow) then
-    --
-    --            case state is
-    --                when IDLE =>
-    --
-    --                    if i_pipe_in_config_empty = '0' and To_integer(unsigned(i_pipe_in_rd_data_count)) = 64 then
-    --                        state            <= read_low_frequency;
-    --                        add_coef         <= 0;
-    --                        o_coef_fir(0)    <= (others => (others => '0'));
-    --                        o_coef_fir(1)    <= (others => (others => '0'));
-    --                        o_coef_fir_ready <= '0';
-    --                    end if;
-    --                --  read coef HD
-    --                when read_low_frequency =>
-    --
-    --                    if add_coef < 32 then
-    --                        o_pipe_in_config_rd_en <= '1';
-    --                        state                  <= valid_low_frequency;
-    --
-    --                    else
-    --                        state                  <= read_high_frequency;
-    --                        o_pipe_in_config_rd_en <= '0';
-    --                        --o_coef_fir_ready       <= '1';
-    --                        add_coef               <= 0;
-    --                    end if;
-    --                -- write coef HD
-    --                when valid_low_frequency =>
-    --
-    --                    o_pipe_in_config_rd_en <= '0';
-    --
-    --                    if i_pipe_in_config_valid = '1' then
-    --                        o_coef_fir(0)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
-    --                        add_coef                <= add_coef + 1;
-    --                        state                   <= read_low_frequency;
-    --                    end if;
-    --                --  read coef SD
-    --                when read_high_frequency =>
-    --
-    --                    if add_coef < 32 then
-    --                        o_pipe_in_config_rd_en <= '1';
-    --                        state                  <= valid_high_frequency;
-    --                    else
-    --                        state                  <= IDLE;
-    --                        o_pipe_in_config_rd_en <= '0';
-    --                        o_coef_fir_ready       <= '1';
-    --
-    --                    end if;
-    --                -- write coef SD
-    --                when valid_high_frequency =>
-    --
-    --                    o_pipe_in_config_rd_en <= '0';
-    --
-    --                    if i_pipe_in_config_valid = '1' then
-    --                        o_coef_fir(1)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
-    --                        add_coef                <= add_coef + 1;
-    --                        state                   <= read_high_frequency;
-    --                    end if;
-    --
-    --            end case;
-    --        end if;
-    --    end process;
 
 end architecture RTL;

@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 --------------------------------------------------------------------------
 -- Counters.vhd
 --
@@ -24,25 +36,23 @@ use UNISIM.vcomponents.all;
 
 entity TUT_EGSE is
     port(
-        okUH     : in    STD_LOGIC_VECTOR(4 downto 0);
-        okHU     : out   STD_LOGIC_VECTOR(2 downto 0);
-        okUHU    : inout STD_LOGIC_VECTOR(31 downto 0);
-        okAA     : inout STD_LOGIC;     --removed for simulation
+        okUH         : in    STD_LOGIC_VECTOR(4 downto 0);
+        okHU         : out   STD_LOGIC_VECTOR(2 downto 0);
+        okUHU        : inout STD_LOGIC_VECTOR(31 downto 0);
+        okAA         : inout STD_LOGIC; --removed for simulation
         -- clock OK
-        sys_clkp : in    STD_LOGIC;
-        sys_clkn : in    STD_LOGIC;
-        --AD7049
-        --        o_sck        : out   STD_LOGIC;
-        --        o_cs_n       : out   STD_LOGIC;
-        --        i_sdi        : in    STD_LOGIC;
-        led      : out   STD_LOGIC_VECTOR(3 downto 0);
-        --        i_sck_rx     : in    STD_LOGIC;
-        --        o_sck_rx     : out   STD_LOGIC;
-        --        -- DAC121S
-                o_DAC_SCLK   : out   STD_LOGIC;
-                o_DAC_SYNC_n : out   STD_LOGIC;
-                o_DAC_DIN    : out   STD_LOGIC;
-                o_DAC_on_off : out   STD_LOGIC
+        sys_clkp     : in    STD_LOGIC;
+        sys_clkn     : in    STD_LOGIC;
+--        -- AD7049
+--        o_sck        : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+--        o_cs_n       : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+--        i_sdi        : in    STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        led          : out   STD_LOGIC_VECTOR(3 downto 0);
+        -- DAC121S
+        o_DAC_SCLK   : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        o_DAC_SYNC_n : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        o_DAC_DIN    : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        o_DAC_on_off : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0)
     );
 end TUT_EGSE;
 
@@ -53,14 +63,14 @@ architecture arch of TUT_EGSE is
     signal okClk : STD_LOGIC;
     signal okHE  : STD_LOGIC_VECTOR(112 downto 0);
     signal okEH  : STD_LOGIC_VECTOR(64 downto 0);
-    signal okEHx : STD_LOGIC_VECTOR(65 * 14 - 1 downto 0);
+    signal okEHx : STD_LOGIC_VECTOR(65 * 18 - 1 downto 0);
 
     signal reg_global                  : STD_LOGIC_VECTOR(31 downto 0);
-    signal fifo_count_raw_data         : Array_config_32stdx2_type;
+    signal fifo_count_raw_data         : Array_config_32stdxDetector_Number_type;
     signal fifo_data_count_spectrum    : STD_LOGIC_VECTOR(31 downto 0);
-    signal reg_spectrum_count_pulse    : Array_config_32stdx2_type;
+    signal reg_spectrum_count_pulse    : Array_config_32stdxDetector_Number_type;
     signal fifo_data_count_spectrum_sd : STD_LOGIC_VECTOR(31 downto 0);
-    signal reg_spectrum_sd_count_pulse : Array_config_32stdx2_type;
+    signal reg_spectrum_sd_count_pulse : Array_config_32stdxDetector_Number_type;
 
     signal reset : std_logic;
     signal count : unsigned(31 downto 0);
@@ -79,8 +89,8 @@ architecture arch of TUT_EGSE is
     signal pipe_in_injection_empty_fifo : STD_LOGIC;
     signal pipe_in_injection_valid_fifo : STD_LOGIC;
 
-    signal dout_fifo_pipe_out_raw_data  : Array_config_32stdx2_type;
-    signal rd_en_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(1 downto 0);
+    signal dout_fifo_pipe_out_raw_data  : Array_config_32stdxDetector_Number_type;
+    signal rd_en_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
     signal led_buf                      : STD_LOGIC_VECTOR(3 downto 0);
 
     signal ep01wire : STD_LOGIC_VECTOR(31 downto 0);
@@ -95,36 +105,36 @@ architecture arch of TUT_EGSE is
 
     signal reset_wire                 : std_logic;
     signal locked                     : std_logic;
-    signal din_fifo_pipe_out_raw_data : Array_config_32signedx2_type;
+    signal din_fifo_pipe_out_raw_data : Array_config_32signedxDetector_Number_type;
 
     signal clk_32Mhz : STD_LOGIC;
 
-    signal data_before_filter : Array_config_16signedx2_type;
+    signal data_before_filter : Array_config_16signedxDetector_Number_type;
 
-    signal ready_after_gain             : STD_LOGIC_VECTOR(1 downto 0);
-    signal wr_en_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(1 downto 0);
+    signal ready_after_gain             : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+    signal wr_en_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
     signal empty_raw_data               : std_logic;
-    signal i_Start_Capture              : STD_LOGIC_VECTOR(1 downto 0);
-    signal i_level_trigger              : STD_LOGIC_VECTOR(1 downto 0);
+    signal i_Start_Capture              : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+    signal i_level_trigger              : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
 
     signal pipe_in_confi_rd_data_count : std_logic_vector(9 downto 0);
     signal coef_fir                    : Array_Array_config_32x16_type_32x16_type;
-    signal i_coef_fir_ready            : STD_LOGIC_VECTOR(1 downto 0);
+    signal i_coef_fir_ready            : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
 
     signal coef_fir_ready : std_logic;
 
-    signal rd_fifo_pipe_out_data_count_raw_data : Array_config_11stdx2_type;
+    signal rd_fifo_pipe_out_data_count_raw_data : Array_config_11stdxDetector_Number_type;
 
     signal ready_fast_injection : std_logic;
     signal data_fast_injection  : signed(11 downto 0);
 
-    signal data_rx         : std_logic_vector(11 downto 0);
+    signal data_rx         : Array_config_12stdxDetector_Number_type;
     signal view_data_rx    : std_logic_vector(11 downto 0);
-    signal ready_rx        : std_logic;
-    signal i_data_CDC      : signed(15 downto 0);
-    signal i_ready_CDC     : std_logic;
-    signal data_rx_keeped  : std_logic_vector(15 downto 0);
-    signal ready_rx_keeped : std_logic;
+    signal ready_rx        : std_logic_vector(Detector_Number - 1 downto 0);
+    signal i_data_CDC      : Array_config_16signedxDetector_Number_type;
+    signal i_ready_CDC     : std_logic_vector(Detector_Number - 1 downto 0);
+    signal data_rx_keeped  : Array_config_16stdxDetector_Number_type;
+    signal ready_rx_keeped : std_logic_vector(Detector_Number - 1 downto 0);
 
     signal TH_rise : std_logic_vector(31 downto 0);
     signal TH_fall : std_logic_vector(31 downto 0);
@@ -140,48 +150,48 @@ architecture arch of TUT_EGSE is
     signal pipe_out_spectrum_sd_dout  : std_logic_vector(31 downto 0);
 
     signal pipe_out_spectrum_din      : std_logic_vector(31 downto 0);
-    signal o_pipe_out_spectrum_din    : Array_config_32stdx2_type;
-    signal o_pipe_out_spectrum_sd_din : Array_config_32stdx2_type;
+    signal o_pipe_out_spectrum_din    : Array_config_32stdxDetector_Number_type;
+    signal o_pipe_out_spectrum_sd_din : Array_config_32stdxDetector_Number_type;
     signal pipe_out_spectrum_sd_din   : std_logic_vector(31 downto 0);
 
     signal pipe_out_spectrum_wr_en            : std_logic;
-    signal o_pipe_out_spectrum_wr_en          : STD_LOGIC_VECTOR(1 downto 0);
-    signal o_pipe_out_spectrum_sd_wr_en       : STD_LOGIC_VECTOR(1 downto 0);
+    signal o_pipe_out_spectrum_wr_en          : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+    signal o_pipe_out_spectrum_sd_wr_en       : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
     signal pipe_out_spectrum_sd_wr_en         : std_logic;
-    signal pipe_out_rd_data_count_spectrum    : STD_LOGIC_VECTOR(11 downto 0);
-    signal pipe_out_rd_data_count_spectrum_sd : STD_LOGIC_VECTOR(10 downto 0);
+    signal pipe_out_rd_data_count_spectrum    : STD_LOGIC_VECTOR(12 downto 0);
+    signal pipe_out_rd_data_count_spectrum_sd : STD_LOGIC_VECTOR(11 downto 0);
 
     signal pipe_out_spectrum_wr_en_fifo : std_logic;
     signal pipe_out_spectrum_din_fifo   : std_logic_vector(31 downto 0);
-    signal spectrum_count_pulse         : Array_config_32stdx2_type;
-    signal spectrum_sd_count_pulse      : Array_config_32stdx2_type;
+    signal spectrum_count_pulse         : Array_config_32stdxDetector_Number_type;
+    signal spectrum_sd_count_pulse      : Array_config_32stdxDetector_Number_type;
 
     signal pipe_out_spectrum_sd_wr_en_fifo : std_logic;
     signal pipe_out_spectrum_sd_din_fifo   : std_logic_vector(31 downto 0);
 
-    signal empty_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(1 downto 0);
-    signal din_fifo_raw_data            : Array_config_32signedx2_type;
+    signal empty_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+    signal din_fifo_raw_data            : Array_config_32signedxDetector_Number_type;
     signal injection_started            : std_logic;
     signal continuous_injection         : std_logic;
-    signal enable_high_filter           : STD_LOGIC_VECTOR(1 downto 0);
-    signal i_gain                       : Array_config_32stdx2_type;
-    signal i_gain_high_frequency        : Array_config_32stdx2_type;
-    signal gain                         : Array_Array_config_32stdx2_type;
-    signal gain_high_frequency          : Array_config_32stdx2_type;
+    signal enable_high_filter           : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+    signal i_gain                       : Array_Array_config_32stdxDetector_Number_type;
+    --signal i_gain_high_frequency        : Array_config_32stdxDetector_Number_type;
+    --signal gain                         : Array_Array_config_32stdxDetector_Number_type;
+    --signal gain_high_frequency          : Array_config_32stdx2_type;
     signal reg_config                   : Array_config_32stdx8_type;
     --signal data_after_gain              : Array_config_16signedx2_type;
-    signal data_after_energy_level      : Array_config_16signedx2_type;
+    signal data_after_energy_level      : Array_config_16signedxDetector_Number_type;
 
-    signal Start            : std_logic;
-    signal Num_Data         : std_logic_vector(11 downto 0);
+    --signal Start            : std_logic;
+    --signal Num_Data         : std_logic_vector(11 downto 0);
     signal level_DAC121S    : std_logic_vector(31 downto 0);
-    signal Busy             : std_logic;
+    --signal Busy             : std_logic;
     signal count_clock_1KHz : unsigned(15 downto 0);
     signal clk_1KHz         : std_logic;
 
     signal cmpt_sequencer    : unsigned(14 downto 0);
     signal enable_clock_1KHz : std_logic;
-    signal TH_ADC_wire       : std_logic_vector(31 downto 0);
+    --signal TH_ADC_wire       : std_logic_vector(31 downto 0);
 
     --signal ep23wire : std_logic_vector(31 downto 0);
     --signal ep24wire : std_logic_vector(31 downto 0);
@@ -309,6 +319,7 @@ begin
             clk_1KHz         <= '0';
         elsif rising_edge(sys_clk) then
             count_clock_1KHz <= count_clock_1KHz + 1;
+            --if To_integer(count_clock_1KHz) >= 10000 then
             if To_integer(count_clock_1KHz) >= 10000 then
                 clk_1KHz         <= not clk_1KHz;
                 count_clock_1KHz <= (others => '0');
@@ -333,14 +344,12 @@ begin
     ------------------------------------------
 
     reset_wire <= reg_global(0);
+    reset      <= (not locked) or reset_wire;
 
-    i_Start_Capture(0) <= reg_global(1);
-    i_Start_Capture(1) <= reg_global(1);
+    i_Start_Capture    <= (others => reg_global(1));
+    enable_high_filter <= (others => reg_global(30));
 
-    reset                 <= (not locked) or reset_wire;
-    enable_high_filter(0) <= reg_global(30);
-    enable_high_filter(1) <= reg_global(30);
-    continuous_injection  <= reg_global(29);
+    continuous_injection <= reg_global(29);
 
     ------------------------------------------
     -- Instantiate the okHost and connect endpoints
@@ -398,59 +407,86 @@ begin
             o_ready                => ready_fast_injection
         );
 
-    ------------------------------------------
-    --  ADC to keeper
-    ------------------------------------------  
+    ----------------------------------------------------------------------ADC unconnect-------------------------------------------
+    -------------------------------------------------------------------------------------------------------------------------------
+    --    ------------------------------------------
+    --    --  ADC to keeper
+    --    ------------------------------------------  
+    --    generate_ADC_enabled : if Enable_ADC_Driver generate
+    --        generate_label_Rx_fe_ads7049_and : for N in 0 to Detector_Number - 1 generate
+    --            label_read_ADC : entity work.Rx_fe_ads7049_and
+    --                port map(
+    --                    --global
+    --                    clk        => clk_32Mhz,
+    --                    rst        => reset,
+    --                    --IO ADC
+    --                    o_sck      => o_sck(N),
+    --                    o_cs_n     => o_cs_n(N),
+    --                    i_sdi      => i_sdi(N),
+    --                    --out
+    --                    o_data_rx  => data_rx(N),
+    --                    o_ready_rx => ready_rx(N)
+    --                );
+    --        end generate generate_label_Rx_fe_ads7049_and;
+    --    end generate generate_ADC_enabled;
+    --
+    --    generate_ADC_disabled : if not Enable_ADC_Driver generate
+    --        o_sck    <= (others => 'Z');
+    --        o_cs_n   <= (others => 'Z');
+    --        data_rx  <= (others => (others => '0'));
+    --        ready_rx <= (others => '0');
+    --    end generate generate_ADC_disabled;
 
-    --    label_read_ADC : entity work.Rx_fe_ads7049_and
-    --        port map(
-    --            --global
-    --            clk        => clk_32Mhz,
-    --            rst        => reset,
-    --            --IO ADC
-    --            o_sck      => o_sck,
-    --            o_cs_n     => o_cs_n,
-    --            i_sdi      => i_sdi,
-    --            --out
-    --            o_data_rx  => data_rx,
-    --            o_ready_rx => ready_rx
-    --        );
+    --    ------------------------------------------
+    --    --  keep data from ADC to CDC
+    --    ------------------------------------------ 
+    --    generate_ADC_keeper_enabled : if Enable_ADC_Driver generate
+    --        generate_label_keep_data_from_ADC : for N in 0 to Detector_Number - 1 generate
+    --            label_keep_data_from_ADC : process(clk_32Mhz, reset) is --  i_sck_rx replace clk_32Mhz
+    --            begin
+    --                if reset = '1' then
+    --                    data_rx_keeped(N)  <= (others => '0');
+    --                    ready_rx_keeped(N) <= '0';
+    --                    view_data_rx       <= (others => '0');
+    --                elsif rising_edge(clk_32Mhz) then --  i_sck_rx replace clk_32Mhz
+    --                    if ready_rx(N) = '1' then
+    --                        ready_rx_keeped(N) <= '1';
+    --                        data_rx_keeped(N)  <= '0' & data_rx(N) & b"000";
+    --                    --data_rx_keeped  <= data_rx & b"0000";
+    --                    --view_data_rx    <= data_rx;
+    --                    else
+    --                        ready_rx_keeped(N) <= '0';
+    --                    end if;
+    --                end if;
+    --            end process;
+    --        end generate generate_label_keep_data_from_ADC;
+    --    end generate generate_ADC_keeper_enabled;
+    --
+    --    generate_ADC_keeper_disabled : if not Enable_ADC_Driver generate
+    --        data_rx_keeped  <= (others => (others => '0'));
+    --        ready_rx_keeped <= (others => '0');
+    --        view_data_rx    <= (others => '0');
+    --    end generate generate_ADC_keeper_disabled;
 
-    ------------------------------------------
-    --  keep data from ADC to CDC
-    ------------------------------------------ 
-
-    --    label_keep_data_from_ADC : process(clk_32Mhz, reset) is --  i_sck_rx replace clk_32Mhz
-    --    begin
-    --        if reset = '1' then
-    --            data_rx_keeped  <= (others => '0');
-    --            ready_rx_keeped <= '0';
-    --            view_data_rx    <= (others => '0');
-    --        elsif rising_edge(clk_32Mhz) then --  i_sck_rx replace clk_32Mhz
-    --            if ready_rx = '1' then
-    --                ready_rx_keeped <= '1';
-    --                data_rx_keeped  <= '0' & data_rx & b"000";
-    --                --data_rx_keeped  <= data_rx & b"0000";
-    --                --view_data_rx    <= data_rx;
-    --            else
-    --                ready_rx_keeped <= '0';
-    --            end if;
-    --        end if;
-    --    end process;
+    ------------------------------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------------------------------
 
     ------------------------------------------
     --  MUX ADC OR Injection
     ------------------------------------------  
-
-    --label_mux_science_data : i_data_CDC   <= signed(data_rx_keeped) when reg_global(31) = '1' else ('0' & data_fast_injection & b"000");
-    label_mux_science_data : i_data_CDC   <= ('0' & data_fast_injection & b"000");
-    --label_mux_science_ready : i_ready_CDC <= ready_rx_keeped when reg_global(31) = '1' else ready_fast_injection;
-    label_mux_science_ready : i_ready_CDC <= ready_fast_injection;
-
+    generate_label_mux_science_data : for N in 0 to Detector_Number - 1 generate
+        --        label_mux_science_data : i_data_CDC(N) <= signed(data_rx_keeped(N)) when (Enable_ADC_Driver and (reg_global(31) = '1')) else ('0' & data_fast_injection & b"000");
+        label_mux_science_data : i_data_CDC(N) <= ('0' & data_fast_injection & b"000");
+    end generate generate_label_mux_science_data;
+    --
+    generate_label : for N in 0 to Detector_Number - 1 generate
+        --        label_mux_science_ready : i_ready_CDC(N) <= ready_rx_keeped(N) when (Enable_ADC_Driver and (reg_global(31) = '1')) else ready_fast_injection;
+        label_mux_science_ready : i_ready_CDC(N) <= ready_fast_injection;
+    end generate generate_label;
     ------------------------------------------
     --  EP
     ------------------------------------------
-    generate_EP : for N IN 1 downto 0 generate
+    generate_EP : for N in 0 to Detector_Number - 1 generate
         label_Ep : entity work.EP
             port map(
                 -- global
@@ -461,11 +497,10 @@ begin
                 --i_data_rx_keeped          => signed(data_rx_keeped),
                 -- global select spectrum
                 i_clk_synchro_spectrum       => clk_synchro_spectrum,
-                i_detector_number            => To_unsigned(N, 1),
-                i_filter_number              => std_logic_vector(To_unsigned(N, 1)),
+                i_detector_number            => To_unsigned(N, Detector_Number_Width),
+                --i_filter_number              => std_logic_vector(To_unsigned(N, 2)),
                 -- input param trigger pick detect energy
-                i_gain                       => unsigned(i_gain(N)),
-                i_gain_high_frequency        => unsigned(i_gain_high_frequency(N)),
+                i_gain                       => i_gain(N),
                 i_TH_ADC                     => TH_ADC,
                 i_TH_rise                    => TH_rise,
                 i_TH_fall                    => TH_fall,
@@ -473,8 +508,8 @@ begin
                 i_TH_rise_high_frequency     => TH_rise_high_frequency,
                 i_TH_fall_high_frequency     => TH_fall_high_frequency,
                 -- input Data science
-                i_ready_CDC                  => i_ready_CDC,
-                i_data_CDC                   => i_data_CDC,
+                i_ready_CDC                  => i_ready_CDC(N),
+                i_data_CDC                   => i_data_CDC(N),
                 -- out view 
                 --o_data_after_gain         => data_after_gain(N),
                 o_ready_after_gain           => ready_after_gain(N),
@@ -499,15 +534,62 @@ begin
     --  mux data spectrum packet
     ------------------------------------------ 
 
-    pipe_out_spectrum_din   <= o_pipe_out_spectrum_din(0) when o_pipe_out_spectrum_wr_en(0) = '1' else o_pipe_out_spectrum_din(1) when o_pipe_out_spectrum_wr_en(1) = '1';
-    pipe_out_spectrum_wr_en <= o_pipe_out_spectrum_wr_en(0) or o_pipe_out_spectrum_wr_en(1);
+    --    pipe_out_spectrum_din   <= o_pipe_out_spectrum_din(0) when o_pipe_out_spectrum_wr_en(0) = '1' else o_pipe_out_spectrum_din(1) when o_pipe_out_spectrum_wr_en(1) = '1';
+    --    pipe_out_spectrum_wr_en <= o_pipe_out_spectrum_wr_en(0) or o_pipe_out_spectrum_wr_en(1);
+
+    lebel_process_mux_data_spectrum_packet : process(sys_clk, reset) is
+    begin
+        if reset = '1' then
+            -- 1. Valeurs par défaut si aucun wr_en n'est actif
+            pipe_out_spectrum_wr_en <= '0';
+            pipe_out_spectrum_din   <= (others => '0');
+
+        elsif rising_edge(sys_clk) then
+            -- 1. Valeurs par défaut si aucun wr_en n'est actif
+            pipe_out_spectrum_wr_en <= '0';
+            pipe_out_spectrum_din   <= (others => '0');
+
+            -- 2. Boucle de priorité (0 à Detector_Number-1)
+            -- Le dernier canal avec wr_en='1' l'emporte
+            for i in 0 to (Detector_Number - 1) loop
+                if o_pipe_out_spectrum_wr_en(i) = '1' then
+                    pipe_out_spectrum_din   <= o_pipe_out_spectrum_din(i);
+                    pipe_out_spectrum_wr_en <= '1'; -- Devient '1' dès qu'au moins un canal est actif
+                end if;
+            end loop;
+
+        end if;
+    end process;
 
     ------------------------------------------
     --  mux data spectrum packet SD
     ------------------------------------------ 
 
-    pipe_out_spectrum_sd_din   <= o_pipe_out_spectrum_sd_din(0) when o_pipe_out_spectrum_sd_wr_en(0) = '1' else o_pipe_out_spectrum_sd_din(1) when o_pipe_out_spectrum_sd_wr_en(1) = '1';
-    pipe_out_spectrum_sd_wr_en <= o_pipe_out_spectrum_sd_wr_en(0) or o_pipe_out_spectrum_sd_wr_en(1);
+    --    pipe_out_spectrum_sd_din   <= o_pipe_out_spectrum_sd_din(0) when o_pipe_out_spectrum_sd_wr_en(0) = '1' else o_pipe_out_spectrum_sd_din(1) when o_pipe_out_spectrum_sd_wr_en(1) = '1';
+    --    pipe_out_spectrum_sd_wr_en <= o_pipe_out_spectrum_sd_wr_en(0) or o_pipe_out_spectrum_sd_wr_en(1);
+
+    lebel_process_mux_data_spectrum_packet_SD : process(sys_clk, reset) is
+    begin
+        if reset = '1' then
+            -- 1. Valeurs par défaut si aucun wr_en n'est actif
+            pipe_out_spectrum_sd_wr_en <= '0';
+            pipe_out_spectrum_sd_din   <= (others => '0');
+
+        elsif rising_edge(sys_clk) then
+            -- 1. Valeurs par défaut (si aucun signal wr_en n'est actif)
+            pipe_out_spectrum_sd_wr_en <= '0';
+            pipe_out_spectrum_sd_din   <= (others => '0');
+
+            -- 2. Boucle de priorité de 0 à Detector_Number-1
+            for i in 0 to (Detector_Number - 1) loop
+                if o_pipe_out_spectrum_sd_wr_en(i) = '1' then
+                    pipe_out_spectrum_sd_din   <= o_pipe_out_spectrum_sd_din(i);
+                    pipe_out_spectrum_sd_wr_en <= '1'; -- Reste à '1' si au moins un canal est actif
+                end if;
+            end loop;
+
+        end if;
+    end process;
 
     ------------------------------------------
     --  process 
@@ -534,7 +616,7 @@ begin
     ------------------------------------------
     --  FSM raw data
     ------------------------------------------
-    generate_label_FSM_raw_data : for N IN 1 downto 0 generate
+    generate_label_FSM_raw_data : for N in 0 to Detector_Number - 1 generate
         label_FSM_raw_data : entity work.FSM_raw_data
             port map(
                 --global
@@ -554,7 +636,7 @@ begin
             );
     end generate generate_label_FSM_raw_data;
 
-    empty_raw_data <= empty_fifo_pipe_out_raw_data(0) and empty_fifo_pipe_out_raw_data(1);
+    empty_raw_data <= and_reduce(empty_fifo_pipe_out_raw_data); -- and_reduce fait un ET logique sur tous les bits d’un vecteur.
 
     --    generate_din_fifo_raw_data : for N IN 1 downto 0 generate
     --        label_din_fifo_raw_data : din_fifo_raw_data(N) <= data_after_energy_level(N) & data_before_filter(N);
@@ -563,7 +645,7 @@ begin
     ------------------------------------------
     --  process generate_din_fifo_raw_data
     ------------------------------------------ 
-    generate_din_fifo_raw_data : for N IN 1 downto 0 generate
+    generate_din_fifo_raw_data : for N in 0 to Detector_Number - 1 generate
         label_trigger : process(sys_clk, reset) is
         begin
             if reset = '1' then
@@ -577,7 +659,7 @@ begin
     ------------------------------------------
     --  process trigger raw data
     ------------------------------------------ 
-    generate_label_trigger : for N IN 1 downto 0 generate
+    generate_label_trigger : for N in 0 to Detector_Number - 1 generate
         label_trigger : process(sys_clk, reset) is
         begin
             if reset = '1' then
@@ -594,41 +676,26 @@ begin
     end generate generate_label_trigger;
 
     ------------------------------------------
-    --  map DAC121S101_Driver
-    ------------------------------------------    
-    label_DAC121S101_Driver : entity work.DAC121S101_Driver
-        port map(
-            i_Rst_n      => not reset,
-            i_Clk        => clk_1KHz,
-            --remote DAC
-            i_Start      => Start,
-            o_Busy       => Busy,
-            i_Num_Data   => Num_Data,
-            --DAC
-            o_DAC_SCLK   => o_DAC_SCLK,
-            o_DAC_SYNC_n => o_DAC_SYNC_n,
-            o_DAC_DIN    => o_DAC_DIN
-        );
-
-    o_DAC_on_off <= Num_Data(0);
-
-    ------------------------------------------
     --  remote DAC121S101_Driver
     ------------------------------------------
-    label_remote_DAC121S101_Driver : entity work.remote_DAC121S01_driver
-        port map(
-            i_Rst_n       => not reset,
-            i_Clk         => clk_1KHz,
-            o_Start       => Start,
-            i_Busy        => Busy,
-            o_Num_Data    => Num_Data,
-            level_DAC121S => level_DAC121S
-        );
+    generate_label_Top_DAC121S101_Driver : for N in 0 to Detector_Number - 1 generate
+        label_Top_DAC121S101_Driver : entity work.Top_DAC121S101_Driver
+            port map(
+                i_reset         => reset,
+                i_clk           => clk_1KHz,
+                i_level_DAC121S => level_DAC121S,
+                o_DAC_SCLK      => o_DAC_SCLK(N),
+                o_DAC_SYNC_n    => o_DAC_SYNC_n(N),
+                o_DAC_DIN       => o_DAC_DIN(N),
+                o_DAC_on_off    => o_DAC_on_off(N)
+            );
+
+    end generate generate_label_Top_DAC121S101_Driver;
 
     ------------------------------------------
     --  FIFO pipe_out data science
     ------------------------------------------
-    generate_fifo_pipe_out_science_raw_data : for N IN 1 downto 0 generate
+    generate_fifo_pipe_out_science_raw_data : for N in 0 to Detector_Number - 1 generate
         fifo_pipe_out_science : entity work.fifo_pipe_out_w32_2048_r32_2048_k160
             port map(
                 rst           => reset,
@@ -650,7 +717,7 @@ begin
     --  FIFO pipe_out spectrum
     ------------------------------------------
 
-    fifo_pipe_out_spectrum : entity work.fifo_pipe_out_w32_4096_r32_4096_k160
+    fifo_pipe_out_spectrum : entity work.fifo_pipe_out_w32_8192_r32_8192_k160
         port map(
             rst           => reset,
             wr_clk        => sys_clk,
@@ -671,7 +738,7 @@ begin
     --  FIFO pipe_out spectrum standard definition
     ------------------------------------------
 
-    fifo_pipe_out_spectrum_SD : entity work.fifo_pipe_out_w32_2048_r32_2048_k160
+    fifo_pipe_out_spectrum_SD : entity work.fifo_pipe_out_w32_4096_r32_4096_k160
         port map(
             rst           => reset,
             wr_clk        => sys_clk,
@@ -707,17 +774,17 @@ begin
             ---
             o_reg_config            => reg_config,
             ----
-            o_gain                  => gain
+            o_gain                  => i_gain
         );
 
     ------------------------------------------
     --  wrappe FSM_read_config to register
     ------------------------------------------
 
-    i_coef_fir_ready(0)    <= coef_fir_ready;
-    i_coef_fir_ready(1)    <= coef_fir_ready;
-    i_gain                 <= gain(0);
-    i_gain_high_frequency  <= gain(1);
+    i_coef_fir_ready <= (others => coef_fir_ready);
+
+    --i_gain                 <= gain(0);
+    --i_gain_high_frequency  <= gain(1);
     ----------------------------------
     --reg_global               <= reg_config(0);
     ep01wire               <= reg_config(1);
@@ -752,7 +819,7 @@ begin
     ------------------------------------------
     --  wire out for FIFO pipe out science, wire out for FIFO pipe out spectrum
     ------------------------------------------
-    generate_label_process_inter_wire : for N IN 1 downto 0 generate
+    generate_label_process_inter_wire : for N in 0 to Detector_Number - 1 generate
         label_process_inter_wire : process(sys_clk, reset) is
         begin
             if reset = '1' then
@@ -764,9 +831,9 @@ begin
             --ep24wire <= (others => '0');
             elsif rising_edge(sys_clk) then
                 fifo_count_raw_data(N)         <= "000000000000000000000" & rd_fifo_pipe_out_data_count_raw_data(N);
-                fifo_data_count_spectrum       <= "00000000000000000000" & pipe_out_rd_data_count_spectrum;
+                fifo_data_count_spectrum       <= "0000000000000000000" & pipe_out_rd_data_count_spectrum;
                 reg_spectrum_count_pulse(N)    <= spectrum_count_pulse(N);
-                fifo_data_count_spectrum_sd    <= "000000000000000000000" & pipe_out_rd_data_count_spectrum_sd;
+                fifo_data_count_spectrum_sd    <= "00000000000000000000" & pipe_out_rd_data_count_spectrum_sd;
                 reg_spectrum_sd_count_pulse(N) <= spectrum_sd_count_pulse(N);
 
                 --ep23wire <= "000000000000000000000" & rd_fifo_pipe_out_data_count_raw_data(1);
@@ -796,7 +863,7 @@ begin
     -------------------------------------------------------------------------
 
     --  okwire OR
-    okWO : okWireOR generic map(N => 14) port map(okEH => okEH, okEHx => okEHx);
+    okWO : okWireOR generic map(N => 18) port map(okEH => okEH, okEHx => okEHx);
     --  reset, start_capture
     ep00 : okWireIn port map(okHE => okHE, ep_addr => x"00", ep_dataout => reg_global);
     --  level DAC121S 
@@ -841,5 +908,18 @@ begin
     ep28 : okWireOut port map(okHE => okHE, okEH => okEHx(13 * 65 - 1 downto 12 * 65), ep_addr => x"28", ep_datain => reg_spectrum_sd_count_pulse(0));
     --  read wire out spectrum_count_pulse sd
     ep29 : okWireOut port map(okHE => okHE, okEH => okEHx(14 * 65 - 1 downto 13 * 65), ep_addr => x"29", ep_datain => reg_spectrum_sd_count_pulse(1));
+
+    -----------------------------------------------------------------------------
+    --  Extanded to seven
+    -----------------------------------------------------------------------------
+
+    --  pipe out raw data
+    --  read wire out for FIFO pipe out science.
+    ep30 : okWireOut port map(okHE => okHE, okEH => okEHx(15 * 65 - 1 downto 14 * 65), ep_addr => x"30", ep_datain => fifo_count_raw_data(2));
+    epA6 : okPipeOut port map(okHE => okHE, okEH => okEHx(16 * 65 - 1 downto 15 * 65), ep_addr => x"A6", ep_read => rd_en_fifo_pipe_out_raw_data(2), ep_datain => dout_fifo_pipe_out_raw_data(2));
+
+    --  read wire out for FIFO pipe out science.
+    ep31 : okWireOut port map(okHE => okHE, okEH => okEHx(17 * 65 - 1 downto 16 * 65), ep_addr => x"31", ep_datain => fifo_count_raw_data(3));
+    epA7 : okPipeOut port map(okHE => okHE, okEH => okEHx(18 * 65 - 1 downto 17 * 65), ep_addr => x"A7", ep_read => rd_en_fifo_pipe_out_raw_data(3), ep_datain => dout_fifo_pipe_out_raw_data(3));
 
 end arch;

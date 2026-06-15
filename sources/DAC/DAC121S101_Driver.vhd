@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 ------------------------------------------------------------------------------------------------------------
 -- Driver for DAC121S101 12-bit Digital-to-Analog Converter
 
@@ -54,6 +66,8 @@ architecture RTL of DAC121S101_Driver is
     -- DAC Control Registers
     signal SPI_Bit_Number_cnt : unsigned(3 downto 0); -- 16-bit standard SPI protocol, MSB first
     signal SPI_Sent_Data      : std_logic_vector(11 downto 0); -- 12-bit unsigned data
+    
+    
 
 begin
 

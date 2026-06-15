@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -15,7 +27,7 @@ entity spectrum_FSM is
         -- global
         i_clk_slow                : in  std_logic;
         i_reset                   : in  std_logic;
-        i_filter_number           : in  std_logic_vector(0 downto 0);
+        i_filter_number           : in  unsigned;
         -- synchro_spectrum
         i_clk_synchro_spectrum    : in  std_logic;
         i_detector_number         : in  unsigned;
@@ -140,7 +152,7 @@ begin
 
                         when 0 =>       -- write ID
                             o_pipe_out_spectrum_wr_en <= '1';
-                            o_pipe_out_spectrum_din   <= "1000" & "000" & i_filter_number & x"0000" & "0000000" & i_set_synchro_spectrum;
+                            o_pipe_out_spectrum_din   <= "1000" & "0" & std_logic_vector(i_detector_number) & std_logic_vector(i_filter_number) & x"0000" & "0000000" & i_set_synchro_spectrum;
 
                             o_spectrum_count_pulse <= spectrum_count_pulse;
                         --------------------------------------------------------

@@ -24,6 +24,8 @@ use std.textio.all;
 use work.mappings.all;
 use work.parameters.all;
 
+use work.UT_EGSE_EP_Package.all;
+
 entity sim_tf is
 end sim_tf;
 
@@ -31,24 +33,25 @@ architecture simulate of sim_tf is
 
     component TUT_EGSE is
         port(
-            okUH         : in    STD_LOGIC_VECTOR(4 downto 0);
-            okHU         : out   STD_LOGIC_VECTOR(2 downto 0);
-            okUHU        : inout STD_LOGIC_VECTOR(31 downto 0);
-            okAA         : inout STD_LOGIC; --removed for simulation
-            -- clock OK
-            sys_clkp     : in    STD_LOGIC;
-            sys_clkn     : in    STD_LOGIC;
---            -- AD7049
---            o_sck        : out   STD_LOGIC;
---            o_cs_n       : out   STD_LOGIC;
---            i_sdi        : in    STD_LOGIC;
-            led          : out   STD_LOGIC_VECTOR(7 downto 0);
---            i_sck_rx     : in    STD_LOGIC;
---            o_sck_rx     : out   STD_LOGIC;
-            -- DAC121S
-            o_DAC_SCLK   : out   STD_LOGIC;
-            o_DAC_SYNC_n : out   STD_LOGIC;
-            o_DAC_DIN    : out   STD_LOGIC
+        okUH         : in    STD_LOGIC_VECTOR(4 downto 0);
+        okHU         : out   STD_LOGIC_VECTOR(2 downto 0);
+        okUHU        : inout STD_LOGIC_VECTOR(31 downto 0);
+        okAA         : inout STD_LOGIC; --removed for simulation
+        -- clock OK
+        sys_clkp     : in    STD_LOGIC;
+        sys_clkn     : in    STD_LOGIC;
+--        -- AD7049
+--        o_sck        : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+--        o_cs_n       : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+--        i_sdi        : in    STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        
+        led          : out   STD_LOGIC_VECTOR(3 downto 0);
+        
+        -- DAC121S
+        o_DAC_SCLK   : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        o_DAC_SYNC_n : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        o_DAC_DIN    : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        o_DAC_on_off : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0)
         );
     end component;
 
@@ -86,12 +89,15 @@ architecture simulate of sim_tf is
     signal pipeInSize_count_config   : integer;
     signal pipeInSize_count_config_1 : integer;
     signal sck                       : STD_LOGIC;
-    signal cnv                       : STD_LOGIC;
+    signal sck_vec                   : std_logic_vector(Detector_Number - 1 downto 0);
+    signal cs_n_vec                  : std_logic_vector(Detector_Number - 1 downto 0);
+    --signal cnv                       : STD_LOGIC;
     signal sdo                       : STD_LOGIC;
     signal sys_clk                   : std_logic;
     signal cs_n                      : std_logic;
-    signal i_sck_rx                  : std_logic;
-    signal o_sck_rx                  : std_logic;
+    --signal i_sck_rx                  : std_logic;
+    --signal o_sck_rx                  : std_logic;
+    signal sdo_vec : std_logic_vector(Detector_Number - 1 downto 0);
 
     ---------------------------------------------------------------------------------------------
 
@@ -108,26 +114,34 @@ begin
 
     Reset <= '1', '0' after 100 ns;
 
-    inst_DUT : TUT_EGSE
-        port map(
-            okUH     => okUH,           --: in    STD_LOGIC_VECTOR (4  downto 0);           -- input  wire [4:0]   okUH,
-            okHU     => okHU,           --: out   STD_LOGIC_VECTOR (2  downto 0);           -- output wire [2:0]   okHU,
-            okUHU    => okUHU,          --: inout STD_LOGIC_VECTOR (31 downto 0);           -- inout  wire [31:0]  okUHU,
-            --      okAA        --: inout STD_LOGIC;                                -- inout  wire         okAA,                    REMOVED FOR SIMULATION
+sdo_vec <= (others => sdo);
 
-            sys_clkp => sys_clkp,
-            sys_clkn => sys_clkn,
---            o_sck    => sck,
---            o_cs_n   => cs_n,
---            i_sdi    => sdo,
-            led      => open,
---            i_sck_rx => sck,
---            o_sck_rx => o_sck_rx,
-            -- DAC121S
-            o_DAC_SCLK   => open,
-            o_DAC_SYNC_n => open,
-            o_DAC_DIN    => open
-        );
+inst_DUT : TUT_EGSE
+    port map(
+        okUH  => okUH,
+        okHU  => okHU,
+        okUHU => okUHU,
+        okAA  => open,
+
+        sys_clkp => sys_clkp,
+        sys_clkn => sys_clkn,
+
+--        -- ADC ADS7049
+--        o_sck  => sck_vec,
+--        o_cs_n => cs_n_vec,
+--        i_sdi => sdo_vec,
+
+        led => open,
+
+        -- DAC121S
+        o_DAC_SCLK   => open,
+        o_DAC_SYNC_n => open,
+        o_DAC_DIN    => open,
+        o_DAC_on_off => open
+    );
+
+sck <= sck_vec(0);
+cs_n <= cs_n_vec(0);
 
     ---------------------------------------------------------------------------------------------------------------------------------
     --
@@ -1025,11 +1039,11 @@ begin
         FrontPanelReset;
         wait for 1 ns;
 
-        SetWireInValue(x"00", x"0000_0001", NO_MASK); -- Reset all design
+        SetWireInValue(x"00", x"8000_0001", NO_MASK); -- Reset all design
         UpdateWireIns;
-        SetWireInValue(x"00", x"0000_0000", NO_MASK); -- unReset all design 
+        SetWireInValue(x"00", x"8000_0000", NO_MASK); -- unReset all design 
         UpdateWireIns;
-        SetWireInValue(x"00", x"0000_0000", NO_MASK); -- set input ADC or Injection  
+        SetWireInValue(x"00", x"8000_0000", NO_MASK); -- set input ADC or Injection  
         UpdateWireIns;
 
         --wait for 700 us;                -- write raw data fifo almost full 

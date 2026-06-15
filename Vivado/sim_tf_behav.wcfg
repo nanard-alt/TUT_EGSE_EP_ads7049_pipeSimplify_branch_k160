@@ -15,22 +15,22 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="8.157994750 ms"></ZoomStartTime>
-      <ZoomEndTime time="22.797407744 ms"></ZoomEndTime>
-      <Cursor1Time time="27.928124000 ms"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="462.615101 us"></ZoomEndTime>
+      <Cursor1Time time="1,036.826000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="348"></NameColumnWidth>
-      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+      <ValueColumnWidth column_width="100"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="114" />
+   <WVObjectSize size="170" />
    <wvobject fp_name="/sim_tf/inst_DUT/i_gain" type="array">
-      <obj_property name="ElementShortName">i_gain[0:1][31:0]</obj_property>
-      <obj_property name="ObjectShortName">i_gain[0:1][31:0]</obj_property>
+      <obj_property name="ElementShortName">i_gain[0:3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain[0:3][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/i_gain_high_frequency" type="array">
-      <obj_property name="ElementShortName">i_gain_high_frequency[0:1][31:0]</obj_property>
-      <obj_property name="ObjectShortName">i_gain_high_frequency[0:1][31:0]</obj_property>
+      <obj_property name="ElementShortName">i_gain_high_frequency[0:3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain_high_frequency[0:3][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/ep01wire" type="array">
       <obj_property name="ElementShortName">ep01wire[31:0]</obj_property>
@@ -191,8 +191,8 @@
       <obj_property name="label">wehn else injection adc</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <wvobject fp_name="/sim_tf/inst_DUT/i_data_CDC" type="array">
-         <obj_property name="ElementShortName">i_data_CDC[15:0]</obj_property>
-         <obj_property name="ObjectShortName">i_data_CDC[15:0]</obj_property>
+         <obj_property name="ElementShortName">i_data_CDC[3:0][15:0]</obj_property>
+         <obj_property name="ObjectShortName">i_data_CDC[3:0][15:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject type="divider" fp_name="divider54">
@@ -200,13 +200,13 @@
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/i_data_CDC" type="array">
-      <obj_property name="ElementShortName">i_data_CDC[15:0]</obj_property>
-      <obj_property name="ObjectShortName">i_data_CDC[15:0]</obj_property>
+      <obj_property name="ElementShortName">i_data_CDC[3:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_CDC[3:0][15:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/data_rx_keeped" type="array">
-      <obj_property name="ElementShortName">data_rx_keeped[15:0]</obj_property>
-      <obj_property name="ObjectShortName">data_rx_keeped[15:0]</obj_property>
+      <obj_property name="ElementShortName">data_rx_keeped[3:0][15:0]</obj_property>
+      <obj_property name="ObjectShortName">data_rx_keeped[3:0][15:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/data_fast_injection" type="array">
       <obj_property name="ElementShortName">data_fast_injection[11:0]</obj_property>
@@ -475,17 +475,17 @@
    <wvobject type="divider" fp_name="divider108">
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/dout_fifo_pipe_out_raw_data" type="array">
-      <obj_property name="ElementShortName">dout_fifo_pipe_out_raw_data[0:1][31:0]</obj_property>
-      <obj_property name="ObjectShortName">dout_fifo_pipe_out_raw_data[0:1][31:0]</obj_property>
+      <obj_property name="ElementShortName">dout_fifo_pipe_out_raw_data[0:3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">dout_fifo_pipe_out_raw_data[0:3][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/fifo_count_raw_data" type="array">
-      <obj_property name="ElementShortName">fifo_count_raw_data[0:1][31:0]</obj_property>
-      <obj_property name="ObjectShortName">fifo_count_raw_data[0:1][31:0]</obj_property>
+      <obj_property name="ElementShortName">fifo_count_raw_data[0:3][31:0]</obj_property>
+      <obj_property name="ObjectShortName">fifo_count_raw_data[0:3][31:0]</obj_property>
       <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/i_level_trigger" type="array">
-      <obj_property name="ElementShortName">i_level_trigger[1:0]</obj_property>
-      <obj_property name="ObjectShortName">i_level_trigger[1:0]</obj_property>
+      <obj_property name="ElementShortName">i_level_trigger[3:0]</obj_property>
+      <obj_property name="ObjectShortName">i_level_trigger[3:0]</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider130">
       <obj_property name="label">FSM_raw_data</obj_property>
@@ -561,11 +561,231 @@
    <wvobject type="divider" fp_name="divider139">
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/empty_fifo_pipe_out_raw_data" type="array">
-      <obj_property name="ElementShortName">empty_fifo_pipe_out_raw_data[1:0]</obj_property>
-      <obj_property name="ObjectShortName">empty_fifo_pipe_out_raw_data[1:0]</obj_property>
+      <obj_property name="ElementShortName">empty_fifo_pipe_out_raw_data[3:0]</obj_property>
+      <obj_property name="ObjectShortName">empty_fifo_pipe_out_raw_data[3:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/sim_tf/inst_DUT/rd_fifo_pipe_out_data_count_raw_data" type="array">
-      <obj_property name="ElementShortName">rd_fifo_pipe_out_data_count_raw_data[1:0][10:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_fifo_pipe_out_data_count_raw_data[1:0][10:0]</obj_property>
+      <obj_property name="ElementShortName">rd_fifo_pipe_out_data_count_raw_data[4:0][10:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_fifo_pipe_out_data_count_raw_data[4:0][10:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider134">
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_clk_fast" type="logic">
+      <obj_property name="ElementShortName">i_clk_fast</obj_property>
+      <obj_property name="ObjectShortName">i_clk_fast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_clk_synchro_spectrum" type="logic">
+      <obj_property name="ElementShortName">i_clk_synchro_spectrum</obj_property>
+      <obj_property name="ObjectShortName">i_clk_synchro_spectrum</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_detector_number" type="array">
+      <obj_property name="ElementShortName">i_detector_number[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_detector_number[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_filter_number" type="array">
+      <obj_property name="ElementShortName">i_filter_number[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_filter_number[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_gain" type="array">
+      <obj_property name="ElementShortName">i_gain[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_gain_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_gain_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_TH_ADC" type="array">
+      <obj_property name="ElementShortName">i_TH_ADC[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_ADC[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_TH_rise" type="array">
+      <obj_property name="ElementShortName">i_TH_rise[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_rise[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_TH_fall" type="array">
+      <obj_property name="ElementShortName">i_TH_fall[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_fall[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_TH_rise_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_TH_rise_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_rise_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_TH_fall_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_TH_fall_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_fall_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_ready_CDC" type="logic">
+      <obj_property name="ElementShortName">i_ready_CDC</obj_property>
+      <obj_property name="ObjectShortName">i_ready_CDC</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_data_CDC" type="array">
+      <obj_property name="ElementShortName">i_data_CDC[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_CDC[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_ready_after_gain" type="logic">
+      <obj_property name="ElementShortName">o_ready_after_gain</obj_property>
+      <obj_property name="ObjectShortName">o_ready_after_gain</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_enable_high_filter" type="logic">
+      <obj_property name="ElementShortName">i_enable_high_filter</obj_property>
+      <obj_property name="ObjectShortName">i_enable_high_filter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_coef_fir" type="array">
+      <obj_property name="ElementShortName">i_coef_fir[0:1][0:31][15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_coef_fir[0:1][0:31][15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/i_coef_fir_ready" type="logic">
+      <obj_property name="ElementShortName">i_coef_fir_ready</obj_property>
+      <obj_property name="ObjectShortName">i_coef_fir_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_data_before_filter" type="array">
+      <obj_property name="ElementShortName">o_data_before_filter[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_before_filter[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_pipe_out_spectrum_din" type="array">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_pipe_out_spectrum_wr_en" type="logic">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_wr_en</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_spectrum_count_pulse" type="array">
+      <obj_property name="ElementShortName">o_spectrum_count_pulse[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_spectrum_count_pulse[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_data_after_energy_level" type="array">
+      <obj_property name="ElementShortName">o_data_after_energy_level[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_after_energy_level[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_pipe_out_spectrum_sd_din" type="array">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_sd_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_sd_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_pipe_out_spectrum_sd_wr_en" type="logic">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_sd_wr_en</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_sd_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(0)\/label_Ep/o_spectrum_sd_count_pulse" type="array">
+      <obj_property name="ElementShortName">o_spectrum_sd_count_pulse[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_spectrum_sd_count_pulse[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider180">
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_clk_slow" type="logic">
+      <obj_property name="ElementShortName">i_clk_slow</obj_property>
+      <obj_property name="ObjectShortName">i_clk_slow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_clk_fast" type="logic">
+      <obj_property name="ElementShortName">i_clk_fast</obj_property>
+      <obj_property name="ObjectShortName">i_clk_fast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_reset" type="logic">
+      <obj_property name="ElementShortName">i_reset</obj_property>
+      <obj_property name="ObjectShortName">i_reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_clk_synchro_spectrum" type="logic">
+      <obj_property name="ElementShortName">i_clk_synchro_spectrum</obj_property>
+      <obj_property name="ObjectShortName">i_clk_synchro_spectrum</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_detector_number" type="array">
+      <obj_property name="ElementShortName">i_detector_number[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_detector_number[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_filter_number" type="array">
+      <obj_property name="ElementShortName">i_filter_number[0:0]</obj_property>
+      <obj_property name="ObjectShortName">i_filter_number[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_gain" type="array">
+      <obj_property name="ElementShortName">i_gain[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_gain_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_gain_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_gain_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_TH_ADC" type="array">
+      <obj_property name="ElementShortName">i_TH_ADC[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_ADC[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_TH_rise" type="array">
+      <obj_property name="ElementShortName">i_TH_rise[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_rise[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_TH_fall" type="array">
+      <obj_property name="ElementShortName">i_TH_fall[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_fall[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_TH_rise_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_TH_rise_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_rise_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_TH_fall_high_frequency" type="array">
+      <obj_property name="ElementShortName">i_TH_fall_high_frequency[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i_TH_fall_high_frequency[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_ready_CDC" type="logic">
+      <obj_property name="ElementShortName">i_ready_CDC</obj_property>
+      <obj_property name="ObjectShortName">i_ready_CDC</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_data_CDC" type="array">
+      <obj_property name="ElementShortName">i_data_CDC[15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_data_CDC[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_ready_after_gain" type="logic">
+      <obj_property name="ElementShortName">o_ready_after_gain</obj_property>
+      <obj_property name="ObjectShortName">o_ready_after_gain</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_enable_high_filter" type="logic">
+      <obj_property name="ElementShortName">i_enable_high_filter</obj_property>
+      <obj_property name="ObjectShortName">i_enable_high_filter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_coef_fir" type="array">
+      <obj_property name="ElementShortName">i_coef_fir[0:1][0:31][15:0]</obj_property>
+      <obj_property name="ObjectShortName">i_coef_fir[0:1][0:31][15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/i_coef_fir_ready" type="logic">
+      <obj_property name="ElementShortName">i_coef_fir_ready</obj_property>
+      <obj_property name="ObjectShortName">i_coef_fir_ready</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_data_before_filter" type="array">
+      <obj_property name="ElementShortName">o_data_before_filter[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_before_filter[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_pipe_out_spectrum_din" type="array">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_pipe_out_spectrum_wr_en" type="logic">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_wr_en</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_spectrum_count_pulse" type="array">
+      <obj_property name="ElementShortName">o_spectrum_count_pulse[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_spectrum_count_pulse[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_data_after_energy_level" type="array">
+      <obj_property name="ElementShortName">o_data_after_energy_level[15:0]</obj_property>
+      <obj_property name="ObjectShortName">o_data_after_energy_level[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_pipe_out_spectrum_sd_din" type="array">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_sd_din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_sd_din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_pipe_out_spectrum_sd_wr_en" type="logic">
+      <obj_property name="ElementShortName">o_pipe_out_spectrum_sd_wr_en</obj_property>
+      <obj_property name="ObjectShortName">o_pipe_out_spectrum_sd_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/sim_tf/inst_DUT/\generate_EP(3)\/label_Ep/o_spectrum_sd_count_pulse" type="array">
+      <obj_property name="ElementShortName">o_spectrum_sd_count_pulse[31:0]</obj_property>
+      <obj_property name="ObjectShortName">o_spectrum_sd_count_pulse[31:0]</obj_property>
    </wvobject>
 </wave_config>

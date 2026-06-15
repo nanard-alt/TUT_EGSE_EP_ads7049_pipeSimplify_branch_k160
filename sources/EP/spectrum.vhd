@@ -1,6 +1,20 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+use work.UT_EGSE_EP_Package.all;
 
 entity spectrum is
     generic(
@@ -14,7 +28,7 @@ entity spectrum is
         -- global select spectrum
         i_clk_synchro_spectrum    : in  std_logic;
         i_detector_number         : in  unsigned;
-        i_filter_number           : in  std_logic_vector(0 downto 0);
+        i_filter_number           : in  unsigned;
         -- input from detect Energy level
         --i_enable_erase            : in  std_logic;
         i_Energy_level_max        : in  signed(15 downto 0);
@@ -29,21 +43,21 @@ end entity spectrum;
 architecture RTL of spectrum is
 
     -- RAM 
-    type Array_addr_type is array (1 downto 0) of std_logic_vector((memory_add_size - 1) downto 0);
+    type Array_addr_type is array (0 to Filter_Number-1) of std_logic_vector((memory_add_size - 1) downto 0);
     signal addr : Array_addr_type;
-    type Array_di_type is array (1 downto 0) of std_logic_vector(15 downto 0);
+    type Array_di_type is array (0 to Filter_Number-1) of std_logic_vector(15 downto 0);
     signal di   : Array_di_type;
-    type Array_do_type is array (1 downto 0) of std_logic_vector(15 downto 0);
+    type Array_do_type is array (0 to Filter_Number-1) of std_logic_vector(15 downto 0);
     signal do   : Array_do_type;
-    signal we   : std_logic_vector(1 downto 0);
-    signal en   : std_logic_vector(1 downto 0);
+    signal we   : std_logic_vector(Filter_Number-1 downto 0);
+    signal en   : std_logic_vector(Filter_Number-1 downto 0);
 
     --signal stamp : unsigned(15 downto 0);
 
     -- out spectrum to fifo pipe out
-    type Array_din_type is array (1 downto 0) of std_logic_vector(31 downto 0);
+    type Array_din_type is array (0 to Filter_Number-1) of std_logic_vector(31 downto 0);
     signal pipe_out_spectrum_din    : Array_din_type;
-    signal pipe_out_spectrum_wr_en  : std_logic_vector(1 downto 0);
+    signal pipe_out_spectrum_wr_en  : std_logic_vector(Filter_Number-1 downto 0);
     signal spectrum_pulse_by_filter : Array_din_type;
 
 begin
@@ -53,7 +67,7 @@ begin
     -- File: rams_sp_nc.vhd 
     ------------------------------------------
 
-    generate_RAM : for N IN 1 downto 0 generate
+    generate_RAM : for N IN 0 to Filter_Number-1 generate
         label_rame_one : entity work.rams_sp_rf
             generic map(
                 memory_add_size => memory_add_size,
@@ -75,7 +89,7 @@ begin
     --
     ------------------------------------------
 
-    generate_label_spectrum_FSM : for N IN 1 downto 0 generate
+    generate_label_spectrum_FSM : for N IN 0 to Filter_Number-1 generate
         label_spectrum_FSM : entity work.spectrum_FSM
             generic map(
                 memory_add_size => memory_add_size,

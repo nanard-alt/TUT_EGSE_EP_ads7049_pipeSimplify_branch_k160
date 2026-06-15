@@ -41,21 +41,21 @@ def save_signal_in_file (Signal_out) :
 
 ############################### classe OK
 
-array_pipe_out = np.ones(2056).astype(int)
-array_pipe_out_sd = np.ones(24).astype(int)
-list_array_pipe_out_MSB = []
-list_array_pipe_out_LSB = []
-list_array_pipe_out1_MSB = []
-list_array_pipe_out1_LSB = []
-Spectre = [0 for i in range(0, 1024)]
-Spectre1 = [0 for i in range(0, 1024)]
+array_pipe_out = np.ones(4112).astype(int)
+array_pipe_out_sd = np.ones(48).astype(int)
+Detector_Number = 4
+Spectrum_Depth = 1024
+Spectrum_Block_Size = 1028
+Spectres = [[0 for i in range(0, Spectrum_Depth)] for detector in range(0, Detector_Number)]
+gain_detectors = [0 for detector in range(0, Detector_Number)]
+gain_detectors_real = [1 for detector in range(0, Detector_Number)]
 
 
 
 #################################### global setting ######################################
 
 mode_adc = 1 # set to one if ADC use
-enable_high_filter = 0 # set to one if clear RAM spectrum
+enable_high_filter = 1 # set to one to use high frequency filter
 continuous_ready  = 1 # generally set to one set to zero if filter analysis
 start_capture  = 0
 
@@ -189,6 +189,39 @@ class DESTester:
 def tohex(val, nbits):
   return hex((val + (1 << nbits)) % (1 << nbits))
 
+def update_gain_values(formated_lines_coef):
+    global gain_detectors
+    global gain_detectors_real
+
+    if enable_high_filter == 0:
+        gain_detectors = [
+            formated_lines_coef[263], # param 264
+            formated_lines_coef[264], # param 265
+            formated_lines_coef[265], # param 266
+            formated_lines_coef[266], # param 267
+        ]
+    else:
+        gain_detectors = [
+            formated_lines_coef[267], # param 268
+            formated_lines_coef[268], # param 269
+            formated_lines_coef[269], # param 270
+            formated_lines_coef[270], # param 271
+        ]
+
+    gain_detectors_real = [2 ** gain_detector for gain_detector in gain_detectors]
+
+def spectrum_label(detector):
+    max_value = max(Spectres[detector])
+    max_x = Spectres[detector].index(max_value)
+    return "detecteur {} - gain x{} (shift {}) - enable_high_filter={} - max {} @ x={}".format(
+        detector,
+        gain_detectors_real[detector],
+        gain_detectors[detector],
+        enable_high_filter,
+        max_value,
+        max_x
+    )
+
 def pathname1():
     i = tk.b4.winfo_id()
     print("identité", i)
@@ -198,8 +231,7 @@ def pathname1():
 def delay_end(fig):
 
     global init_spectrum
-    global Spectre
-    global Spectre1
+    global Spectres
 
     racine.after(200, lambda:delay_end(fig))
     #print("delay_end")
@@ -210,7 +242,7 @@ def delay_end(fig):
     des.getwire(adress_wire_out_science)
 
 
-    if get == 2056:
+    if get == 4112:
         #print("read pointer spectrum filter 0 : {}".format(get))
         # print("################################ READ FIFO  Pipe spectrum filter 0 #############################################")
         adresse_pipe_out_read = 0xA2  # filter1
@@ -221,7 +253,7 @@ def delay_end(fig):
         adress_wire_out_science = 0x26  # filter 0 SD
         des.getwire(adress_wire_out_science)
 
-        if get == 24:
+        if get == 48:
 
             print("read pointer spectrum filter 0 standard definition : {}".format(get))
             adresse_pipe_out_read = 0xA5  # filter0
@@ -249,60 +281,40 @@ def delay_end(fig):
             print("############################################")
 
 
-            #print("################################ DATA of  spectrum filter 1 #############################################")
-            for elm in list_array_pipe_out[4:1027] :
-                #print(type(elm))
-                #list_array_pipe_out_MSB.append(int(elm/2**16))
-                list_array_pipe_out_MSB.append(np.short((elm & 0xFFFF0000)/2**16))
-                #print("address : {}".format(np.short((elm & 0xFFFF0000) / 2 ** 16)))
-                list_array_pipe_out_LSB.append(np.short(elm & 0xFFFF))
-                #print("energy : {}".format(np.short(elm & 0xFFFF)))
+            #print("################################ DATA of spectrum by detector #############################################")
+            for detector in range(0, Detector_Number):
+                start_index = detector * Spectrum_Block_Size + 4
+                end_index = (detector + 1) * Spectrum_Block_Size
 
-                if (np.short(elm & 0xFFFF)) != 0:
-                    #print("spectrum", tohex(elm, 32))
+                for elm in list_array_pipe_out[start_index:end_index]:
+                    data = (elm & 0xFFFF)
 
-                    # Construction du spectre
-                    add = int(((elm & 0xFFFF0000) / 2 ** 16))  # Ajout GO
-                    data = (elm & 0xFFFF)  # Ajout GO
-                    Spectre[add] = Spectre[add] + data  # Ajout GO
-                    # Spectre[add] = data
-
-
-            for elm in list_array_pipe_out[1032:2055]:
-                # print(type(elm))
-                # list_array_pipe_out_MSB.append(int(elm/2**16))
-                list_array_pipe_out1_MSB.append(np.short((elm & 0xFFFF0000) / 2 ** 16))
-                # print("address : {}".format(np.short((elm & 0xFFFF0000) / 2 ** 16)))
-                list_array_pipe_out1_LSB.append(np.short(elm & 0xFFFF))
-                # print("energy : {}".format(np.short(elm & 0xFFFF)))
-
-                if (np.short(elm & 0xFFFF)) != 0:
-                    #print("spectrum", tohex(elm, 32))
-
-                    # Construction du spectre
-                    add = int(((elm & 0xFFFF0000) / 2 ** 16))  # Ajout GO
-                    data = (elm & 0xFFFF)  # Ajout GO
-                    Spectre1[add] = Spectre1[add] + data  # Ajout GO
-                    # Spectre1[add] = data
+                    if np.short(data) != 0:
+                        add = int(((elm & 0xFFFF0000) / 2 ** 16))
+                        if 0 <= add < Spectrum_Depth:
+                            Spectres[detector][add] = Spectres[detector][add] + data
 
         # racine.bind("<BackSpace>",  clear_vect())
 
         if init_spectrum == True :
 
-            Spectre = [0 for i in range(0, 1024)]
-            Spectre1 = [0 for i in range(0, 1024)]
+            Spectres = [[0 for i in range(0, Spectrum_Depth)] for detector in range(0, Detector_Number)]
             init_spectrum = False
             # tk.messagebox.showinfo("showinfo", "init_spectrum = {}".format(init_spectrum))
 
-        min_1 = min(Spectre)
-        min_2 = min(Spectre1)
-        max_1 = max(Spectre)
-        max_2 = max(Spectre1)
+        min_spectrum = min(min(Spectre) for Spectre in Spectres)
+        max_spectrum = max(max(Spectre) for Spectre in Spectres)
 
 
-        fig.axes[0].set_ylim(((min(min_1, min_2), max(max_1, max_2))))
-        fig.axes[0].lines[0].set_ydata(Spectre)
-        fig.axes[0].lines[1].set_ydata(Spectre1)
+        fig.axes[0].set_ylim(((min_spectrum, max_spectrum)))
+        for detector in range(0, Detector_Number):
+            fig.axes[0].lines[detector].set_ydata(Spectres[detector])
+            fig.axes[0].lines[detector].set_label(spectrum_label(detector))
+        legend = fig.axes[0].get_legend()
+        if legend:
+            legend_texts = legend.get_texts()
+            for detector in range(0, min(Detector_Number, len(legend_texts))):
+                legend_texts[detector].set_text(spectrum_label(detector))
         #racine.update()
         canvas.draw_idle()
 
@@ -330,7 +342,6 @@ def param(mode_adc, enable_high_filter, continuous_ready, start_capture,reset):
 def Reset_unreset() :
 
     mode_adc = 0  # set to one if ADC use
-    enable_high_filter = 1  # set to one if clear RAM spectrum
     continuous_ready = 1  # generally set to one set to zero if filter analysis
     start_capture = 0
     reset = 1
@@ -354,12 +365,13 @@ def close() :
     des.Close
     print("exit")
 
-    print("\nNb de coups :\nFir1 = {}\nFir2 = {}\n ".format(sum(Spectre), sum(Spectre1)))
+    print("\nNb de coups :")
+    for detector in range(0, Detector_Number):
+        print("detecteur {} = {}".format(detector, sum(Spectres[detector])))
 
-    save_signal_in_file(Spectre)
+    save_signal_in_file(Spectres[0])
     #print(time.strftime())
-    print(Spectre)
-    print(Spectre1)
+    print(Spectres)
     racine.destroy()
     racine.quit()
 
@@ -372,7 +384,6 @@ def close() :
 def Injection() :
 
     mode_adc = 0  # set to one if ADC use
-    enable_high_filter = 0  # set to one if clear RAM spectrum
     continuous_ready = 0  # generally set to zero set to one if filter analysis
     start_capture = 1
 
@@ -402,7 +413,6 @@ def Injection() :
 def ADC() :
 
     mode_adc = 1  # set to one if ADC use
-    #enable_high_filter = 0  # set to one to enable spectre on high filter
     #continuous_ready = 0  # generally set to zero set to one if filter analysis
     #start_capture = 1
 
@@ -655,16 +665,16 @@ des.setpipein(list_pipe_in_array,adresse)
 ###################################  START CAPTURE  ###############################################
 
 start_capture  = 1
-enable_high_filter = 0 # set to one if clear RAM spectrum
+update_gain_values(formated_lines_coef)
 
 print ("start_capture")
 des.start_capture(param(mode_adc, enable_high_filter, continuous_ready, start_capture, reset))
 
 ###################################  IRQ time  ###############################################
 
-fig.axes[0].plot(Spectre, label = "FIR 1")  #Axes class represents one (sub-)plot in a figure
-fig.axes[0].plot(Spectre1, label = "FIR 2")  #Axes class represents one (sub-)plot in a figure
-fig.legend()
+for detector in range(0, Detector_Number):
+    fig.axes[0].plot(Spectres[detector], label = spectrum_label(detector))  #Axes class represents one (sub-)plot in a figure
+plot1.legend(loc="upper left", fontsize=7, framealpha=0.75)
 fig.supxlabel("raw")
 fig.supylabel("Count number")
 

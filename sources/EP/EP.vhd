@@ -1,3 +1,15 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -15,10 +27,8 @@ entity EP is
         -- global select spectrum
         i_clk_synchro_spectrum       : in  std_logic;
         i_detector_number            : in  unsigned;
-        i_filter_number              : in  std_logic_vector(0 downto 0);
         --input param
-        i_gain                       : in  unsigned(31 downto 0);
-        i_gain_high_frequency        : in  unsigned(31 downto 0);
+        i_gain                       : in  Array_config_32unsignedx2_type;
         i_TH_ADC                     : in  std_logic_vector(31 downto 0);
         i_TH_rise                    : in  std_logic_vector(31 downto 0);
         i_TH_fall                    : in  std_logic_vector(31 downto 0);
@@ -55,32 +65,32 @@ architecture RTL of EP is
     signal data_before_filter_CDC  : signed(15 downto 0);
     signal ready_before_filter_CDC : std_logic;
 
-    signal ready_before_filter     : std_logic_vector(1 downto 0);
+    signal ready_before_filter     : std_logic_vector(Filter_Number-1 downto 0);
     signal data_before_filter      : Array_config_16signedx2_type;
     signal data_after_filter       : Array_config_16signedx2_type;
     signal Energy_level_max        : Array_config_16signedx2_type;
-    signal readyEnergy_level_max   : std_logic_vector(1 downto 0);
+    signal readyEnergy_level_max   : std_logic_vector(Filter_Number-1 downto 0);
     signal data_after_energy_level : Array_config_16signedx2_type;
 
-    signal ready_after_filter : std_logic_vector(1 downto 0);
+    signal ready_after_filter : std_logic_vector(Filter_Number-1 downto 0);
     signal data_after_gain    : Array_config_16signedx2_type;
-    signal ready_after_gain   : std_logic_vector(1 downto 0);
+    signal ready_after_gain   : std_logic_vector(Filter_Number-1 downto 0);
 
-    signal ready_energy_level_max_sd : std_logic_vector(1 downto 0);
+    signal ready_energy_level_max_sd : std_logic_vector(Filter_Number-1 downto 0);
     signal energy_level_max_sd       : Array_config_16signedx2_type;
 
     signal pipe_out_spectrum_din   : Array_config_32stdx2_type;
-    signal pipe_out_spectrum_wr_en : std_logic_vector(1 downto 0);
+    signal pipe_out_spectrum_wr_en : std_logic_vector(Filter_Number-1 downto 0);
     signal spectrum_count_pulse    : Array_config_32stdx2_type;
 
     signal pipe_out_spectrum_sd_din   : Array_config_32stdx2_type;
-    signal pipe_out_spectrum_sd_wr_en : std_logic_vector(1 downto 0);
+    signal pipe_out_spectrum_sd_wr_en : std_logic_vector(Filter_Number-1 downto 0);
     signal spectrum_sd_count_pulse    : Array_config_32stdx2_type;
 
     signal TH_rise : Array_config_32stdx2_type;
     signal TH_fall : Array_config_32stdx2_type;
 
-    signal gain : Array_config_32unsignedx2_type;
+    --signal gain : Array_config_32unsignedx2_type;
 
 begin
 
@@ -113,16 +123,15 @@ begin
         ready_before_filter_CDC <= i_ready_CDC;
     end generate label_generate;
 
-    data_before_filter(0) <= data_before_filter_CDC;
-    data_before_filter(1) <= data_before_filter_CDC;
-
-    ready_before_filter(0) <= ready_before_filter_CDC;
-    ready_before_filter(1) <= ready_before_filter_CDC;
+    generate_input_filter_copy : for N in 0 to Filter_Number - 1 generate
+        data_before_filter(N)  <= data_before_filter_CDC;
+        ready_before_filter(N) <= ready_before_filter_CDC;
+    end generate generate_input_filter_copy;
 
     ------------------------------------------
     --  FIR filter
     ------------------------------------------
-    generate_label_FIR_filter : for N IN 1 downto 0 generate
+    generate_label_FIR_filter : for N in 0 to Filter_Number - 1 generate
         label_FIR_filter : entity work.FIR_filter
             port map(
                 --global
@@ -147,14 +156,14 @@ begin
     ------------------------------------------
     --  Gain
     ------------------------------------------
-    generate_label_gain : for N IN 1 downto 0 generate
+    generate_label_gain : for N in 0 to Filter_Number - 1 generate
         label_gain : entity work.gain
             port map(
                 -- global
                 i_clk_slow           => i_clk_slow,
                 i_reset              => i_reset,
                 -- input gain
-                i_gain               => gain(N),
+                i_gain               => i_gain(N),
                 -- input data
                 i_data_after_filter  => data_after_filter(N),
                 i_ready_after_filter => ready_after_filter(N),
@@ -164,8 +173,8 @@ begin
             );
     end generate generate_label_gain;
 
-    gain(0) <= i_gain;
-    gain(1) <= i_gain_high_frequency;
+    --gain(0) <= i_gain;
+    --gain(1) <= i_gain_high_frequency;
 
     --o_data_after_gain  <= data_after_gain;
     o_ready_after_gain <= ready_after_gain(0) when i_enable_high_filter = '0' else ready_after_gain(1);
@@ -173,7 +182,7 @@ begin
     ------------------------------------------
     --  Energy level
     ------------------------------------------
-    generate_label_energy_level : for N IN 1 downto 0 generate
+    generate_label_energy_level : for N in 0 to Filter_Number - 1 generate
         label_energy_level : entity work.Energy_level
             port map(
                 i_clk_slow                => i_clk_slow,
@@ -201,7 +210,7 @@ begin
     ------------------------------------------
     --  spectrum HD
     ------------------------------------------
-    generate_lable_spectrum : for N IN 1 downto 0 generate
+    generate_lable_spectrum : for N in 0 to Filter_Number - 1 generate
         lable_spectrum : entity work.spectrum
             generic map(
                 memory_add_size => 10,
@@ -214,7 +223,7 @@ begin
                 -- global select spectrum
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
-                i_filter_number           => i_filter_number,
+                i_filter_number           => To_unsigned(N, Filter_Number_Width),
                 -- input from detect Energy level
                 --i_enable_erase            => i_enable_erase,
                 i_Energy_level_max        => Energy_level_max(N),
@@ -233,7 +242,7 @@ begin
     ------------------------------------------
     --  detect standard energy
     ------------------------------------------
-    generate_label_standard_energy : for N IN 1 downto 0 generate
+    generate_label_standard_energy : for N in 0 to Filter_Number - 1 generate
         label_standard_energy : entity work.detect_standard_energy
             port map(
                 i_clk_slow                  => i_clk_slow,
@@ -248,7 +257,7 @@ begin
     ------------------------------------------
     --  spectrum Standard definition
     ------------------------------------------
-    generate_lable_spectrum_Standard_definition : for N IN 1 downto 0 generate
+    generate_lable_spectrum_Standard_definition : for N in 0 to Filter_Number - 1 generate
         lable_spectrum_Standard_definition : entity work.spectrum
             generic map(
                 memory_add_size => 3,
@@ -261,7 +270,7 @@ begin
                 -- global select spectrum
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
-                i_filter_number           => i_filter_number,
+                i_filter_number           => To_unsigned(N, Filter_Number_Width),
                 -- input from detect Energy level
                 --i_enable_erase            => i_enable_erase,
                 i_Energy_level_max        => energy_level_max_sd(N),
