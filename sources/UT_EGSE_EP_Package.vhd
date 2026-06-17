@@ -16,9 +16,11 @@ use ieee.numeric_std.all;
 
 package UT_EGSE_EP_Package is
 
+    function index_width(value : positive) return natural;
+
     constant ads_7049_complex_clock : std_logic := '0';
     constant Detector_Number        : integer   := 4;
-    constant Detector_Number_Width  : natural   := 2;
+    constant Detector_Number_Width  : natural   := index_width(Detector_Number);
     constant Filter_Number          : integer   := 2;
     constant Filter_Number_Width    : natural   := 1;
     constant Enable_ADC_Driver      : boolean   := true;
@@ -59,3 +61,23 @@ package UT_EGSE_EP_Package is
     --    constant depth_memory    : integer := 2**memory_add_size;
 
 end package UT_EGSE_EP_Package;
+
+package body UT_EGSE_EP_Package is
+
+    function index_width(value : positive) return natural is
+        variable width     : natural := 0;
+        variable max_index : natural := value - 1;
+    begin
+        while max_index > 0 loop
+            width     := width + 1;
+            max_index := max_index / 2;
+        end loop;
+
+        if width = 0 then
+            return 1;
+        else
+            return width;
+        end if;
+    end function index_width;
+
+end package body UT_EGSE_EP_Package;

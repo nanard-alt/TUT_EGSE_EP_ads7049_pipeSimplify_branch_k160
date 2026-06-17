@@ -45,7 +45,7 @@ list_pipe_in_array = np.ones(128).astype(int)
 #################################### global setting ######################################
 
 mode_adc = 0 # set to one if ADC use
-enable_high_freq = 0
+enable_high_freq = 1
 continuous_ready  = 1 # generally set to one set to zero if filter analysis
 start_capture  = 0
 

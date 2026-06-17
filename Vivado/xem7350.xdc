@@ -82,6 +82,7 @@ set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports 
 set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {okUHU[*]}]
 set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {okUHU[*]}]
 
+#create_clock -name sys_clk -period 5.000 [get_ports sys_clkp] 
 
 ############################################################################
 ## System Clock
@@ -93,7 +94,14 @@ set_property IOSTANDARD LVDS [get_ports {sys_clkn}]
 set_property PACKAGE_PIN AC3 [get_ports {sys_clkn}]
 
 create_clock -name sys_clk -period 5 [get_ports sys_clkp]
-set_clock_groups -asynchronous -group [get_clocks {sys_clk}] -group [get_clocks {mmcm0_clk0 okUH0}]
+
+set_clock_groups -name async_frontpanel_virtual -asynchronous \
+    -group [get_clocks virt_okUH0] \
+    -group [get_clocks -include_generated_clocks okUH0]
+
+set_clock_groups -name async_frontpanel_user -asynchronous \
+    -group [get_clocks -include_generated_clocks okUH0] \
+    -group [get_clocks -include_generated_clocks sys_clk]
 
 # LEDs #####################################################################
 set_property PACKAGE_PIN T24 [get_ports {led[0]}]
