@@ -43,7 +43,8 @@ architecture RTL of FSM_read_config is
 
     --    type state_type is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, read_low_frequency, valid_low_frequency, read_trigger, valid_trigger);
     --    signal state    : state_type;
-    constant Config_Read_Word_Count : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + 1;
+    constant Config_End_Padding_Word_Count : natural := 3;
+    constant Config_Read_Word_Count        : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + Config_End_Padding_Word_Count;
     signal add_coef : integer;
 
     type state_type_config is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, valid_high_frequency, read_trigger, valid_read_trigger,
@@ -322,7 +323,7 @@ begin
 
                 when read_end_usb_buffer =>
 
-                    if cnt_read_end_usb_buffer = 1 then
+                    if cnt_read_end_usb_buffer = Config_End_Padding_Word_Count then
                         state_config           <= IDLE;
                         o_pipe_in_config_rd_en <= '0';
                         cnt_number_detector    <= 0;

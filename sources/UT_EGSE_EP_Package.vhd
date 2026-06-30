@@ -19,11 +19,12 @@ package UT_EGSE_EP_Package is
     function index_width(value : positive) return natural;
 
     constant ads_7049_complex_clock : std_logic := '0';
-    constant Detector_Number        : integer   := 4;
+    constant Detector_Number        : integer   := 7;
     constant Detector_Number_Width  : natural   := index_width(Detector_Number);
     constant Filter_Number          : integer   := 2;
     constant Filter_Number_Width    : natural   := 1;
-    constant Enable_ADC_Driver      : boolean   := true;
+    -- ADC comment: ADC inputs disabled; science input uses the injection path.
+    constant Enable_ADC_Driver      : boolean   := false;
 
     type Array_config_32x32_type is array (0 to 31) of signed(31 downto 0);
 

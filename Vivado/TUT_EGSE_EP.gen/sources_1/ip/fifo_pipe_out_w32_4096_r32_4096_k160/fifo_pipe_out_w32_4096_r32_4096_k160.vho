@@ -1,4 +1,4 @@
--- (c) Copyright 1995-2025 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1995-2026 Xilinx, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
 -- of Xilinx, Inc. and is protected under U.S. and
@@ -63,7 +63,7 @@ COMPONENT fifo_pipe_out_w32_4096_r32_4096_k160
     full : OUT STD_LOGIC;
     empty : OUT STD_LOGIC;
     valid : OUT STD_LOGIC;
-    rd_data_count : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    rd_data_count : OUT STD_LOGIC_VECTOR(12 DOWNTO 0);
     wr_rst_busy : OUT STD_LOGIC;
     rd_rst_busy : OUT STD_LOGIC 
   );

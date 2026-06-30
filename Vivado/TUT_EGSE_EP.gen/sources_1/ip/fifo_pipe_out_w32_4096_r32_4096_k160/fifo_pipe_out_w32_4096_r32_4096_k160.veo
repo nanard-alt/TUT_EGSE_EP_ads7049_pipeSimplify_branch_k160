@@ -1,4 +1,4 @@
-// (c) Copyright 1995-2025 Xilinx, Inc. All rights reserved.
+// (c) Copyright 1995-2026 Xilinx, Inc. All rights reserved.
 // 
 // This file contains confidential and proprietary information
 // of Xilinx, Inc. and is protected under U.S. and
@@ -65,7 +65,7 @@ fifo_pipe_out_w32_4096_r32_4096_k160 your_instance_name (
   .full(full),                    // output wire full
   .empty(empty),                  // output wire empty
   .valid(valid),                  // output wire valid
-  .rd_data_count(rd_data_count),  // output wire [11 : 0] rd_data_count
+  .rd_data_count(rd_data_count),  // output wire [12 : 0] rd_data_count
   .wr_rst_busy(wr_rst_busy),      // output wire wr_rst_busy
   .rd_rst_busy(rd_rst_busy)      // output wire rd_rst_busy
 );

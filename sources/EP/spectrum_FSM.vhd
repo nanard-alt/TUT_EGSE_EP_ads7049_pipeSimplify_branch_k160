@@ -152,7 +152,9 @@ begin
 
                         when 0 =>       -- write ID
                             o_pipe_out_spectrum_wr_en <= '1';
-                            o_pipe_out_spectrum_din   <= "1000" & "0" & std_logic_vector(i_detector_number) & std_logic_vector(i_filter_number) & x"0000" & "0000000" & i_set_synchro_spectrum;
+                            -- 32-bit header: 4-bit type, reserved bit, 3-bit
+                            -- detector ID, filter ID, payload and sync flag.
+                            o_pipe_out_spectrum_din   <= "1000" & "0" & std_logic_vector(resize(i_detector_number, 3)) & std_logic_vector(i_filter_number) & x"0000" & "000000" & i_set_synchro_spectrum;
 
                             o_spectrum_count_pulse <= spectrum_count_pulse;
                         --------------------------------------------------------

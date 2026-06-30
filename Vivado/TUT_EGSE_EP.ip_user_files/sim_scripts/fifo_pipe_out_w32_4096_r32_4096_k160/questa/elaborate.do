@@ -1,1 +1,1 @@
-vopt +acc=npr -l elaborate.log  -L xil_defaultlib -L xpm -L fifo_generator_v13_2_7 -L unisims_ver -L unimacro_ver -L secureip -work xil_defaultlib xil_defaultlib.fifo_pipe_out_w32_4096_r32_4096_k160 xil_defaultlib.glbl -o fifo_pipe_out_w32_4096_r32_4096_k160_opt
+vopt +acc=npr -l elaborate.log  -L xil_defaultlib -L fifo_generator_v13_2_7 -L unisims_ver -L unimacro_ver -L secureip -L xpm -work xil_defaultlib xil_defaultlib.fifo_pipe_out_w32_4096_r32_4096_k160 xil_defaultlib.glbl -o fifo_pipe_out_w32_4096_r32_4096_k160_opt

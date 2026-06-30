@@ -43,10 +43,11 @@ entity TUT_EGSE is
         -- clock OK
         sys_clkp     : in    STD_LOGIC;
         sys_clkn     : in    STD_LOGIC;
---        -- AD7049
---        o_sck        : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
---        o_cs_n       : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
---        i_sdi        : in    STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        -- ADS7049
+        -- ADC comment: ADC IO disabled/commented out.
+        -- o_sck        : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        -- o_cs_n       : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+        -- i_sdi        : in    STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
         led          : out   STD_LOGIC_VECTOR(3 downto 0);
         -- DAC121S
         o_DAC_SCLK   : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
@@ -63,7 +64,7 @@ architecture arch of TUT_EGSE is
     signal okClk : STD_LOGIC;
     signal okHE  : STD_LOGIC_VECTOR(112 downto 0);
     signal okEH  : STD_LOGIC_VECTOR(64 downto 0);
-    signal okEHx : STD_LOGIC_VECTOR(65 * 18 - 1 downto 0);
+    signal okEHx : STD_LOGIC_VECTOR(65 * 24 - 1 downto 0);
 
     signal reg_global                  : STD_LOGIC_VECTOR(31 downto 0);
     signal fifo_count_raw_data         : Array_config_32stdxDetector_Number_type;
@@ -129,7 +130,6 @@ architecture arch of TUT_EGSE is
     signal data_fast_injection  : signed(11 downto 0);
 
     signal data_rx         : Array_config_12stdxDetector_Number_type;
-    signal view_data_rx    : std_logic_vector(11 downto 0);
     signal ready_rx        : std_logic_vector(Detector_Number - 1 downto 0);
     signal i_data_CDC      : Array_config_16signedxDetector_Number_type;
     signal i_ready_CDC     : std_logic_vector(Detector_Number - 1 downto 0);
@@ -158,8 +158,8 @@ architecture arch of TUT_EGSE is
     signal o_pipe_out_spectrum_wr_en          : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
     signal o_pipe_out_spectrum_sd_wr_en       : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
     signal pipe_out_spectrum_sd_wr_en         : std_logic;
-    signal pipe_out_rd_data_count_spectrum    : STD_LOGIC_VECTOR(12 downto 0);
-    signal pipe_out_rd_data_count_spectrum_sd : STD_LOGIC_VECTOR(11 downto 0);
+    signal pipe_out_rd_data_count_spectrum    : STD_LOGIC_VECTOR(13 downto 0);
+    signal pipe_out_rd_data_count_spectrum_sd : STD_LOGIC_VECTOR(12 downto 0);
 
     signal pipe_out_spectrum_wr_en_fifo : std_logic;
     signal pipe_out_spectrum_din_fifo   : std_logic_vector(31 downto 0);
@@ -407,66 +407,53 @@ begin
             o_ready                => ready_fast_injection
         );
 
-    ----------------------------------------------------------------------ADC unconnect-------------------------------------------
-    -------------------------------------------------------------------------------------------------------------------------------
-    --    ------------------------------------------
-    --    --  ADC to keeper
-    --    ------------------------------------------  
-    --    generate_ADC_enabled : if Enable_ADC_Driver generate
-    --        generate_label_Rx_fe_ads7049_and : for N in 0 to Detector_Number - 1 generate
-    --            label_read_ADC : entity work.Rx_fe_ads7049_and
-    --                port map(
-    --                    --global
-    --                    clk        => clk_32Mhz,
-    --                    rst        => reset,
-    --                    --IO ADC
-    --                    o_sck      => o_sck(N),
-    --                    o_cs_n     => o_cs_n(N),
-    --                    i_sdi      => i_sdi(N),
-    --                    --out
-    --                    o_data_rx  => data_rx(N),
-    --                    o_ready_rx => ready_rx(N)
-    --                );
-    --        end generate generate_label_Rx_fe_ads7049_and;
-    --    end generate generate_ADC_enabled;
-    --
-    --    generate_ADC_disabled : if not Enable_ADC_Driver generate
-    --        o_sck    <= (others => 'Z');
-    --        o_cs_n   <= (others => 'Z');
-    --        data_rx  <= (others => (others => '0'));
-    --        ready_rx <= (others => '0');
-    --    end generate generate_ADC_disabled;
+    ------------------------------------------
+    -- ADS7049 receivers
+    -- ADC comment: ADC IO driver disabled/commented out.
+    ------------------------------------------
+    -- generate_ADC_enabled : if Enable_ADC_Driver generate
+    --     generate_label_Rx_fe_ads7049_and : for N in 0 to Detector_Number - 1 generate
+    --         label_read_ADC : entity work.Rx_fe_ads7049_and
+    --             port map(
+    --                 clk        => clk_32Mhz,
+    --                 rst        => reset,
+    --                 o_sck      => o_sck(N),
+    --                 o_cs_n     => o_cs_n(N),
+    --                 i_sdi      => i_sdi(N),
+    --                 o_data_rx  => data_rx(N),
+    --                 o_ready_rx => ready_rx(N)
+    --             );
+    --     end generate generate_label_Rx_fe_ads7049_and;
+    -- end generate generate_ADC_enabled;
 
-    --    ------------------------------------------
-    --    --  keep data from ADC to CDC
-    --    ------------------------------------------ 
-    --    generate_ADC_keeper_enabled : if Enable_ADC_Driver generate
-    --        generate_label_keep_data_from_ADC : for N in 0 to Detector_Number - 1 generate
-    --            label_keep_data_from_ADC : process(clk_32Mhz, reset) is --  i_sck_rx replace clk_32Mhz
-    --            begin
-    --                if reset = '1' then
-    --                    data_rx_keeped(N)  <= (others => '0');
-    --                    ready_rx_keeped(N) <= '0';
-    --                    view_data_rx       <= (others => '0');
-    --                elsif rising_edge(clk_32Mhz) then --  i_sck_rx replace clk_32Mhz
-    --                    if ready_rx(N) = '1' then
-    --                        ready_rx_keeped(N) <= '1';
-    --                        data_rx_keeped(N)  <= '0' & data_rx(N) & b"000";
-    --                    --data_rx_keeped  <= data_rx & b"0000";
-    --                    --view_data_rx    <= data_rx;
-    --                    else
-    --                        ready_rx_keeped(N) <= '0';
-    --                    end if;
-    --                end if;
-    --            end process;
-    --        end generate generate_label_keep_data_from_ADC;
-    --    end generate generate_ADC_keeper_enabled;
-    --
-    --    generate_ADC_keeper_disabled : if not Enable_ADC_Driver generate
-    --        data_rx_keeped  <= (others => (others => '0'));
-    --        ready_rx_keeped <= (others => '0');
-    --        view_data_rx    <= (others => '0');
-    --    end generate generate_ADC_keeper_disabled;
+    data_rx  <= (others => (others => '0'));
+    ready_rx <= (others => '0');
+
+    ------------------------------------------
+    -- Capture ADC data on the rising edge before the CDC input
+    ------------------------------------------
+    generate_ADC_keeper_enabled : if Enable_ADC_Driver generate
+        generate_label_keep_data_from_ADC : for N in 0 to Detector_Number - 1 generate
+            label_keep_data_from_ADC : process(clk_32Mhz, reset) is
+            begin
+                if reset = '1' then
+                    data_rx_keeped(N)  <= (others => '0');
+                    ready_rx_keeped(N) <= '0';
+                elsif rising_edge(clk_32Mhz) then
+                    ready_rx_keeped(N) <= '0';
+                    if ready_rx(N) = '1' then
+                        ready_rx_keeped(N) <= '1';
+                        data_rx_keeped(N)  <= '0' & data_rx(N) & b"000";
+                    end if;
+                end if;
+            end process;
+        end generate generate_label_keep_data_from_ADC;
+    end generate generate_ADC_keeper_enabled;
+
+    generate_ADC_keeper_disabled : if not Enable_ADC_Driver generate
+        data_rx_keeped  <= (others => (others => '0'));
+        ready_rx_keeped <= (others => '0');
+    end generate generate_ADC_keeper_disabled;
 
     ------------------------------------------------------------------------------------------------------------------------------------------------
     ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -475,13 +462,11 @@ begin
     --  MUX ADC OR Injection
     ------------------------------------------  
     generate_label_mux_science_data : for N in 0 to Detector_Number - 1 generate
-        --        label_mux_science_data : i_data_CDC(N) <= signed(data_rx_keeped(N)) when (Enable_ADC_Driver and (reg_global(31) = '1')) else ('0' & data_fast_injection & b"000");
-        label_mux_science_data : i_data_CDC(N) <= ('0' & data_fast_injection & b"000");
+        label_mux_science_data : i_data_CDC(N) <= signed(data_rx_keeped(N)) when (Enable_ADC_Driver and (reg_global(31) = '1')) else ('0' & data_fast_injection & b"000");
     end generate generate_label_mux_science_data;
-    --
+
     generate_label : for N in 0 to Detector_Number - 1 generate
-        --        label_mux_science_ready : i_ready_CDC(N) <= ready_rx_keeped(N) when (Enable_ADC_Driver and (reg_global(31) = '1')) else ready_fast_injection;
-        label_mux_science_ready : i_ready_CDC(N) <= ready_fast_injection;
+        label_mux_science_ready : i_ready_CDC(N) <= ready_rx_keeped(N) when (Enable_ADC_Driver and (reg_global(31) = '1')) else ready_fast_injection;
     end generate generate_label;
     ------------------------------------------
     --  EP
@@ -831,9 +816,9 @@ begin
             --ep24wire <= (others => '0');
             elsif rising_edge(sys_clk) then
                 fifo_count_raw_data(N)         <= "000000000000000000000" & rd_fifo_pipe_out_data_count_raw_data(N);
-                fifo_data_count_spectrum       <= "0000000000000000000" & pipe_out_rd_data_count_spectrum;
+                fifo_data_count_spectrum       <= "000000000000000000" & pipe_out_rd_data_count_spectrum;
                 reg_spectrum_count_pulse(N)    <= spectrum_count_pulse(N);
-                fifo_data_count_spectrum_sd    <= "00000000000000000000" & pipe_out_rd_data_count_spectrum_sd;
+                fifo_data_count_spectrum_sd    <= "0000000000000000000" & pipe_out_rd_data_count_spectrum_sd;
                 reg_spectrum_sd_count_pulse(N) <= spectrum_sd_count_pulse(N);
 
                 --ep23wire <= "000000000000000000000" & rd_fifo_pipe_out_data_count_raw_data(1);
@@ -863,7 +848,7 @@ begin
     -------------------------------------------------------------------------
 
     --  okwire OR
-    okWO : okWireOR generic map(N => 18) port map(okEH => okEH, okEHx => okEHx);
+    okWO : okWireOR generic map(N => 24) port map(okEH => okEH, okEHx => okEHx);
     --  reset, start_capture
     ep00 : okWireIn port map(okHE => okHE, ep_addr => x"00", ep_dataout => reg_global);
     --  level DAC121S 
@@ -921,5 +906,15 @@ begin
     --  read wire out for FIFO pipe out science.
     ep31 : okWireOut port map(okHE => okHE, okEH => okEHx(17 * 65 - 1 downto 16 * 65), ep_addr => x"31", ep_datain => fifo_count_raw_data(3));
     epA7 : okPipeOut port map(okHE => okHE, okEH => okEHx(18 * 65 - 1 downto 17 * 65), ep_addr => x"A7", ep_read => rd_en_fifo_pipe_out_raw_data(3), ep_datain => dout_fifo_pipe_out_raw_data(3));
+
+    -- Detectors 5 to 7: raw FIFO counters and data pipes.
+    ep32 : okWireOut port map(okHE => okHE, okEH => okEHx(19 * 65 - 1 downto 18 * 65), ep_addr => x"32", ep_datain => fifo_count_raw_data(4));
+    epA8 : okPipeOut port map(okHE => okHE, okEH => okEHx(20 * 65 - 1 downto 19 * 65), ep_addr => x"A8", ep_read => rd_en_fifo_pipe_out_raw_data(4), ep_datain => dout_fifo_pipe_out_raw_data(4));
+
+    ep33 : okWireOut port map(okHE => okHE, okEH => okEHx(21 * 65 - 1 downto 20 * 65), ep_addr => x"33", ep_datain => fifo_count_raw_data(5));
+    epA9 : okPipeOut port map(okHE => okHE, okEH => okEHx(22 * 65 - 1 downto 21 * 65), ep_addr => x"A9", ep_read => rd_en_fifo_pipe_out_raw_data(5), ep_datain => dout_fifo_pipe_out_raw_data(5));
+
+    ep34 : okWireOut port map(okHE => okHE, okEH => okEHx(23 * 65 - 1 downto 22 * 65), ep_addr => x"34", ep_datain => fifo_count_raw_data(6));
+    epAA : okPipeOut port map(okHE => okHE, okEH => okEHx(24 * 65 - 1 downto 23 * 65), ep_addr => x"AA", ep_read => rd_en_fifo_pipe_out_raw_data(6), ep_datain => dout_fifo_pipe_out_raw_data(6));
 
 end arch;

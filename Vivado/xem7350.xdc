@@ -110,23 +110,41 @@ set_property PACKAGE_PIN R25 [get_ports {led[2]}]
 set_property PACKAGE_PIN P26 [get_ports {led[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {led[*]}]
 
-#set_property -dict {PACKAGE_PIN AF24 IOSTANDARD LVCMOS33} [get_ports {o_sck[0]}] ; # FMC-K13 J3-2
-#set_property -dict {PACKAGE_PIN Y22 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[0]}] ; # FMC-F5 J3-3
-#set_property -dict {PACKAGE_PIN AA22 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[0]}] ; # FMC-E2 J3-5
+# ADC comment: ADC IO constraints disabled/commented out in VHDL.
+# ADS7049 ADC 1
+# set_property -dict {PACKAGE_PIN AF24 IOSTANDARD LVCMOS33} [get_ports {o_sck[0]}]
+# set_property -dict {PACKAGE_PIN Y22  IOSTANDARD LVCMOS33} [get_ports {o_cs_n[0]}]
+# set_property -dict {PACKAGE_PIN AA22 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[0]}]
 
-#set_property -dict {PACKAGE_PIN J18 IOSTANDARD LVCMOS33} [get_ports {o_sck[1]}] ; # CLK_ADC_2 FMC-H13 LA_07_P
-#set_property -dict {PACKAGE_PIN C16 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[1]}] ; # FMC-F5 J3-3
-#set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[1]}] ; # FMC-E2 J3-5
+# ADS7049 ADC 2
+# set_property -dict {PACKAGE_PIN J18 IOSTANDARD LVCMOS33} [get_ports {o_sck[1]}]
+# set_property -dict {PACKAGE_PIN C16 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[1]}]
+# set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[1]}]
 
-## ADC 3
-#set_property -dict {PACKAGE_PIN L18 IOSTANDARD LVCMOS33} [get_ports {o_sck[2]}]
-#set_property -dict {PACKAGE_PIN F15 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[2]}]
-#set_property -dict {PACKAGE_PIN G15 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[2]}]
+# ADS7049 ADC 3
+# set_property -dict {PACKAGE_PIN L18 IOSTANDARD LVCMOS33} [get_ports {o_sck[2]}]
+# set_property -dict {PACKAGE_PIN F15 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[2]}]
+# set_property -dict {PACKAGE_PIN G15 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[2]}]
 
-## ADC 4
-#set_property -dict {PACKAGE_PIN G10 IOSTANDARD LVCMOS33} [get_ports {o_sck[3]}]
-#set_property -dict {PACKAGE_PIN H9  IOSTANDARD LVCMOS33} [get_ports {o_cs_n[3]}]
-#set_property -dict {PACKAGE_PIN G9  IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[3]}]
+# ADS7049 ADC 4
+# set_property -dict {PACKAGE_PIN G10 IOSTANDARD LVCMOS33} [get_ports {o_sck[3]}]
+# set_property -dict {PACKAGE_PIN H9  IOSTANDARD LVCMOS33} [get_ports {o_cs_n[3]}]
+# set_property -dict {PACKAGE_PIN G9  IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[3]}]
+
+# ADS7049 ADC 5
+# set_property -dict {PACKAGE_PIN F19 IOSTANDARD LVCMOS33} [get_ports {o_sck[4]}]
+# set_property -dict {PACKAGE_PIN H19 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[4]}]
+# set_property -dict {PACKAGE_PIN E20 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[4]}]
+
+# ADS7049 ADC 6
+# set_property -dict {PACKAGE_PIN K18 IOSTANDARD LVCMOS33} [get_ports {o_sck[5]}]
+# set_property -dict {PACKAGE_PIN F10 IOSTANDARD LVCMOS33} [get_ports {o_cs_n[5]}]
+# set_property -dict {PACKAGE_PIN G11 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[5]}]
+
+# ADS7049 ADC 7
+# set_property -dict {PACKAGE_PIN J11 IOSTANDARD LVCMOS33} [get_ports {o_sck[6]}]
+# set_property -dict {PACKAGE_PIN F9  IOSTANDARD LVCMOS33} [get_ports {o_cs_n[6]}]
+# set_property -dict {PACKAGE_PIN J10 IOSTANDARD LVCMOS33 PULLUP true} [get_ports {i_sdi[6]}]
 
 
 
@@ -153,3 +171,21 @@ set_property -dict {PACKAGE_PIN G14 IOSTANDARD LVCMOS12} [get_ports {o_DAC_SCLK[
 set_property -dict {PACKAGE_PIN G12 IOSTANDARD LVCMOS12} [get_ports {o_DAC_SYNC_n[3]}]  ; # SYNCH_DAC_4 FMC-H31 LA_28_P
 set_property -dict {PACKAGE_PIN H14 IOSTANDARD LVCMOS12} [get_ports {o_DAC_DIN[3]}]     ; # DIN_DAC_4   FMC-H28 LA_24_P
 set_property -dict {PACKAGE_PIN F12 IOSTANDARD LVCMOS12} [get_ports {o_DAC_on_off[3]}]  ; # ON_4        FMC-H32 LA_28_N
+
+# DAC 5
+set_property -dict {PACKAGE_PIN H18 IOSTANDARD LVCMOS12} [get_ports {o_DAC_SCLK[4]}]
+set_property -dict {PACKAGE_PIN A18 IOSTANDARD LVCMOS12} [get_ports {o_DAC_SYNC_n[4]}]
+set_property -dict {PACKAGE_PIN H17 IOSTANDARD LVCMOS12} [get_ports {o_DAC_DIN[4]}]
+set_property -dict {PACKAGE_PIN A19 IOSTANDARD LVCMOS12} [get_ports {o_DAC_on_off[4]}]
+
+# DAC 6
+set_property -dict {PACKAGE_PIN A9  IOSTANDARD LVCMOS12} [get_ports {o_DAC_SCLK[5]}]
+set_property -dict {PACKAGE_PIN A8  IOSTANDARD LVCMOS12} [get_ports {o_DAC_SYNC_n[5]}]
+set_property -dict {PACKAGE_PIN G20 IOSTANDARD LVCMOS12} [get_ports {o_DAC_DIN[5]}]
+set_property -dict {PACKAGE_PIN L17 IOSTANDARD LVCMOS12} [get_ports {o_DAC_on_off[5]}]
+
+# DAC 7
+set_property -dict {PACKAGE_PIN J16 IOSTANDARD LVCMOS12} [get_ports {o_DAC_SCLK[6]}]
+set_property -dict {PACKAGE_PIN J13 IOSTANDARD LVCMOS12} [get_ports {o_DAC_SYNC_n[6]}]
+set_property -dict {PACKAGE_PIN J15 IOSTANDARD LVCMOS12} [get_ports {o_DAC_DIN[6]}]
+set_property -dict {PACKAGE_PIN H13 IOSTANDARD LVCMOS12} [get_ports {o_DAC_on_off[6]}]

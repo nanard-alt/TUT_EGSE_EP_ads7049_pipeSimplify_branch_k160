@@ -41,12 +41,22 @@ def save_signal_in_file (Signal_out) :
 
 ############################### classe OK
 
-array_pipe_out = np.ones(4112).astype(int)
-array_pipe_out_sd = np.ones(48).astype(int)
-Detector_Number = 4
+Detector_Number = 7
+Filter_Number = 2
+Fir_Coefficient_Count = 32
+Config_Register_Count = 7
 Spectrum_Depth = 1024
+Spectrum_SD_Depth = 8
 Spectrum_Block_Size = 1028
+Spectrum_Pipe_Word_Count = Detector_Number * Spectrum_Block_Size
+Spectrum_SD_Filter_Word_Count = 12
+Spectrum_SD_Word_Count = Detector_Number * Spectrum_SD_Filter_Word_Count
+Gain_Low_Start_Index = (Fir_Coefficient_Count * Filter_Number * Detector_Number) + Config_Register_Count
+Gain_High_Start_Index = Gain_Low_Start_Index + Detector_Number
+array_pipe_out = np.ones(Spectrum_Pipe_Word_Count).astype(int)
+array_pipe_out_sd = np.ones(Spectrum_SD_Word_Count).astype(int)
 Spectres = [[0 for i in range(0, Spectrum_Depth)] for detector in range(0, Detector_Number)]
+Spectres_sd = [[0 for i in range(0, Spectrum_SD_Depth)] for detector in range(0, Detector_Number)]
 gain_detectors = [0 for detector in range(0, Detector_Number)]
 gain_detectors_real = [1 for detector in range(0, Detector_Number)]
 
@@ -55,7 +65,7 @@ gain_detectors_real = [1 for detector in range(0, Detector_Number)]
 #################################### global setting ######################################
 
 mode_adc = 1 # set to one if ADC use
-enable_high_filter = 1 # set to one to use high frequency filter
+enable_high_filter = 0 # set to one to use high frequency filter
 continuous_ready  = 1 # generally set to one set to zero if filter analysis
 start_capture  = 0
 
@@ -183,7 +193,7 @@ class DESTester:
 
     def getpipeout_sd(self, adresse_pipe_out_read):
         self.xem.ReadFromPipeOut(adresse_pipe_out_read, array_pipe_out_sd)
-        return (array_pipe_out)
+        return (array_pipe_out_sd)
 
 
 def tohex(val, nbits):
@@ -194,19 +204,9 @@ def update_gain_values(formated_lines_coef):
     global gain_detectors_real
 
     if enable_high_filter == 0:
-        gain_detectors = [
-            formated_lines_coef[263], # param 264
-            formated_lines_coef[264], # param 265
-            formated_lines_coef[265], # param 266
-            formated_lines_coef[266], # param 267
-        ]
+        gain_detectors = formated_lines_coef[Gain_Low_Start_Index:Gain_Low_Start_Index + Detector_Number]
     else:
-        gain_detectors = [
-            formated_lines_coef[267], # param 268
-            formated_lines_coef[268], # param 269
-            formated_lines_coef[269], # param 270
-            formated_lines_coef[270], # param 271
-        ]
+        gain_detectors = formated_lines_coef[Gain_High_Start_Index:Gain_High_Start_Index + Detector_Number]
 
     gain_detectors_real = [2 ** gain_detector for gain_detector in gain_detectors]
 
@@ -222,6 +222,15 @@ def spectrum_label(detector):
         max_x
     )
 
+def spectrum_sd_label(detector):
+    max_value = max(Spectres_sd[detector])
+    max_x = Spectres_sd[detector].index(max_value)
+    return "detecteur {} - SD - max {} @ x={}".format(
+        detector,
+        max_value,
+        max_x
+    )
+
 def pathname1():
     i = tk.b4.winfo_id()
     print("identité", i)
@@ -232,6 +241,7 @@ def delay_end(fig):
 
     global init_spectrum
     global Spectres
+    global Spectres_sd
 
     racine.after(200, lambda:delay_end(fig))
     #print("delay_end")
@@ -242,7 +252,7 @@ def delay_end(fig):
     des.getwire(adress_wire_out_science)
 
 
-    if get == 4112:
+    if get == Spectrum_Pipe_Word_Count:
         #print("read pointer spectrum filter 0 : {}".format(get))
         # print("################################ READ FIFO  Pipe spectrum filter 0 #############################################")
         adresse_pipe_out_read = 0xA2  # filter1
@@ -253,18 +263,12 @@ def delay_end(fig):
         adress_wire_out_science = 0x26  # filter 0 SD
         des.getwire(adress_wire_out_science)
 
-        if get == 48:
+        if get == Spectrum_SD_Word_Count:
 
             print("read pointer spectrum filter 0 standard definition : {}".format(get))
             adresse_pipe_out_read = 0xA5  # filter0
             des.getpipeout_sd(adresse_pipe_out_read)
             list_array_pipe_out_standard_definition = list(array_pipe_out_sd)
-
-            for element in list_array_pipe_out_standard_definition[0:11]:
-                print("spectrum SD filter 0", tohex(element, 32))
-
-            for element in list_array_pipe_out_standard_definition[11:23]:
-                print("spectrum SD filter 1", tohex(element, 32))
 
             adress_wire_out_science = 0x28
             des.getwire(adress_wire_out_science)
@@ -280,41 +284,63 @@ def delay_end(fig):
             print("read counter pulse filter Standard definition  detector 1 add=0x29 {}".format(get))
             print("############################################")
 
-
-            #print("################################ DATA of spectrum by detector #############################################")
             for detector in range(0, Detector_Number):
-                start_index = detector * Spectrum_Block_Size + 4
-                end_index = (detector + 1) * Spectrum_Block_Size
+                start_index = detector * Spectrum_SD_Filter_Word_Count + 4
+                end_index = (detector + 1) * Spectrum_SD_Filter_Word_Count
 
-                for elm in list_array_pipe_out[start_index:end_index]:
+                for elm in list_array_pipe_out_standard_definition[start_index:end_index]:
                     data = (elm & 0xFFFF)
 
                     if np.short(data) != 0:
                         add = int(((elm & 0xFFFF0000) / 2 ** 16))
-                        if 0 <= add < Spectrum_Depth:
-                            Spectres[detector][add] = Spectres[detector][add] + data
+                        if 0 <= add < Spectrum_SD_Depth:
+                            Spectres_sd[detector][add] = Spectres_sd[detector][add] + data
+
+        #print("################################ DATA of spectrum by detector #############################################")
+        for detector in range(0, Detector_Number):
+            start_index = detector * Spectrum_Block_Size + 4
+            end_index = (detector + 1) * Spectrum_Block_Size
+
+            for elm in list_array_pipe_out[start_index:end_index]:
+                data = (elm & 0xFFFF)
+
+                if np.short(data) != 0:
+                    add = int(((elm & 0xFFFF0000) / 2 ** 16))
+                    if 0 <= add < Spectrum_Depth:
+                        Spectres[detector][add] = Spectres[detector][add] + data
 
         # racine.bind("<BackSpace>",  clear_vect())
 
         if init_spectrum == True :
 
             Spectres = [[0 for i in range(0, Spectrum_Depth)] for detector in range(0, Detector_Number)]
+            Spectres_sd = [[0 for i in range(0, Spectrum_SD_Depth)] for detector in range(0, Detector_Number)]
             init_spectrum = False
             # tk.messagebox.showinfo("showinfo", "init_spectrum = {}".format(init_spectrum))
 
         min_spectrum = min(min(Spectre) for Spectre in Spectres)
         max_spectrum = max(max(Spectre) for Spectre in Spectres)
+        min_spectrum_sd = min(min(Spectre) for Spectre in Spectres_sd)
+        max_spectrum_sd = max(max(Spectre) for Spectre in Spectres_sd)
 
 
         fig.axes[0].set_ylim(((min_spectrum, max_spectrum)))
+        fig.axes[1].set_ylim(((min_spectrum_sd, max_spectrum_sd)))
         for detector in range(0, Detector_Number):
             fig.axes[0].lines[detector].set_ydata(Spectres[detector])
             fig.axes[0].lines[detector].set_label(spectrum_label(detector))
+            fig.axes[1].lines[detector].set_ydata(Spectres_sd[detector])
+            fig.axes[1].lines[detector].set_label(spectrum_sd_label(detector))
         legend = fig.axes[0].get_legend()
         if legend:
             legend_texts = legend.get_texts()
             for detector in range(0, min(Detector_Number, len(legend_texts))):
                 legend_texts[detector].set_text(spectrum_label(detector))
+        legend_sd = fig.axes[1].get_legend()
+        if legend_sd:
+            legend_texts_sd = legend_sd.get_texts()
+            for detector in range(0, min(Detector_Number, len(legend_texts_sd))):
+                legend_texts_sd[detector].set_text(spectrum_sd_label(detector))
         #racine.update()
         canvas.draw_idle()
 
@@ -368,6 +394,7 @@ def close() :
     print("\nNb de coups :")
     for detector in range(0, Detector_Number):
         print("detecteur {} = {}".format(detector, sum(Spectres[detector])))
+        print("detecteur {} SD = {}".format(detector, sum(Spectres_sd[detector])))
 
     save_signal_in_file(Spectres[0])
     #print(time.strftime())
@@ -452,7 +479,9 @@ def get_gain_filtre0(event) :
     #list2 = formated_lines_coef[136:139]
     #formated_lines_coef = list1 + [gain_filtre0] + list2
 
-    formated_lines_coef[135] = gain_filtre0
+    for detector in range(0, Detector_Number):
+        formated_lines_coef[Gain_Low_Start_Index + detector] = gain_filtre0
+    update_gain_values(formated_lines_coef)
 
     for index, fruit in enumerate(formated_lines_coef):
         print(f"L'index {index} correspond à : {fruit}")
@@ -479,7 +508,9 @@ def gain_high_frequency0(event) :
     print("gain_high_frequency0:",valeur)
     gain_filtre0 = int(math.log2(int(valeur)))
 
-    formated_lines_coef[136] = gain_filtre0
+    for detector in range(0, Detector_Number):
+        formated_lines_coef[Gain_High_Start_Index + detector] = gain_filtre0
+    update_gain_values(formated_lines_coef)
 
     for index, fruit in enumerate(formated_lines_coef):
         print(f"L'index {index} correspond à : {fruit}")
@@ -515,7 +546,9 @@ def get_gain_filtre1(event) :
     des.setwire_gain_filtre1(gain_filtre1)
     print(gain_filtre1)
 
-    formated_lines_coef[137] = gain_filtre1
+    for detector in range(0, Detector_Number):
+        formated_lines_coef[Gain_High_Start_Index + detector] = gain_filtre1
+    update_gain_values(formated_lines_coef)
 
     for index, fruit in enumerate(formated_lines_coef):
         print(f"L'index {index} correspond à : {fruit}")
@@ -546,7 +579,9 @@ def gain_high_frequency1(event) :
     des.setwire_gain_high_frequency1(gain_filtre1)
     print(gain_filtre1)
 
-    formated_lines_coef[138] = gain_filtre1
+    for detector in range(0, Detector_Number):
+        formated_lines_coef[Gain_High_Start_Index + detector] = gain_filtre1
+    update_gain_values(formated_lines_coef)
 
     for index, fruit in enumerate(formated_lines_coef):
         print(f"L'index {index} correspond à : {fruit}")
@@ -565,11 +600,14 @@ racine = tk.Tk() #fait apparaitre fenetre principale
 des = DESTester()
 
 
-# the figure that will contain the plot
-fig = Figure(figsize=(5, 5),dpi=100)
+# the figure that will contain the plots
+fig = Figure(figsize=(11, 5),dpi=100)
 
-# adding the subplot
-plot1 = fig.add_subplot(111)
+# adding the subplots
+plot_hd = fig.add_subplot(121)
+plot_sd = fig.add_subplot(122)
+plot_hd.set_title("Spectre haute definition")
+plot_sd.set_title("Spectre basse definition")
 
 # creating the Tkinter canvas
 # containing the Matplotlib figure
@@ -584,7 +622,7 @@ toolbar = NavigationToolbar2Tk(canvas,racine)
 
 toolbar.update()
 
-racine.geometry("600x600+500+500")
+racine.geometry("1200x650+300+300")
 racine.pack_propagate(0)
 racine.title("Main_Win_GSE_3UT")
 label = tk.Label(racine, text="GSE GUI 3UT")
@@ -674,9 +712,12 @@ des.start_capture(param(mode_adc, enable_high_filter, continuous_ready, start_ca
 
 for detector in range(0, Detector_Number):
     fig.axes[0].plot(Spectres[detector], label = spectrum_label(detector))  #Axes class represents one (sub-)plot in a figure
-plot1.legend(loc="upper left", fontsize=7, framealpha=0.75)
+    fig.axes[1].plot(Spectres_sd[detector], label = spectrum_sd_label(detector))
+plot_hd.legend(loc="upper left", fontsize=7, framealpha=0.75)
+plot_sd.legend(loc="upper left", fontsize=7, framealpha=0.75)
 fig.supxlabel("raw")
 fig.supylabel("Count number")
+fig.tight_layout()
 
 delay_end(fig)
 
