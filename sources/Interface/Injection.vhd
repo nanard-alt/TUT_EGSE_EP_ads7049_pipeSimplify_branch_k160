@@ -52,7 +52,7 @@ begin
             count            <= (others => '0');
             count_wait_valid <= (others => '0');
 
-            o_data              <= x"258";
+            o_data              <= x"064";
             o_ready             <= '0';
             wait_one_cycle      <= '0';
             o_injection_started <= '0';

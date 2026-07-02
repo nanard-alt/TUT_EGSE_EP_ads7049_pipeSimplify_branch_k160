@@ -408,16 +408,16 @@ def close() :
 
 
 
-def Injection() :
+def Injection(signal_file_name) :
 
     mode_adc = 0  # set to one if ADC use
     continuous_ready = 0  # generally set to zero set to one if filter analysis
     start_capture = 1
 
-    print("injection")
+    print("injection {}".format(signal_file_name))
     des.start_capture(param(mode_adc, enable_high_filter, continuous_ready, start_capture, reset))
 
-    file_name = open('Signal_ADC_400keV.txt', "r")
+    file_name = open(signal_file_name, "r")
     lines = file_name.readlines()
     formated_lines = []
     for elm in lines:
@@ -431,11 +431,23 @@ def Injection() :
 
     #################################### write formated_lines to pipe in INJECTION ##########################################
 
-    print("############## INJection #####################")
+    print("############## INJection {} #####################".format(signal_file_name))
     list_pipe_in_array = np.array(formated_lines)
     # print("list_pipe_in_array{}.format"(list_pipe_in_array))
     adresse = 0x80
     des.setpipein(list_pipe_in_array, adresse)
+
+def Injection_20keV() :
+    Injection('Signal_ADC_20keV.txt')
+
+def Injection_100keV() :
+    Injection('Signal_ADC_100keV.txt')
+
+def Injection_400keV() :
+    Injection('Signal_ADC_400keV.txt')
+
+def Injection_800keV() :
+    Injection('Signal_ADC_800keV.txt')
 
 def ADC() :
 
@@ -627,14 +639,29 @@ racine.pack_propagate(0)
 racine.title("Main_Win_GSE_3UT")
 label = tk.Label(racine, text="GSE GUI 3UT")
 label.pack()
+enable_high_filter_label = tk.Label(
+    racine,
+    text="enable_high_filter = {}".format(enable_high_filter),
+    bg="#fff2b3" if enable_high_filter else "#e8e8e8",
+    fg="#7a4a00" if enable_high_filter else "#333333",
+    padx=10,
+    pady=4
+)
+enable_high_filter_label.pack()
 
 #b5 = Button(racine, text="RESET", command=Reset_unreset,name="b5") # BOUTON reset
-b6 = tk.Button(racine, text="Injection", command=Injection,name="b6") # BOUTON Injection
+b6 = tk.Button(racine, text="Inject 20 keV", command=Injection_20keV, name="b6", bg="#d7f5d0", activebackground="#b8e8ad")
+b8 = tk.Button(racine, text="Inject 100 keV", command=Injection_100keV, name="b8", bg="#d6e9ff", activebackground="#b8d8ff")
+b9 = tk.Button(racine, text="Inject 400 keV", command=Injection_400keV, name="b9", bg="#ffe2c2", activebackground="#ffc98f")
+b10 = tk.Button(racine, text="Inject 800 keV", command=Injection_800keV, name="b10", bg="#ffd6d6", activebackground="#ffb3b3")
 b7 = tk.Button(racine, text="ADC", command=ADC,name="b7") # BOUTON Injection
 #b8 = Button(racine, text="Close Opal Kelly", command=close,name="b8") # BOUTON Injection
 #b5.pack()
 b7.pack()
 b6.pack()
+b8.pack()
+b9.pack()
+b10.pack()
 #b8.pack()
 
 label = tk.Label(racine, text="level pulse rising : 1->1024")
