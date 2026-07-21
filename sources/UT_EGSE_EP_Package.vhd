@@ -32,6 +32,10 @@ package UT_EGSE_EP_Package is
     type Array_Array_config_32x16_type is array (0 to Filter_Number - 1) of Array_config_32x16_type;
     type Array_Array_config_32x16_type_32x16_type is array (0 to Detector_Number - 1) of Array_Array_config_32x16_type;
 
+    type Array_config_10x16_type is array (0 to 9) of signed(15 downto 0);
+    type Array_Array_config_10x16_type is array (0 to Filter_Number - 1) of Array_config_10x16_type;
+    type Array_Array_Array_config_10x16_type is array (0 to Detector_Number - 1) of Array_Array_config_10x16_type;	
+
     type Array_config_32stdx2_type is array (0 to Filter_Number - 1) of std_logic_vector(31 downto 0);
 
     type Array_config_32stdxDetector_Number_type is array (0 to Detector_Number - 1) of std_logic_vector(31 downto 0);

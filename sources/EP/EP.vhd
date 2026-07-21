@@ -42,11 +42,13 @@ entity EP is
         -- out
         --o_data_after_gain         : out signed(15 downto 0);
         o_ready_after_gain           : out std_logic;
-        --coef
+        -- coef
         i_enable_high_filter         : in  std_logic;
         i_coef_fir                   : in  Array_Array_config_32x16_type;
         i_coef_fir_ready             : in  std_logic;
         o_data_before_filter         : out signed(15 downto 0);
+        -- param detect_standard_energy
+        i_standard_energy_threshold  : in  Array_Array_Array_config_10x16_type;
         -- out spectrum to fifo pipe out
         o_pipe_out_spectrum_din      : out std_logic_vector(31 downto 0);
         o_pipe_out_spectrum_wr_en    : out std_logic;
@@ -65,26 +67,26 @@ architecture RTL of EP is
     signal data_before_filter_CDC  : signed(15 downto 0);
     signal ready_before_filter_CDC : std_logic;
 
-    signal ready_before_filter     : std_logic_vector(Filter_Number-1 downto 0);
+    signal ready_before_filter     : std_logic_vector(Filter_Number - 1 downto 0);
     signal data_before_filter      : Array_config_16signedx2_type;
     signal data_after_filter       : Array_config_16signedx2_type;
     signal Energy_level_max        : Array_config_16signedx2_type;
-    signal readyEnergy_level_max   : std_logic_vector(Filter_Number-1 downto 0);
+    signal readyEnergy_level_max   : std_logic_vector(Filter_Number - 1 downto 0);
     signal data_after_energy_level : Array_config_16signedx2_type;
 
-    signal ready_after_filter : std_logic_vector(Filter_Number-1 downto 0);
+    signal ready_after_filter : std_logic_vector(Filter_Number - 1 downto 0);
     signal data_after_gain    : Array_config_16signedx2_type;
-    signal ready_after_gain   : std_logic_vector(Filter_Number-1 downto 0);
+    signal ready_after_gain   : std_logic_vector(Filter_Number - 1 downto 0);
 
-    signal ready_energy_level_max_sd : std_logic_vector(Filter_Number-1 downto 0);
+    signal ready_energy_level_max_sd : std_logic_vector(Filter_Number - 1 downto 0);
     signal energy_level_max_sd       : Array_config_16signedx2_type;
 
     signal pipe_out_spectrum_din   : Array_config_32stdx2_type;
-    signal pipe_out_spectrum_wr_en : std_logic_vector(Filter_Number-1 downto 0);
+    signal pipe_out_spectrum_wr_en : std_logic_vector(Filter_Number - 1 downto 0);
     signal spectrum_count_pulse    : Array_config_32stdx2_type;
 
     signal pipe_out_spectrum_sd_din   : Array_config_32stdx2_type;
-    signal pipe_out_spectrum_sd_wr_en : std_logic_vector(Filter_Number-1 downto 0);
+    signal pipe_out_spectrum_sd_wr_en : std_logic_vector(Filter_Number - 1 downto 0);
     signal spectrum_sd_count_pulse    : Array_config_32stdx2_type;
 
     signal TH_rise : Array_config_32stdx2_type;
@@ -247,6 +249,7 @@ begin
             port map(
                 i_clk_slow                  => i_clk_slow,
                 i_reset                     => i_reset,
+                i_standard_energy_threshold => i_standard_energy_threshold(to_integer(i_detector_number))(N),
                 i_ready_energy_level_max    => readyEnergy_level_max(N),
                 i_energy_level_max          => Energy_level_max(N),
                 o_ready_energy_level_max_sd => ready_energy_level_max_sd(N),

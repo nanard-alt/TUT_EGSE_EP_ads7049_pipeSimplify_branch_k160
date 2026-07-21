@@ -49,6 +49,8 @@ begin
             ready_after_gain_resize <= '0';
             if i_ready_after_filter = '1' then
                 ready_after_gain_resize <= '1';
+                -- Extension signée sur 21 bits pour garder de la marge avant l'application du gain par décalage.
+                -- 21 c'est 16+5 donc 5 bits marge
                 data_after_gain_resize  <= resize(signed(i_data_after_filter), 21);
             end if;
         end if;
@@ -63,6 +65,7 @@ begin
             ready_after_gain <= '0';
             if ready_after_gain_resize = '1' then
                 ready_after_gain <= '1';
+                -- Application du gain : décalage à gauche équivalent à une multiplication par 2^i_gain.
                 data_after_gain  <= SHIFT_LEFT(data_after_gain_resize, To_integer(i_gain));
             end if;
         end if;
@@ -78,6 +81,7 @@ begin
             if ready_after_gain = '1' then
                 o_ready_after_gain <= '1';
                 if data_after_gain < 32768 then
+                    -- Retour au format 16 bits lorsque le résultat amplifié reste dans la plage autorisée.
                     o_data_after_gain <= resize(signed(data_after_gain), 16);
                 else
                     o_data_after_gain <= To_signed(32735, 16);

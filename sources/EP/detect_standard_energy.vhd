@@ -14,10 +14,14 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.UT_EGSE_EP_Package.all;
+
 entity detect_standard_energy is
     port(
         i_clk_slow                  : in  std_logic;
         i_reset                     : in  std_logic;
+        
+        i_standard_energy_threshold : in  Array_config_10x16_type;
         -- input from detect Energy level
         i_ready_energy_level_max    : in  std_logic;
         i_energy_level_max          : in  signed(15 downto 0);
@@ -28,7 +32,7 @@ entity detect_standard_energy is
 end entity detect_standard_energy;
 
 architecture RTL of detect_standard_energy is
-   
+
 begin
 
     ------------------------------------------
@@ -37,41 +41,47 @@ begin
 
     label_detect_standard_energy : process(i_clk_slow, i_reset) is
     begin
-    if i_reset = '1' then
+        if i_reset = '1' then
 
-        o_energy_level_max_sd       <= (others => '0');
-        o_ready_energy_level_max_sd <= '0';
+            o_energy_level_max_sd       <= (others => '0');
+            o_ready_energy_level_max_sd <= '0';
 
-    elsif rising_edge(i_clk_slow) then
+        elsif rising_edge(i_clk_slow) then
 
-        o_ready_energy_level_max_sd <= '0';
+            o_ready_energy_level_max_sd <= '0';
 
-        if i_energy_level_max >= 0 and i_energy_level_max < 6553 and i_ready_energy_level_max = '1' then
-            o_ready_energy_level_max_sd <= '1';
-            o_energy_level_max_sd       <= x"1000";
-        else
-            if i_energy_level_max >= 6553 and i_energy_level_max < 13106 and i_ready_energy_level_max = '1' then
-                o_ready_energy_level_max_sd <= '1';
-                o_energy_level_max_sd       <= x"2000";
-            else
-                if i_energy_level_max >= 13106 and i_energy_level_max < 19659 and i_ready_energy_level_max = '1' then
+            if i_ready_energy_level_max = '1' then
+
+                if i_energy_level_max >= i_standard_energy_threshold(0) and i_energy_level_max < i_standard_energy_threshold(1) then
+
+                    o_ready_energy_level_max_sd <= '1';
+                    o_energy_level_max_sd       <= x"1000";
+
+                elsif i_energy_level_max >= i_standard_energy_threshold(2) and i_energy_level_max < i_standard_energy_threshold(3) then
+
+                    o_ready_energy_level_max_sd <= '1';
+                    o_energy_level_max_sd       <= x"2000";
+
+                elsif i_energy_level_max >= i_standard_energy_threshold(4) and i_energy_level_max < i_standard_energy_threshold(5) then
+
                     o_ready_energy_level_max_sd <= '1';
                     o_energy_level_max_sd       <= x"3000";
-                else
-                    if i_energy_level_max >= 19659 and i_energy_level_max < 26212 and i_ready_energy_level_max = '1' then
-                        o_ready_energy_level_max_sd <= '1';
-                        o_energy_level_max_sd       <= x"4000";
-                    else
-                        if i_energy_level_max >= 26212 and i_energy_level_max <= 32767 and i_ready_energy_level_max = '1' then
-                            o_ready_energy_level_max_sd <= '1';
-                            o_energy_level_max_sd       <= x"5000";
-                        end if;
-                    end if;
+
+                elsif i_energy_level_max >= i_standard_energy_threshold(6) and i_energy_level_max < i_standard_energy_threshold(7) then
+
+                    o_ready_energy_level_max_sd <= '1';
+                    o_energy_level_max_sd       <= x"4000";
+
+                elsif i_energy_level_max >= i_standard_energy_threshold(8) and i_energy_level_max <= i_standard_energy_threshold(9) then
+
+                    o_ready_energy_level_max_sd <= '1';
+                    o_energy_level_max_sd       <= x"5000";
+
                 end if;
             end if;
+
         end if;
-        
-    end if;    
+
     end process;
 
 end architecture RTL;
