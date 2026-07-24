@@ -28,13 +28,13 @@ entity EP is
         i_clk_synchro_spectrum       : in  std_logic;
         i_detector_number            : in  unsigned;
         --input param
-        i_gain                       : in  Array_config_32unsignedx2_type;
-        i_TH_ADC                     : in  std_logic_vector(31 downto 0);
-        i_TH_rise                    : in  std_logic_vector(31 downto 0);
-        i_TH_fall                    : in  std_logic_vector(31 downto 0);
+        i_gain                       : in  Array_config_16unsignedx2_type;
+        i_TH_ADC                     : in  std_logic_vector(15 downto 0);
+        i_TH_rise                    : in  std_logic_vector(15 downto 0);
+        i_TH_fall                    : in  std_logic_vector(15 downto 0);
         --input param high frquency
-        i_TH_rise_high_frequency     : in  std_logic_vector(31 downto 0);
-        i_TH_fall_high_frequency     : in  std_logic_vector(31 downto 0);
+        i_TH_rise_high_frequency     : in  std_logic_vector(15 downto 0);
+        i_TH_fall_high_frequency     : in  std_logic_vector(15 downto 0);
         --i_enable_erase            : in  std_logic;
         -- input
         i_ready_CDC                  : in  std_logic;
@@ -89,8 +89,8 @@ architecture RTL of EP is
     signal pipe_out_spectrum_sd_wr_en : std_logic_vector(Filter_Number - 1 downto 0);
     signal spectrum_sd_count_pulse    : Array_config_32stdx2_type;
 
-    signal TH_rise : Array_config_32stdx2_type;
-    signal TH_fall : Array_config_32stdx2_type;
+    signal TH_rise : Array_config_16stdx2_type;
+    signal TH_fall : Array_config_16stdx2_type;
 
     --signal gain : Array_config_32unsignedx2_type;
 

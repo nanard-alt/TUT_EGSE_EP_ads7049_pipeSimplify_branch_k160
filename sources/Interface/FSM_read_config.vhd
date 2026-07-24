@@ -31,9 +31,9 @@ entity FSM_read_config is
         o_coef_fir_ready        : out std_logic;
         o_coef_fir              : out Array_Array_config_32x16_type_32x16_type;
         --output reg 
-        o_reg_config            : out Array_config_32stdx8_type;
+        o_reg_config            : out Array_config_16stdx8_type;
         -- output gain
-        o_gain                  : out Array_Array_config_32stdxDetector_Number_type
+        o_gain                  : out Array_Array_config_16unsignedxDetector_Number_type
         -- output gain
         --o_gain_high_frequency   : out Array_Array_config_32stdx2_type
     );
@@ -186,7 +186,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(1) <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(1) <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config    <= read_TH_rise;
                     end if;
 
@@ -199,7 +199,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(2) <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(2) <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config    <= read_TL_fall;
                     end if;
 
@@ -212,7 +212,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(3) <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(3) <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config    <= read_TH_ADC;
                     end if;
 
@@ -225,7 +225,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(4)     <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(4)     <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config        <= read_level_DAC;
                         cnt_number_detector <= 0;
                     end if;
@@ -239,7 +239,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(5)     <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(5)     <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config        <= read_TH_rise_high_frequency;
                         cnt_number_detector <= 0;
                     end if;
@@ -253,7 +253,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(6)     <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(6)     <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config        <= read_TH_fall_high_frequency;
                         cnt_number_detector <= 0;
                     end if;
@@ -267,7 +267,7 @@ begin
 
                     o_pipe_in_config_rd_en <= '0';
                     if i_pipe_in_config_valid = '1' then
-                        o_reg_config(7)     <= std_logic_vector(i_pipe_in_config_dout);
+                        o_reg_config(7)     <= std_logic_vector(i_pipe_in_config_dout(15 downto 0));
                         state_config        <= read_gain;
                         cnt_number_detector <= 0;
                     end if;
@@ -293,7 +293,7 @@ begin
 
                     if i_pipe_in_config_valid = '1' then
                         cnt_number_detector            <= cnt_number_detector + 1;
-                        o_gain(cnt_number_detector)(0) <= unsigned(i_pipe_in_config_dout); -- set all detector for low frequency filter
+                        o_gain(cnt_number_detector)(0) <= unsigned(i_pipe_in_config_dout(15 downto 0)); -- set all detector for low frequency filter
                         state_config                   <= read_gain;
                     end if;
 
@@ -317,7 +317,7 @@ begin
 
                     if i_pipe_in_config_valid = '1' then
                         cnt_number_detector            <= cnt_number_detector + 1;
-                        o_gain(cnt_number_detector)(1) <= unsigned(i_pipe_in_config_dout); -- set all detector high_frequency
+                        o_gain(cnt_number_detector)(1) <= unsigned(i_pipe_in_config_dout(15 downto 0)); -- set all detector high_frequency
                         state_config                   <= read_gain_high_frequency;
                     end if;
 

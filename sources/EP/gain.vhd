@@ -20,7 +20,7 @@ entity gain is
         i_clk_slow           : in  std_logic;
         i_reset              : in  std_logic;
         -- input gain       
-        i_gain               : in  unsigned(31 downto 0);
+        i_gain               : in  unsigned(15 downto 0);
         -- input data
         i_data_after_filter  : in  signed(15 downto 0);
         i_ready_after_filter : in  std_logic;

@@ -94,7 +94,7 @@ architecture arch of TUT_EGSE is
     signal rd_en_fifo_pipe_out_raw_data : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
     signal led_buf                      : STD_LOGIC_VECTOR(3 downto 0);
 
-    signal ep01wire : STD_LOGIC_VECTOR(31 downto 0);
+    signal ep01wire : STD_LOGIC_VECTOR(15 downto 0);
 
     signal pipe_in_config_din   : STD_LOGIC_VECTOR(31 downto 0);
     signal pipe_in_config_wr_en : std_logic;
@@ -136,12 +136,12 @@ architecture arch of TUT_EGSE is
     signal data_rx_keeped  : Array_config_16stdxDetector_Number_type;
     signal ready_rx_keeped : std_logic_vector(Detector_Number - 1 downto 0);
 
-    signal TH_rise : std_logic_vector(31 downto 0);
-    signal TH_fall : std_logic_vector(31 downto 0);
-    signal TH_ADC  : std_logic_vector(31 downto 0);
+    signal TH_rise : std_logic_vector(15 downto 0);
+    signal TH_fall : std_logic_vector(15 downto 0);
+    signal TH_ADC  : std_logic_vector(15 downto 0);
 
-    signal TH_rise_high_frequency : std_logic_vector(31 downto 0);
-    signal TH_fall_high_frequency : std_logic_vector(31 downto 0);
+    signal TH_rise_high_frequency : std_logic_vector(15 downto 0);
+    signal TH_fall_high_frequency : std_logic_vector(15 downto 0);
 
     signal pipe_out_spectrum_rd_en : std_logic;
     signal pipe_out_spectrum_dout  : std_logic_vector(31 downto 0);
@@ -174,11 +174,11 @@ architecture arch of TUT_EGSE is
     signal injection_started            : std_logic;
     signal continuous_injection         : std_logic;
     signal enable_high_filter           : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
-    signal i_gain                       : Array_Array_config_32stdxDetector_Number_type;
+    signal i_gain                       : Array_Array_config_16unsignedxDetector_Number_type;
     --signal i_gain_high_frequency        : Array_config_32stdxDetector_Number_type;
     --signal gain                         : Array_Array_config_32stdxDetector_Number_type;
     --signal gain_high_frequency          : Array_config_32stdx2_type;
-    signal reg_config                   : Array_config_32stdx8_type;
+    signal reg_config                   : Array_config_16stdx8_type;
     signal standard_energy_threshold    : Array_Array_Array_config_10x16_type := (
         others => (
             others => (
@@ -668,7 +668,7 @@ begin
                 i_level_trigger(N) <= '0';
             elsif rising_edge(sys_clk) then
                 --  test if injection mode to avoid trigger on value 0
-                if (signed(ep01wire(15 downto 0)) < data_before_filter(N) and injection_started = '1' and reg_global(31) = '0') or (signed(ep01wire(15 downto 0)) < data_before_filter(N) and reg_global(31) = '1') then
+                if (signed(ep01wire) < data_before_filter(N) and injection_started = '1' and reg_global(31) = '0') or (signed(ep01wire) < data_before_filter(N) and reg_global(31) = '1') then
                     i_level_trigger(N) <= '1';
                 else
                     i_level_trigger(N) <= '0';

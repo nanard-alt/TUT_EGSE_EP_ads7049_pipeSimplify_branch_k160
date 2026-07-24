@@ -23,9 +23,9 @@ entity Energy_level is
         --input
         i_data_after_filter       : in  signed(15 downto 0);
         --input Th level
-        i_TH_ADC                  : in  std_logic_vector(31 downto 0);
-        i_TH_rise                 : in  std_logic_vector(31 downto 0);
-        i_TH_fall                 : in  std_logic_vector(31 downto 0);
+        i_TH_ADC                  : in  std_logic_vector(15 downto 0);
+        i_TH_rise                 : in  std_logic_vector(15 downto 0);
+        i_TH_fall                 : in  std_logic_vector(15 downto 0);
         --output
         o_Energy_level_max        : out signed(15 downto 0);
         o_readyEnergy_level_max   : out std_logic;
@@ -64,10 +64,10 @@ begin
                     o_data_after_energy_level <= i_data_after_gain;
                     o_readyEnergy_level_max   <= '0';
 
-                    if (i_data_before_filter > signed(i_TH_ADC(15 downto 0))) and i_TH_ADC /= x"00000000" then
+                    if (i_data_before_filter > signed(i_TH_ADC)) and i_TH_ADC /= x"0000" then
                         state <= event_saturating;
                     else
-                        if (i_data_after_filter > signed(i_TH_rise(15 downto 0))) and i_TH_rise /= x"00000000" then
+                        if (i_data_after_filter > signed(i_TH_rise)) and i_TH_rise /= x"0000" then
                             state        <= event_detecting;
                             max_research <= i_data_after_filter;
                         end if;
@@ -77,11 +77,11 @@ begin
 
                     o_data_after_energy_level <= i_data_after_gain;
 
-                    if (i_data_before_filter > signed(i_TH_ADC(15 downto 0))) and i_TH_ADC /= x"00000000" then
+                    if (i_data_before_filter > signed(i_TH_ADC)) and i_TH_ADC /= x"0000" then
                         state <= event_saturating;
                     else
 
-                        if (i_data_after_filter < signed(i_TH_fall(15 downto 0))) and i_TH_fall /= x"00000000" then
+                        if (i_data_after_filter < signed(i_TH_fall)) and i_TH_fall /= x"0000" then
                             state <= event_detecting_finish;
                         else
                             if (i_data_after_filter >= max_research) then
