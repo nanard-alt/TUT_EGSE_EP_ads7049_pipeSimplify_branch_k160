@@ -53,26 +53,31 @@ begin
             if i_ready_energy_level_max = '1' then
 
                 if i_energy_level_max >= i_standard_energy_threshold(0) and i_energy_level_max < i_standard_energy_threshold(1) then
+                    -- standard_energy_threshold(0..1): 0 <= energy < 6553
 
                     o_ready_energy_level_max_sd <= '1';
                     o_energy_level_max_sd       <= x"1000";
 
-                elsif i_energy_level_max >= i_standard_energy_threshold(2) and i_energy_level_max < i_standard_energy_threshold(3) then
+                elsif i_energy_level_max >= i_standard_energy_threshold(1) and i_energy_level_max < i_standard_energy_threshold(2) then
+                    -- standard_energy_threshold(1..2): 6553 <= energy < 13106
 
                     o_ready_energy_level_max_sd <= '1';
                     o_energy_level_max_sd       <= x"2000";
 
-                elsif i_energy_level_max >= i_standard_energy_threshold(4) and i_energy_level_max < i_standard_energy_threshold(5) then
+                elsif i_energy_level_max >= i_standard_energy_threshold(2) and i_energy_level_max < i_standard_energy_threshold(3) then
+                    -- standard_energy_threshold(2..3): 13106 <= energy < 19659
 
                     o_ready_energy_level_max_sd <= '1';
                     o_energy_level_max_sd       <= x"3000";
 
-                elsif i_energy_level_max >= i_standard_energy_threshold(6) and i_energy_level_max < i_standard_energy_threshold(7) then
+                elsif i_energy_level_max >= i_standard_energy_threshold(3) and i_energy_level_max < i_standard_energy_threshold(4) then
+                    -- standard_energy_threshold(3..4): 19659 <= energy < 26212
 
                     o_ready_energy_level_max_sd <= '1';
                     o_energy_level_max_sd       <= x"4000";
 
-                elsif i_energy_level_max >= i_standard_energy_threshold(8) and i_energy_level_max <= i_standard_energy_threshold(9) then
+                elsif i_energy_level_max >= i_standard_energy_threshold(4) and i_energy_level_max <= i_standard_energy_threshold(5) then
+                    -- standard_energy_threshold(4..5): 26212 <= energy <= 32767
 
                     o_ready_energy_level_max_sd <= '1';
                     o_energy_level_max_sd       <= x"5000";

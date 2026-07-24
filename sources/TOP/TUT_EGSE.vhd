@@ -184,14 +184,14 @@ architecture arch of TUT_EGSE is
             others => (
                 0 => to_signed(0, 16),
                 1 => to_signed(6553, 16),
-                2 => to_signed(6553, 16),
-                3 => to_signed(13106, 16),
-                4 => to_signed(13106, 16),
-                5 => to_signed(19659, 16),
-                6 => to_signed(19659, 16),
-                7 => to_signed(26212, 16),
-                8 => to_signed(26212, 16),
-                9 => to_signed(32767, 16)
+                2 => to_signed(13106, 16),
+                3 => to_signed(19659, 16),
+                4 => to_signed(26212, 16),
+                5 => to_signed(32767, 16),
+                6 => to_signed(0, 16),
+                7 => to_signed(0, 16),
+                8 => to_signed(0, 16),
+                9 => to_signed(0, 16)
             )
         )
     );
