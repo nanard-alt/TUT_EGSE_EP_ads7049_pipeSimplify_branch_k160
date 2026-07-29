@@ -32,6 +32,7 @@ entity FSM_read_config is
         o_coef_fir              : out Array_Array_config_32x16_type_32x16_type;
         --output reg 
         o_reg_config            : out Array_config_16stdx8_type;
+        o_standard_energy_threshold : out Array_Array_Array_config_10x16_type;
         -- output gain
         o_gain                  : out Array_Array_config_16unsignedxDetector_Number_type
         -- output gain
@@ -44,16 +45,20 @@ architecture RTL of FSM_read_config is
     --    type state_type is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, read_low_frequency, valid_low_frequency, read_trigger, valid_trigger);
     --    signal state    : state_type;
     constant Config_End_Padding_Word_Count : natural := 3;
-    constant Config_Read_Word_Count        : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + Config_End_Padding_Word_Count;
+    constant Standard_Energy_Threshold_Count : natural := 6;
+    constant Config_Read_Word_Count        : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + (Standard_Energy_Threshold_Count * Filter_Number * Detector_Number) + Config_End_Padding_Word_Count;
     signal add_coef : integer;
 
     type state_type_config is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, valid_high_frequency, read_trigger, valid_read_trigger,
                                read_TH_rise, valid_read_TH_rise, read_TL_fall, valid_read_TL_fall, read_TH_ADC, valid_read_TH_ADC, read_gain, valid_read_gain, read_gain_high_frequency,
+                               read_standard_energy_threshold, valid_read_standard_energy_threshold,
                                valid_read_gain_high_frequency, read_level_DAC, valid_read_level_DAC, read_TH_rise_high_frequency, read_end_usb_buffer, valid_read_end_usb_buffer,
                                read_TH_fall_high_frequency, valid_read_TH_fall_high_frequency, valid_read_TH_rise_high_frequency,stop);
 
     signal state_config            : state_type_config;
     signal cnt_number_detector     : integer;
+    signal cnt_number_filter       : integer;
+    signal cnt_standard_energy_threshold : integer;
     signal cnt_read_end_usb_buffer : integer;
     signal count_wait_valid        : unsigned(5 downto 0);
 
@@ -72,12 +77,15 @@ begin
             add_coef               <= 0;
             o_coef_fir             <= (others => (others => (others => (others => '0'))));
             o_gain                 <= (others => (others => (others => '0')));
+            o_standard_energy_threshold <= (others => (others => (others => (others => '0'))));
 
 
             --o_gain_high_frequency(0) <= (others => (others => '0'));
             --o_gain_high_frequency(1) <= (others => (others => '0'));
             o_coef_fir_ready        <= '0';
             cnt_number_detector     <= 0;
+            cnt_number_filter       <= 0;
+            cnt_standard_energy_threshold <= 0;
             cnt_read_end_usb_buffer <= 0;
             o_reg_config            <= (others => (others => '0'));
             count_wait_valid        <= (others => '0');
@@ -94,11 +102,14 @@ begin
                         add_coef                <= 0;
                         o_coef_fir              <= (others => (others => (others => (others => '0'))));
                         o_gain                  <= (others => (others => (others => '0')));
+                        o_standard_energy_threshold <= (others => (others => (others => (others => '0'))));
                        
                         --o_gain_high_frequency(0) <= (others => (others => '0'));
                         --o_gain_high_frequency(1) <= (others => (others => '0'));
                         o_coef_fir_ready        <= '0';
                         cnt_number_detector     <= 0;
+                        cnt_number_filter       <= 0;
+                        cnt_standard_energy_threshold <= 0;
                         cnt_read_end_usb_buffer <= 0;
                         o_reg_config            <= (others => (others => '0'));
                         count_wait_valid        <= (others => '0');
@@ -300,9 +311,11 @@ begin
                 when read_gain_high_frequency =>
 
                     if cnt_number_detector = Detector_Number then
-                        state_config           <= read_end_usb_buffer;
+                        state_config           <= read_standard_energy_threshold;
                         o_pipe_in_config_rd_en <= '0';
                         cnt_number_detector    <= 0;
+                        cnt_number_filter      <= 0;
+                        cnt_standard_energy_threshold <= 0;
 
                     else
                         state_config           <= valid_read_gain_high_frequency;
@@ -319,6 +332,43 @@ begin
                         cnt_number_detector            <= cnt_number_detector + 1;
                         o_gain(cnt_number_detector)(1) <= unsigned(i_pipe_in_config_dout(15 downto 0)); -- set all detector high_frequency
                         state_config                   <= read_gain_high_frequency;
+                    end if;
+
+                when read_standard_energy_threshold =>
+
+                    if cnt_number_detector = Detector_Number then
+                        state_config           <= read_end_usb_buffer;
+                        o_pipe_in_config_rd_en <= '0';
+                        cnt_number_detector    <= 0;
+                        cnt_number_filter      <= 0;
+                        cnt_standard_energy_threshold <= 0;
+
+                    else
+                        state_config           <= valid_read_standard_energy_threshold;
+                        o_pipe_in_config_rd_en <= '1';
+                    end if;
+
+                when valid_read_standard_energy_threshold =>
+
+                    o_pipe_in_config_rd_en <= '0';
+
+                    if i_pipe_in_config_valid = '1' then
+                        o_standard_energy_threshold(cnt_number_detector)(cnt_number_filter)(cnt_standard_energy_threshold) <= i_pipe_in_config_dout(15 downto 0);
+
+                        if cnt_standard_energy_threshold = Standard_Energy_Threshold_Count - 1 then
+                            cnt_standard_energy_threshold <= 0;
+
+                            if cnt_number_filter = Filter_Number - 1 then
+                                cnt_number_filter   <= 0;
+                                cnt_number_detector <= cnt_number_detector + 1;
+                            else
+                                cnt_number_filter <= cnt_number_filter + 1;
+                            end if;
+                        else
+                            cnt_standard_energy_threshold <= cnt_standard_energy_threshold + 1;
+                        end if;
+
+                        state_config <= read_standard_energy_threshold;
                     end if;
 
                 when read_end_usb_buffer =>

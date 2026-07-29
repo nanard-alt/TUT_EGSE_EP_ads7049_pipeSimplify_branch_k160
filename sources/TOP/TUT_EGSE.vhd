@@ -179,22 +179,7 @@ architecture arch of TUT_EGSE is
     --signal gain                         : Array_Array_config_32stdxDetector_Number_type;
     --signal gain_high_frequency          : Array_config_32stdx2_type;
     signal reg_config                   : Array_config_16stdx8_type;
-    signal standard_energy_threshold    : Array_Array_Array_config_10x16_type := (
-        others => (
-            others => (
-                0 => to_signed(0, 16),
-                1 => to_signed(6553, 16),
-                2 => to_signed(13106, 16),
-                3 => to_signed(19659, 16),
-                4 => to_signed(26212, 16),
-                5 => to_signed(32767, 16),
-                6 => to_signed(0, 16),
-                7 => to_signed(0, 16),
-                8 => to_signed(0, 16),
-                9 => to_signed(0, 16)
-            )
-        )
-    );
+    signal standard_energy_threshold    : Array_Array_Array_config_10x16_type;
     --signal data_after_gain              : Array_config_16signedx2_type;
     signal data_after_energy_level      : Array_config_16signedxDetector_Number_type;
 
@@ -520,7 +505,7 @@ begin
                 i_coef_fir_ready             => i_coef_fir_ready(N),
                 -- out view
                 o_data_before_filter         => data_before_filter(N),
-                i_standard_energy_threshold  => standard_energy_threshold,
+                i_standard_energy_threshold  => standard_energy_threshold(N),
                 -- out spectrum to fifo pipe out
                 o_pipe_out_spectrum_din      => o_pipe_out_spectrum_din(N),
                 o_pipe_out_spectrum_wr_en    => o_pipe_out_spectrum_wr_en(N),
@@ -775,6 +760,7 @@ begin
             o_coef_fir              => coef_fir,
             ---
             o_reg_config            => reg_config,
+            o_standard_energy_threshold => standard_energy_threshold,
             ----
             o_gain                  => i_gain
         );

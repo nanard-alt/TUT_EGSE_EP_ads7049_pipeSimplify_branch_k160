@@ -40,11 +40,7 @@ architecture simulate of sim_tf is
         -- clock OK
         sys_clkp     : in    STD_LOGIC;
         sys_clkn     : in    STD_LOGIC;
-        -- ADS7049
-        o_sck        : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
-        o_cs_n       : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
-        i_sdi        : in    STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
-        
+        -- ADS7049 disabled in synthesis top
         led          : out   STD_LOGIC_VECTOR(3 downto 0);
         
         -- DAC121S
@@ -125,12 +121,7 @@ inst_DUT : TUT_EGSE
 
         sys_clkp => sys_clkp,
         sys_clkn => sys_clkn,
-
-        -- ADC ADS7049
-        o_sck  => sck_vec,
-        o_cs_n => cs_n_vec,
-        i_sdi  => sdo_vec,
-
+        -- ADC ADS7049 disabled in synthesis top
         led => open,
 
         -- DAC121S
@@ -140,8 +131,8 @@ inst_DUT : TUT_EGSE
         o_DAC_on_off => open
     );
 
-sck <= sck_vec(0);
-cs_n <= cs_n_vec(0);
+sck <= '0';
+cs_n <= '1';
 
     ---------------------------------------------------------------------------------------------------------------------------------
     --

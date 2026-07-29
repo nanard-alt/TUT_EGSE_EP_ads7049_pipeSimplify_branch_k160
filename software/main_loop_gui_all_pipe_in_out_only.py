@@ -12,12 +12,14 @@ import matplotlib.pyplot as plt
 
 init_spectrum = False
 
+# Demande la remise a zero des spectres affiches au prochain rafraichissement.
 def clr_graph() :
     global init_spectrum
     init_spectrum = True
     # tk.messagebox.showinfo("showinfo", "init_spectrum = {}".format(init_spectrum))
 
 
+# Sauvegarde un spectre dans un fichier horodate sous C:/temp.
 def save_signal_in_file (Signal_out) :
 
     trimester = time.strftime("%Y%m%d-%H%M%S")
@@ -45,6 +47,8 @@ Detector_Number = 7
 Filter_Number = 2
 Fir_Coefficient_Count = 32
 Config_Register_Count = 7
+Standard_Energy_Threshold_Count = 6
+Config_End_Padding_Word_Count = 3
 Spectrum_Depth = 1024
 Spectrum_SD_Depth = 8
 Spectrum_Block_Size = 1028
@@ -53,6 +57,8 @@ Spectrum_SD_Filter_Word_Count = 12
 Spectrum_SD_Word_Count = Detector_Number * Spectrum_SD_Filter_Word_Count
 Gain_Low_Start_Index = (Fir_Coefficient_Count * Filter_Number * Detector_Number) + Config_Register_Count
 Gain_High_Start_Index = Gain_Low_Start_Index + Detector_Number
+Standard_Energy_Threshold_Start_Index = Gain_High_Start_Index + Detector_Number
+Config_Frame_Word_Count = Standard_Energy_Threshold_Start_Index + (Standard_Energy_Threshold_Count * Filter_Number * Detector_Number) + Config_End_Padding_Word_Count
 array_pipe_out = np.ones(Spectrum_Pipe_Word_Count).astype(int)
 array_pipe_out_sd = np.ones(Spectrum_SD_Word_Count).astype(int)
 Spectres = [[0 for i in range(0, Spectrum_Depth)] for detector in range(0, Detector_Number)]
@@ -60,6 +66,15 @@ Spectres_sd = [[0 for i in range(0, Spectrum_SD_Depth)] for detector in range(0,
 gain_detectors = [0 for detector in range(0, Detector_Number)]
 gain_detectors_real = [1 for detector in range(0, Detector_Number)]
 
+# Lit le fichier de configuration et verifie la taille attendue par le FPGA.
+def read_coef_file(path='coef_V2.txt'):
+    with open(path, "r") as file:
+        values = [int(line.strip()) for line in file if line.strip()]
+
+    if len(values) != Config_Frame_Word_Count:
+        raise ValueError("{} must contain {} words, got {}".format(path, Config_Frame_Word_Count, len(values)))
+
+    return values
 
 
 #################################### global setting ######################################
@@ -71,10 +86,12 @@ start_capture  = 0
 
 #################################### CLASS ######################################
 
+# Encapsule les acces Opal Kelly FrontPanel: wires, pipe in et pipe out.
 class DESTester:
     def __init__(self):
         return
 
+    # Ouvre la carte Opal Kelly et verifie que FrontPanel est disponible.
     def InitializeDevice(self):
         # Open the first device we find.
         self.xem = ok.FrontPanelDevices().Open()
@@ -111,17 +128,21 @@ class DESTester:
         return(True)
 
 
+    # Ferme la connexion FrontPanel.
     def Close (self) :
         self.xem = ok.FrontPanel().Close()
 
+    # Envoie le mot de controle global avec reset actif.
     def ResetDES(self,param_vals):
         self.xem.SetWireInValue(0x00, param_vals)# ADC mode disable , clear RAM spectre disable, continuous mode disable, reset enable
         self.xem.UpdateWireIns()
 
+    # Envoie le mot de controle global avec reset inactif.
     def unResetDES(self,param_vals):
         self.xem.SetWireInValue(0x00, param_vals)# ADC mode disable , clear RAM spectre disable, continuous mode disable, reset disable
         self.xem.UpdateWireIns()
 
+    # Demarre une capture via le WireIn de controle global.
     def start_capture(self,param_vals):
         self.xem.SetWireInValue(0x00, param_vals)# ADC mode disable , clear RAM spectre disable, continuous mode disable, capture start,  reset enable
         self.xem.UpdateWireIns()
@@ -131,74 +152,89 @@ class DESTester:
         self.xem.SetWireInValue(0x01, level_trig)
         self.xem.UpdateWireIns()
 
+    # Ecrit le seuil de front montant basse frequence.
     def setwire_TH_rise(self,TH_rise):
 
         self.xem.SetWireInValue(0x02, TH_rise)
         self.xem.UpdateWireIns()
 
+    # Ecrit le seuil de front montant haute frequence.
     def setwire_TH_rise_high_frequency(self,TH_rise):
 
         self.xem.SetWireInValue(0x08, TH_rise)
         self.xem.UpdateWireIns()
 
 
+    # Ecrit le seuil de front descendant basse frequence.
     def setwire_TH_fall(self,TH_fall):
 
         self.xem.SetWireInValue(0x03, TH_fall)
         self.xem.UpdateWireIns()
 
+    # Ecrit le seuil de front descendant haute frequence.
     def setwire_TH_fall_high_frequency(self,TH_fall):
 
         self.xem.SetWireInValue(0x09, TH_fall)
         self.xem.UpdateWireIns()
 
+    # Ecrit le seuil ADC sur le WireIn dedie.
     def setwire_TH_ADC(self, TH_ADC):
 
         self.xem.SetWireInValue(0x07, TH_ADC)
         self.xem.UpdateWireIns()
 
+    # Ecrit le gain du filtre basse frequence via WireIn.
     def setwire_gain_filtre0(self,gain_filtre0):
 
         self.xem.SetWireInValue(0x04, gain_filtre0)
         self.xem.UpdateWireIns()
 
+    # Ecrit le gain haute frequence du filtre 0 via WireIn.
     def setwire_gain_high_frequency0(self,gain_high_frequency0):
 
         self.xem.SetWireInValue(0x0A, gain_high_frequency0)
         self.xem.UpdateWireIns()
 
+    # Ecrit le gain du filtre 1 via WireIn.
     def setwire_gain_filtre1(self,gain_filtre1):
 
         self.xem.SetWireInValue(0x05, gain_filtre1)
         self.xem.UpdateWireIns()
 
+    # Ecrit le gain haute frequence du filtre 1 via WireIn.
     def setwire_gain_high_frequency1(self,gain_high_frequency1):
 
         self.xem.SetWireInValue(0x0B, gain_high_frequency1)
         self.xem.UpdateWireIns()
 
 
+    # Lit un WireOut de status ou de compteur depuis le FPGA.
     def getwire(self,adress_wire_out_science):
         global get
         self.xem.UpdateWireOuts();
         get = self.xem.GetWireOutValue(adress_wire_out_science)
 
+    # Envoie un tableau 32 bits vers un PipeIn Opal Kelly.
     def setpipein(self,list_pipe_in,adresse):
         self.xem.WriteToPipeIn(adresse, list_pipe_in)
 
+    # Lit le spectre haute definition depuis un PipeOut.
     def getpipeout(self,adresse_pipe_out_read):
         self.xem.ReadFromPipeOut(adresse_pipe_out_read,array_pipe_out)
         return(array_pipe_out)
 
 
+    # Lit le spectre basse definition depuis un PipeOut.
     def getpipeout_sd(self, adresse_pipe_out_read):
         self.xem.ReadFromPipeOut(adresse_pipe_out_read, array_pipe_out_sd)
-        return (array_pipe_out_sd)
+        return (array_pipe_out)
 
 
+# Convertit une valeur signee en representation hexadecimale non signee.
 def tohex(val, nbits):
   return hex((val + (1 << nbits)) % (1 << nbits))
 
+# Met a jour les gains affiches dans les legendes a partir de la config.
 def update_gain_values(formated_lines_coef):
     global gain_detectors
     global gain_detectors_real
@@ -210,6 +246,7 @@ def update_gain_values(formated_lines_coef):
 
     gain_detectors_real = [2 ** gain_detector for gain_detector in gain_detectors]
 
+# Construit la legende du graphe haute definition pour un detecteur.
 def spectrum_label(detector):
     max_value = max(Spectres[detector])
     max_x = Spectres[detector].index(max_value)
@@ -222,21 +259,20 @@ def spectrum_label(detector):
         max_x
     )
 
+# Construit la legende du graphe basse definition pour un detecteur.
 def spectrum_sd_label(detector):
     max_value = max(Spectres_sd[detector])
     max_x = Spectres_sd[detector].index(max_value)
-    return "detecteur {} - SD - max {} @ x={}".format(
-        detector,
-        max_value,
-        max_x
-    )
+    return "detecteur {} - SD - max {} @ x={}".format(detector, max_value, max_x)
 
+# Affiche le chemin Tkinter associe a un widget pour debug.
 def pathname1():
     i = tk.b4.winfo_id()
     print("identité", i)
     u = racine.winfo_pathname(i, False)
     print("pathname", u)
 
+# Boucle periodique de lecture FPGA et de mise a jour des graphes.
 def delay_end(fig):
 
     global init_spectrum
@@ -270,6 +306,18 @@ def delay_end(fig):
             des.getpipeout_sd(adresse_pipe_out_read)
             list_array_pipe_out_standard_definition = list(array_pipe_out_sd)
 
+            for detector in range(0, Detector_Number):
+                start_index_sd = detector * Spectrum_SD_Filter_Word_Count + 4
+                end_index_sd = (detector + 1) * Spectrum_SD_Filter_Word_Count
+
+                for elm in list_array_pipe_out_standard_definition[start_index_sd:end_index_sd]:
+                    data = (elm & 0xFFFF)
+
+                    if np.short(data) != 0:
+                        add = int(((elm & 0xFFFF0000) / 2 ** 16))
+                        if 0 <= add < Spectrum_SD_Depth:
+                            Spectres_sd[detector][add] = Spectres_sd[detector][add] + data
+
             adress_wire_out_science = 0x28
             des.getwire(adress_wire_out_science)
 
@@ -284,30 +332,19 @@ def delay_end(fig):
             print("read counter pulse filter Standard definition  detector 1 add=0x29 {}".format(get))
             print("############################################")
 
-            for detector in range(0, Detector_Number):
-                start_index = detector * Spectrum_SD_Filter_Word_Count + 4
-                end_index = (detector + 1) * Spectrum_SD_Filter_Word_Count
 
-                for elm in list_array_pipe_out_standard_definition[start_index:end_index]:
+            #print("################################ DATA of spectrum by detector #############################################")
+            for detector in range(0, Detector_Number):
+                start_index = detector * Spectrum_Block_Size + 4
+                end_index = (detector + 1) * Spectrum_Block_Size
+
+                for elm in list_array_pipe_out[start_index:end_index]:
                     data = (elm & 0xFFFF)
 
                     if np.short(data) != 0:
                         add = int(((elm & 0xFFFF0000) / 2 ** 16))
-                        if 0 <= add < Spectrum_SD_Depth:
-                            Spectres_sd[detector][add] = Spectres_sd[detector][add] + data
-
-        #print("################################ DATA of spectrum by detector #############################################")
-        for detector in range(0, Detector_Number):
-            start_index = detector * Spectrum_Block_Size + 4
-            end_index = (detector + 1) * Spectrum_Block_Size
-
-            for elm in list_array_pipe_out[start_index:end_index]:
-                data = (elm & 0xFFFF)
-
-                if np.short(data) != 0:
-                    add = int(((elm & 0xFFFF0000) / 2 ** 16))
-                    if 0 <= add < Spectrum_Depth:
-                        Spectres[detector][add] = Spectres[detector][add] + data
+                        if 0 <= add < Spectrum_Depth:
+                            Spectres[detector][add] = Spectres[detector][add] + data
 
         # racine.bind("<BackSpace>",  clear_vect())
 
@@ -322,7 +359,6 @@ def delay_end(fig):
         max_spectrum = max(max(Spectre) for Spectre in Spectres)
         min_spectrum_sd = min(min(Spectre) for Spectre in Spectres_sd)
         max_spectrum_sd = max(max(Spectre) for Spectre in Spectres_sd)
-
 
         fig.axes[0].set_ylim(((min_spectrum, max_spectrum)))
         fig.axes[1].set_ylim(((min_spectrum_sd, max_spectrum_sd)))
@@ -360,11 +396,13 @@ def delay_end(fig):
 
 #################################### param ######################################
 
+# Construit le mot de controle 32 bits envoye sur le WireIn 0x00.
 def param(mode_adc, enable_high_filter, continuous_ready, start_capture,reset):
     param_vals = 2**31*mode_adc + 2**30*enable_high_filter + 2**29*continuous_ready + 2**1*start_capture + 2**0*reset
     print(param_vals)
     return param_vals
 
+# Lance une sequence reset puis unreset depuis la GUI.
 def Reset_unreset() :
 
     mode_adc = 0  # set to one if ADC use
@@ -379,6 +417,7 @@ def Reset_unreset() :
     des.unResetDES(param(mode_adc, enable_high_filter, continuous_ready, start_capture, reset))
     start_capture = 1
 
+# Initialise la connexion Opal Kelly avant demarrage de la GUI.
 def InitializeDevice() :
     print("------ DES Encrypt/Decrypt Tester in Python ------")
 
@@ -386,6 +425,7 @@ def InitializeDevice() :
         exit
     print("------------------------------------------------------------")
 
+# Ferme la GUI apres sauvegarde et affichage du resume de comptage.
 def close() :
     print("button Close")
     des.Close
@@ -394,7 +434,6 @@ def close() :
     print("\nNb de coups :")
     for detector in range(0, Detector_Number):
         print("detecteur {} = {}".format(detector, sum(Spectres[detector])))
-        print("detecteur {} SD = {}".format(detector, sum(Spectres_sd[detector])))
 
     save_signal_in_file(Spectres[0])
     #print(time.strftime())
@@ -408,13 +447,14 @@ def close() :
 
 
 
-def Injection(signal_file_name) :
+# Injecte un fichier signal vers le PipeIn 0x80.
+def Injection(signal_file_name='Signal_ADC_400keV.txt') :
 
     mode_adc = 0  # set to one if ADC use
     continuous_ready = 0  # generally set to zero set to one if filter analysis
     start_capture = 1
 
-    print("injection {}".format(signal_file_name))
+    print("injection")
     des.start_capture(param(mode_adc, enable_high_filter, continuous_ready, start_capture, reset))
 
     file_name = open(signal_file_name, "r")
@@ -431,24 +471,13 @@ def Injection(signal_file_name) :
 
     #################################### write formated_lines to pipe in INJECTION ##########################################
 
-    print("############## INJection {} #####################".format(signal_file_name))
-    list_pipe_in_array = np.array(formated_lines)
+    print("############## INJection #####################")
+    list_pipe_in_array = np.array(formated_lines, dtype=np.int32)
     # print("list_pipe_in_array{}.format"(list_pipe_in_array))
     adresse = 0x80
     des.setpipein(list_pipe_in_array, adresse)
 
-def Injection_20keV() :
-    Injection('Signal_ADC_20keV.txt')
-
-def Injection_100keV() :
-    Injection('Signal_ADC_100keV.txt')
-
-def Injection_400keV() :
-    Injection('Signal_ADC_400keV.txt')
-
-def Injection_800keV() :
-    Injection('Signal_ADC_800keV.txt')
-
+# Bascule en mode acquisition ADC et demarre la capture.
 def ADC() :
 
     mode_adc = 1  # set to one if ADC use
@@ -458,6 +487,7 @@ def ADC() :
     print("ADC")
     des.start_capture(param(mode_adc, enable_high_filter, continuous_ready, start_capture, reset))
 
+# Applique depuis la GUI le seuil de front montant.
 def get_entry_TH(event) :
     valeur = v.get()
     print("get_entry_TH:",valeur)
@@ -465,6 +495,7 @@ def get_entry_TH(event) :
     des.setwire_TH_rise(TH_rise)
     print(TH_rise)
 
+# Applique depuis la GUI le seuil de front descendant.
 def get_entry_TL(event) :
     valeur = v1.get()
     print("get_entry_TL:",valeur)
@@ -472,15 +503,11 @@ def get_entry_TL(event) :
     des.setwire_TH_fall(TH_fall)
     print(TH_fall)
 
+# Applique un gain basse frequence a tous les detecteurs dans la config.
 def get_gain_filtre0(event) :
 
     print("Coef")
-    file = open('coef_V2.txt', "r")
-    lines_coef = file.readlines()
-    formated_lines_coef = []
-    for elm in lines_coef:
-        formated_lines_coef.append(int(elm[:-1]))  ##la liste lines a des eleementr ascii dont on supprime\n avec :-1
-        # formated_lines.append(elm[:-1])
+    formated_lines_coef = read_coef_file()
 
     ###### Ecris la liste sur le port 0x81
     # print("la liste coef est \n {}".format(formated_lines_coef))
@@ -500,21 +527,17 @@ def get_gain_filtre0(event) :
 
 
     print(formated_lines_coef)
-    list_pipe_in_array = np.array(formated_lines_coef)
+    list_pipe_in_array = np.array(formated_lines_coef, dtype=np.int32)
     # print("la liste coef est \n {}".format(formated_lines_coef))
     # print("le tableau coef est \n {}".format(list_pipe_in_array))
     adresse = 0x81  # PORT pour écrire toute la configuration
     des.setpipein(list_pipe_in_array, adresse)
 
+# Applique un gain haute frequence filtre 0 a tous les detecteurs.
 def gain_high_frequency0(event) :
 
     print("Coef")
-    file = open('coef_V2.txt', "r")
-    lines_coef = file.readlines()
-    formated_lines_coef = []
-    for elm in lines_coef:
-        formated_lines_coef.append(int(elm[:-1]))  ##la liste lines a des eleementr ascii dont on supprime\n avec :-1
-        # formated_lines.append(elm[:-1])
+    formated_lines_coef = read_coef_file()
 
     valeur = v2.get()
     print("gain_high_frequency0:",valeur)
@@ -529,7 +552,7 @@ def gain_high_frequency0(event) :
 
 
     print(formated_lines_coef)
-    list_pipe_in_array = np.array(formated_lines_coef)
+    list_pipe_in_array = np.array(formated_lines_coef, dtype=np.int32)
     # print("la liste coef est \n {}".format(formated_lines_coef))
     # print("le tableau coef est \n {}".format(list_pipe_in_array))
     adresse = 0x81  # PORT pour écrire toute la configuration
@@ -539,16 +562,12 @@ def gain_high_frequency0(event) :
 
 
 
+# Applique le gain du filtre 1 et renvoie la config complete.
 def get_gain_filtre1(event) :
 
 
     print("Coef")
-    file = open('coef_V2.txt', "r")
-    lines_coef = file.readlines()
-    formated_lines_coef = []
-    for elm in lines_coef:
-        formated_lines_coef.append(int(elm[:-1]))  ##la liste lines a des eleementr ascii dont on supprime\n avec :-1
-        # formated_lines.append(elm[:-1])
+    formated_lines_coef = read_coef_file()
 
     ###### Ecris la liste sur le port 0x81
     # print("la liste coef est \n {}".format(formated_lines_coef))
@@ -567,7 +586,7 @@ def get_gain_filtre1(event) :
 
 
     print(formated_lines_coef)
-    list_pipe_in_array = np.array(formated_lines_coef)
+    list_pipe_in_array = np.array(formated_lines_coef, dtype=np.int32)
     # print("la liste coef est \n {}".format(formated_lines_coef))
     # print("le tableau coef est \n {}".format(list_pipe_in_array))
     adresse = 0x81  # PORT pour écrire toute la configuration
@@ -575,15 +594,11 @@ def get_gain_filtre1(event) :
 
 
 
+# Applique le gain haute frequence filtre 1 et renvoie la config complete.
 def gain_high_frequency1(event) :
 
     print("Coef")
-    file = open('coef_V2.txt', "r")
-    lines_coef = file.readlines()
-    formated_lines_coef = []
-    for elm in lines_coef:
-        formated_lines_coef.append(int(elm[:-1]))  ##la liste lines a des eleementr ascii dont on supprime\n avec :-1
-        # formated_lines.append(elm[:-1])
+    formated_lines_coef = read_coef_file()
 
     valeur = v3.get()
     print("gain_high_frequency1:",valeur)
@@ -600,7 +615,7 @@ def gain_high_frequency1(event) :
 
 
     print(formated_lines_coef)
-    list_pipe_in_array = np.array(formated_lines_coef)
+    list_pipe_in_array = np.array(formated_lines_coef, dtype=np.int32)
     # print("la liste coef est \n {}".format(formated_lines_coef))
     # print("le tableau coef est \n {}".format(list_pipe_in_array))
     adresse = 0x81  # PORT pour écrire toute la configuration
@@ -612,8 +627,8 @@ racine = tk.Tk() #fait apparaitre fenetre principale
 des = DESTester()
 
 
-# the figure that will contain the plots
-fig = Figure(figsize=(11, 5),dpi=100)
+# the figure that will contain the plot
+fig = Figure(figsize=(12, 5),dpi=100)
 
 # adding the subplots
 plot_hd = fig.add_subplot(121)
@@ -634,34 +649,27 @@ toolbar = NavigationToolbar2Tk(canvas,racine)
 
 toolbar.update()
 
-racine.geometry("1200x650+300+300")
+racine.geometry("1200x820+120+80")
 racine.pack_propagate(0)
 racine.title("Main_Win_GSE_3UT")
 label = tk.Label(racine, text="GSE GUI 3UT")
 label.pack()
-enable_high_filter_label = tk.Label(
-    racine,
-    text="enable_high_filter = {}".format(enable_high_filter),
-    bg="#fff2b3" if enable_high_filter else "#e8e8e8",
-    fg="#7a4a00" if enable_high_filter else "#333333",
-    padx=10,
-    pady=4
-)
-enable_high_filter_label.pack()
 
+label = tk.Label(racine, text="enable_high_filter = {}".format(enable_high_filter))
+label.pack()
 #b5 = Button(racine, text="RESET", command=Reset_unreset,name="b5") # BOUTON reset
-b6 = tk.Button(racine, text="Inject 20 keV", command=Injection_20keV, name="b6", bg="#d7f5d0", activebackground="#b8e8ad")
-b8 = tk.Button(racine, text="Inject 100 keV", command=Injection_100keV, name="b8", bg="#d6e9ff", activebackground="#b8d8ff")
-b9 = tk.Button(racine, text="Inject 400 keV", command=Injection_400keV, name="b9", bg="#ffe2c2", activebackground="#ffc98f")
-b10 = tk.Button(racine, text="Inject 800 keV", command=Injection_800keV, name="b10", bg="#ffd6d6", activebackground="#ffb3b3")
-b7 = tk.Button(racine, text="ADC", command=ADC,name="b7") # BOUTON Injection
+b7 = tk.Button(racine, text="ADC", command=ADC,name="b7") # BOUTON ADC
+b20 = tk.Button(racine, text="Inject 20 keV", command=lambda: Injection('Signal_ADC_20keV.txt'), name="b20", bg="#ccffcc")
+b100 = tk.Button(racine, text="Inject 100 keV", command=lambda: Injection('Signal_ADC_100keV.txt'), name="b100", bg="#cce5ff")
+b400 = tk.Button(racine, text="Inject 400 keV", command=lambda: Injection('Signal_ADC_400keV.txt'), name="b400", bg="#ffdf99")
+b800 = tk.Button(racine, text="Inject 800 keV", command=lambda: Injection('Signal_ADC_800keV.txt'), name="b800", bg="#ffcccc")
 #b8 = Button(racine, text="Close Opal Kelly", command=close,name="b8") # BOUTON Injection
 #b5.pack()
 b7.pack()
-b6.pack()
-b8.pack()
-b9.pack()
-b10.pack()
+b20.pack()
+b100.pack()
+b400.pack()
+b800.pack()
 #b8.pack()
 
 label = tk.Label(racine, text="level pulse rising : 1->1024")
@@ -711,18 +719,13 @@ des.unResetDES(param(mode_adc, enable_high_filter, continuous_ready, start_captu
 ###### Ouvre la fichier et forme une liste
 
 print ("Coef")
-file = open('coef_V2.txt', "r")
-lines_coef = file.readlines()
-formated_lines_coef = []
-for elm in lines_coef :
-    formated_lines_coef.append(int(elm[:-1]))##la liste lines a des eleementr ascii dont on supprime\n avec :-1
-    #formated_lines.append(elm[:-1])
+formated_lines_coef = read_coef_file()
 
 ###### Ecris la liste sur le port 0x81
 #for index, fruit in enumerate(formated_lines_coef):
 #    print(f"L'index {index} correspond à : {fruit}")
 #print("la liste coef est \n {}".format(formated_lines_coef))
-list_pipe_in_array = np.array(formated_lines_coef)
+list_pipe_in_array = np.array(formated_lines_coef, dtype=np.int32)
 #print("le tableau coef est \n {}".format(list_pipe_in_array))
 adresse=0x81  # PORT pour écrire toute la configuration
 des.setpipein(list_pipe_in_array,adresse)
@@ -744,7 +747,6 @@ plot_hd.legend(loc="upper left", fontsize=7, framealpha=0.75)
 plot_sd.legend(loc="upper left", fontsize=7, framealpha=0.75)
 fig.supxlabel("raw")
 fig.supylabel("Count number")
-fig.tight_layout()
 
 delay_end(fig)
 

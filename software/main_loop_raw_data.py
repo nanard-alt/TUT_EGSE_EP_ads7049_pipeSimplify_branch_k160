@@ -27,6 +27,28 @@ raw_detector_endpoints = [
 ]
 
 
+Detector_Number = 7
+Filter_Number = 2
+Fir_Coefficient_Count = 32
+Config_Register_Count = 7
+Standard_Energy_Threshold_Count = 6
+Config_End_Padding_Word_Count = 3
+Gain_Low_Start_Index = (Fir_Coefficient_Count * Filter_Number * Detector_Number) + Config_Register_Count
+Gain_High_Start_Index = Gain_Low_Start_Index + Detector_Number
+Standard_Energy_Threshold_Start_Index = Gain_High_Start_Index + Detector_Number
+Config_Frame_Word_Count = Standard_Energy_Threshold_Start_Index + (Standard_Energy_Threshold_Count * Filter_Number * Detector_Number) + Config_End_Padding_Word_Count
+
+
+# Lit le fichier de configuration et verifie la taille attendue par le FPGA.
+def read_coef_file(path='coef_V2.txt'):
+    with open(path, "r") as file:
+        values = [int(line.strip()) for line in file if line.strip()]
+
+    if len(values) != Config_Frame_Word_Count:
+        raise ValueError("{} must contain {} words, got {}".format(path, Config_Frame_Word_Count, len(values)))
+
+    return values
+
 file_names = ['Signal_ADC_20keV.txt','Signal_ADC_100keV.txt','Signal_ADC_400keV.txt','Signal_ADC_800keV.txt',
               'Signal_ADC_20keV.txt','Signal_ADC_100keV.txt','Signal_ADC_400keV.txt','Signal_ADC_800keV.txt',
               'Signal_ADC_20keV.txt','Signal_ADC_100keV.txt','Signal_ADC_400keV.txt','Signal_ADC_800keV.txt',
@@ -55,10 +77,12 @@ start_capture  = 0
 
 #################################### CLASS ######################################
 
+# Encapsule les acces Opal Kelly FrontPanel: wires, pipe in et pipe out.
 class DESTester:
     def __init__(self):
         return
 
+    # Ouvre la carte Opal Kelly et verifie que FrontPanel est disponible.
     def InitializeDevice(self):
         # Open the first device we find.
         self.xem = ok.FrontPanelDevices().Open()
@@ -94,47 +118,57 @@ class DESTester:
         print ("FrontPanel support is available.")
         return(True)
 
+    # Envoie le mot de controle global avec reset actif.
     def ResetDES(self,param_vals):
         self.xem.SetWireInValue(0x00, param_vals)# ADC mode disable , clear RAM spectre disable, continuous mode disable, reset enable
         self.xem.UpdateWireIns()
 
+    # Envoie le mot de controle global avec reset inactif.
     def unResetDES(self,param_vals):
         self.xem.SetWireInValue(0x00, param_vals)# ADC mode disable , clear RAM spectre disable, continuous mode disable, reset disable
         self.xem.UpdateWireIns()
 
+    # Demarre une capture via le WireIn de controle global.
     def start_capture(self,param_vals):
         self.xem.SetWireInValue(0x00, param_vals)# ADC mode disable , clear RAM spectre disable, continuous mode disable, capture start,  reset enable
         self.xem.UpdateWireIns()
 
+    # Ecrit le niveau de trigger sur le WireIn dedie.
     def setwire(self):
 
         self.xem.SetWireInValue(0x01, level_trig)
         self.xem.UpdateWireIns()
 
+    # Ecrit le niveau de trigger sur le WireIn dedie.
     def setwire_TH_rise(self):
 
         self.xem.SetWireInValue(0x02, TH_rise)
         self.xem.UpdateWireIns()
 
+    # Ecrit le niveau de trigger sur le WireIn dedie.
     def setwire_TH_fall(self):
 
         self.xem.SetWireInValue(0x03, TH_fall)
         self.xem.UpdateWireIns()
 
+    # Lit un WireOut de status ou de compteur depuis le FPGA.
     def getwire(self,adress_wire_out_science):
         global get
         self.xem.UpdateWireOuts();
         get = self.xem.GetWireOutValue(adress_wire_out_science)
 
+    # Envoie un tableau 32 bits vers un PipeIn Opal Kelly.
     def setpipein(self,list_pipe_in,adresse):
         self.xem.WriteToPipeIn(adresse, list_pipe_in)
 
+    # Lit un bloc de donnees depuis un PipeOut Opal Kelly.
     def getpipeout(self,adresse_pipe_out_read):
         self.xem.ReadFromPipeOut(adresse_pipe_out_read,array_pipe_out)
         return(array_pipe_out)
 
 #################################### param ######################################
 
+# Construit le mot de controle 32 bits envoye sur le WireIn 0x00.
 def param(mode_adc, enable_high_freq, continuous_ready, start_capture,reset):
     param_vals = 2**31*mode_adc + 2**30*enable_high_freq + 2**29*continuous_ready + 2**1*start_capture + 2**0*reset
 
@@ -170,18 +204,13 @@ des.unResetDES(param(mode_adc, enable_high_freq, continuous_ready, start_capture
 
 #################################  LOAD COEF and  SET LEVEL TRIGG  ###################################################
 print ("Coef")
-file = open('coef_V2.txt', "r")
-lines_coef = file.readlines()
-formated_lines_coef = []
-for elm in lines_coef :
-    formated_lines_coef.append(int(elm[:-1]))##la liste lines a des eleementr ascii dont on supprime\n avec :-1
-    #formated_lines.append(elm[:-1])
+formated_lines_coef = read_coef_file()
 
 #print("la liste coef est \n {}".format(formated_lines_coef))
-list_pipe_in_array = np.array(formated_lines_coef)
+list_pipe_in_array = np.array(formated_lines_coef, dtype=np.int32)
 #print("le tableau coef est \n {}".format(list_pipe_in_array))
-gain_base_index = 455 if enable_high_freq == 0 else 462
-gain_detector = [formated_lines_coef[gain_base_index + detector] for detector in range(7)]
+gain_base_index = Gain_Low_Start_Index if enable_high_freq == 0 else Gain_High_Start_Index
+gain_detector = [formated_lines_coef[gain_base_index + detector] for detector in range(Detector_Number)]
 gain_detector_real = [2 ** gain for gain in gain_detector]
 adresse=0x81  # filter0
 des.setpipein(list_pipe_in_array,adresse)
@@ -216,7 +245,7 @@ for file_name in file_names:
     print("max-min", max(formated_lines)-min(formated_lines))
 
 #################################### write formated_lines to pipe in injection ##########################################
-    list_pipe_in_array = np.array(formated_lines)
+    list_pipe_in_array = np.array(formated_lines, dtype=np.int32)
     #print("list_pipe_in_array{}".format(list_pipe_in_array))
     adresse = 0x80
     des.setpipein(list_pipe_in_array, adresse)

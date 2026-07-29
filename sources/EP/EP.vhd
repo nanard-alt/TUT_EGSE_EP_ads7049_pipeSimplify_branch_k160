@@ -48,7 +48,7 @@ entity EP is
         i_coef_fir_ready             : in  std_logic;
         o_data_before_filter         : out signed(15 downto 0);
         -- param detect_standard_energy
-        i_standard_energy_threshold  : in  Array_Array_Array_config_10x16_type;
+        i_standard_energy_threshold  : in  Array_Array_config_10x16_type;
         -- out spectrum to fifo pipe out
         o_pipe_out_spectrum_din      : out std_logic_vector(31 downto 0);
         o_pipe_out_spectrum_wr_en    : out std_logic;
@@ -249,7 +249,7 @@ begin
             port map(
                 i_clk_slow                  => i_clk_slow,
                 i_reset                     => i_reset,
-                i_standard_energy_threshold => i_standard_energy_threshold(to_integer(i_detector_number))(N),
+                i_standard_energy_threshold => i_standard_energy_threshold(N),
                 i_ready_energy_level_max    => readyEnergy_level_max(N),
                 i_energy_level_max          => Energy_level_max(N),
                 o_ready_energy_level_max_sd => ready_energy_level_max_sd(N),
