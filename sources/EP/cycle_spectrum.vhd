@@ -16,10 +16,12 @@ use ieee.numeric_std.all;
 
 entity cycle_spectrum is
     port(
-        sys_clk                : in  std_logic;
-        reset                  : in  std_logic;
-        
-        o_clk_synchro_spectrum : out std_logic
+        -- global
+        sys_clk                : in  std_logic; -- horloge systeme
+        reset                  : in  std_logic; -- reset actif a 1
+
+        -- synchronisation des spectres
+        o_clk_synchro_spectrum : out std_logic -- signal periodique de synchronisation/lecture des spectres
     );
 end entity cycle_spectrum;
 

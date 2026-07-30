@@ -18,17 +18,21 @@ use work.UT_EGSE_EP_Package.all;
 
 entity FIR_filter is
     port(
-        --global
-        i_clk_slow       : in  std_logic;
-        i_reset          : in  std_logic;
-        --input
-        i_coef_fir       : in  Array_config_32x16_type;
-        i_coef_fir_ready : in  std_logic;
-        i_data           : in  signed(15 downto 0);
-        i_ready          : in  std_logic;
-        --output
-        o_data           : out signed(15 downto 0);
-        o_ready          : out std_logic
+        -- global
+        i_clk_slow       : in  std_logic; -- horloge systeme lente
+        i_reset          : in  std_logic; -- reset actif a 1
+
+        -- configuration des coefficients FIR
+        i_coef_fir       : in  Array_config_32x16_type; -- 32 coefficients FIR signes 16 bits
+        i_coef_fir_ready : in  std_logic; -- pulse indiquant que les coefficients FIR sont charges
+
+        -- entree echantillon provenant de l'ADC ou injection
+        i_data           : in  signed(15 downto 0); -- echantillon d'entree avant filtrage
+        i_ready          : in  std_logic; -- pulse indiquant que i_data est valide
+
+        -- sortie echantillon filtre vers gain
+        o_data           : out signed(15 downto 0); -- echantillon apres filtrage FIR
+        o_ready          : out std_logic -- pulse indiquant que o_data est valide
     );
 end entity FIR_filter;
 

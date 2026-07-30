@@ -17,16 +17,19 @@ use ieee.numeric_std.all;
 entity gain is
     port(
         -- global
-        i_clk_slow           : in  std_logic;
-        i_reset              : in  std_logic;
-        -- input gain       
-        i_gain               : in  unsigned(15 downto 0);
-        -- input data
-        i_data_after_filter  : in  signed(15 downto 0);
-        i_ready_after_filter : in  std_logic;
-        -- output data
-        o_data_after_gain    : out signed(15 downto 0);
-        o_ready_after_gain   : out std_logic
+        i_clk_slow           : in  std_logic; -- horloge systeme lente
+        i_reset              : in  std_logic; -- reset actif a 1
+
+        -- configuration du gain
+        i_gain               : in  unsigned(15 downto 0); -- gain applique sous forme de decalage 2^i_gain
+
+        -- entree echantillon filtre provenant de FIR_filter
+        i_data_after_filter  : in  signed(15 downto 0); -- echantillon apres filtrage FIR
+        i_ready_after_filter : in  std_logic; -- pulse indiquant que i_data_after_filter est valide
+
+        -- sortie echantillon amplifie vers Energy_level
+        o_data_after_gain    : out signed(15 downto 0); -- echantillon apres application du gain
+        o_ready_after_gain   : out std_logic -- pulse indiquant que o_data_after_gain est valide
     );
 end entity gain;
 

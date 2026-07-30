@@ -16,19 +16,23 @@ use ieee.numeric_std.all;
 
 entity FSM_raw_data is
     port(
-        --global
-        i_clk_slow                     : in  std_logic;
-        i_reset                        : in  std_logic;
-        --input
-        i_continuous_injection         : in  std_logic;
-        i_level_trigger                : in  std_logic;
-        i_Start_Capture                : in  std_logic;
-        i_din_fifo_raw_data            : in  signed(31 downto 0);
-        i_ready                        : in  std_logic;
-        --output
-        o_din_fifo_pipe_out_raw_data   : out signed(31 downto 0);
-        o_wr_en_fifo_pipe_out_raw_data : out std_logic;
-        i_empty_fifo_pipe_out_raw_data : in  std_logic
+        -- global
+        i_clk_slow                     : in  std_logic; -- horloge systeme lente
+        i_reset                        : in  std_logic; -- reset actif a 1
+
+        -- commandes de capture raw
+        i_continuous_injection         : in  std_logic; -- mode injection continue avec attente du trigger niveau
+        i_level_trigger                : in  std_logic; -- detection du niveau d'energie pour declencher la capture
+        i_Start_Capture                : in  std_logic; -- autorisation de capture raw
+
+        -- entree echantillon raw
+        i_din_fifo_raw_data            : in  signed(31 downto 0); -- echantillon raw 32 bits provenant de la chaine d'acquisition
+        i_ready                        : in  std_logic; -- pulse indiquant que i_din_fifo_raw_data est valide
+
+        -- sortie vers FIFO PipeOut raw data
+        o_din_fifo_pipe_out_raw_data   : out signed(31 downto 0); -- echantillon raw 32 bits envoye vers la FIFO PipeOut
+        o_wr_en_fifo_pipe_out_raw_data : out std_logic; -- demande d'ecriture dans la FIFO PipeOut raw data
+        i_empty_fifo_pipe_out_raw_data : in  std_logic -- FIFO PipeOut raw data vide
     );
 end entity FSM_raw_data;
 

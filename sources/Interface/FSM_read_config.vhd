@@ -18,23 +18,29 @@ use work.UT_EGSE_EP_Package.all;
 
 entity FSM_read_config is
     port(
-        --global
-        i_clk_slow              : in  std_logic;
-        i_reset                 : in  std_logic;
-        --input
-        i_pipe_in_config_empty  : in  std_logic;
-        i_pipe_in_config_valid  : in  std_logic;
-        i_pipe_in_config_dout   : in  signed(31 downto 0);
-        i_pipe_in_rd_data_count : in  STD_LOGIC_VECTOR(9 downto 0);
-        --output
-        o_pipe_in_config_rd_en  : out std_logic;
-        o_coef_fir_ready        : out std_logic;
-        o_coef_fir              : out Array_Array_config_32x16_type_32x16_type;
-        --output reg 
-        o_reg_config            : out Array_config_16stdx8_type;
-        o_standard_energy_threshold : out Array_Array_Array_config_10x16_type;
-        -- output gain
-        o_gain                  : out Array_Array_config_16unsignedxDetector_Number_type
+        -- global
+        i_clk_slow              : in  std_logic; -- horloge systeme lente
+        i_reset                 : in  std_logic; -- reset actif a 1
+
+        -- entree FIFO PipeIn config ep81
+        i_pipe_in_config_empty  : in  std_logic; -- FIFO config vide
+        i_pipe_in_config_valid  : in  std_logic; -- mot i_pipe_in_config_dout valide apres lecture FIFO
+        i_pipe_in_config_dout   : in  signed(31 downto 0); -- mot 32 bits lu depuis la FIFO config, seuls les 16 bits faibles configurent les signaux internes
+        i_pipe_in_rd_data_count : in  STD_LOGIC_VECTOR(9 downto 0); -- nombre de mots disponibles dans la FIFO config
+
+        -- commande de lecture FIFO PipeIn config
+        o_pipe_in_config_rd_en  : out std_logic; -- demande de lecture d'un mot dans la FIFO config
+
+        -- sortie coefficients FIR
+        o_coef_fir_ready        : out std_logic; -- pulse indiquant que les coefficients FIR sont charges
+        o_coef_fir              : out Array_Array_config_32x16_type_32x16_type; -- coefficients FIR par detecteur, filtre et index coefficient
+
+        -- sortie registres de configuration
+        o_reg_config            : out Array_config_16stdx8_type; -- registres de configuration 16 bits lus depuis la trame ep81
+        o_standard_energy_threshold : out Array_Array_Array_config_10x16_type; -- seuils standard energy par detecteur, filtre et seuil
+
+        -- sortie gains
+        o_gain                  : out Array_Array_config_16unsignedxDetector_Number_type -- gains 16 bits par detecteur et filtre
         -- output gain
         --o_gain_high_frequency   : out Array_Array_config_32stdx2_type
     );

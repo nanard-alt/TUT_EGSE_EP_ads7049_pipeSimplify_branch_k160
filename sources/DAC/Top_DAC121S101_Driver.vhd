@@ -16,16 +16,18 @@ use ieee.numeric_std.all;
 
 entity Top_DAC121S101_Driver is
     port(
-        -- Reset and clock
-        i_reset         : in  std_logic;
-        i_clk           : in  std_logic;
-        -- DAC setting
-        i_level_DAC121S : in  std_logic_vector(31 downto 0);
-        -- DAC outputs
-        o_DAC_SCLK      : out std_logic;
-        o_DAC_SYNC_n    : out std_logic;
-        o_DAC_DIN       : out std_logic;
-        o_DAC_on_off    : out std_logic
+        -- global
+        i_reset         : in  std_logic; -- reset actif a 1
+        i_clk           : in  std_logic; -- horloge de commande DAC
+
+        -- configuration niveau DAC
+        i_level_DAC121S : in  std_logic_vector(31 downto 0); -- mot de configuration DAC, seuls les 12 bits faibles pilotent le DAC
+
+        -- sortie SPI vers DAC121S101
+        o_DAC_SCLK      : out std_logic; -- horloge serie SPI du DAC
+        o_DAC_SYNC_n    : out std_logic; -- synchronisation trame SPI active a 0
+        o_DAC_DIN       : out std_logic; -- donnee serie SPI vers le DAC
+        o_DAC_on_off    : out std_logic -- recopie du bit 0 de la valeur DAC pour commande on/off
     );
 end entity Top_DAC121S101_Driver;
 
@@ -43,11 +45,16 @@ begin
 
     label_DAC121S101_Driver : entity work.DAC121S101_Driver
         port map(
+            -- global
             i_Rst_n      => Rst_n,
             i_Clk        => i_clk,
+
+            -- commande de conversion DAC
             i_Start      => Start,
             o_Busy       => Busy,
             i_Num_Data   => Num_Data,
+
+            -- sortie SPI vers DAC121S101
             o_DAC_SCLK   => o_DAC_SCLK,
             o_DAC_SYNC_n => o_DAC_SYNC_n,
             o_DAC_DIN    => o_DAC_DIN
@@ -55,11 +62,16 @@ begin
 
     label_remote_DAC121S101_Driver : entity work.remote_DAC121S01_driver
         port map(
+            -- global
             i_Rst_n       => Rst_n,
             i_Clk         => i_clk,
+
+            -- commande vers driver SPI DAC
             o_Start       => Start,
             i_Busy        => Busy,
             o_Num_Data    => Num_Data,
+
+            -- configuration niveau DAC
             level_DAC121S => i_level_DAC121S
         );
 

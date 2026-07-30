@@ -19,32 +19,36 @@ use work.UT_EGSE_EP_Package.all;
 entity spectrum_FSM is
 
     generic(
-        memory_add_size : integer := 10;
-        depth_memory    : integer := 1024
+        memory_add_size : integer := 10; -- largeur adresse RAM: 10 pour 1024 bins, 3 pour 8 bins
+        depth_memory    : integer := 1024 -- profondeur RAM du spectre
     );
 
     port(
         -- global
-        i_clk_slow                : in  std_logic;
-        i_reset                   : in  std_logic;
-        i_filter_number           : in  unsigned;
-        -- synchro_spectrum
-        i_clk_synchro_spectrum    : in  std_logic;
-        i_detector_number         : in  unsigned;
-        i_set_synchro_spectrum    : in  std_logic_vector(0 downto 0);
-        -- RAM
-        o_we                      : out std_logic;
-        o_en                      : out std_logic;
-        o_addr                    : out std_logic_vector(memory_add_size - 1 downto 0);
-        o_di                      : out std_logic_vector(15 downto 0);
-        i_do                      : in  std_logic_vector(15 downto 0);
-        -- input from detect Energy level
-        i_ready_energy_level_max  : in  std_logic;
-        i_energy_level_max        : in  signed(15 downto 0);
-        -- out spectrum to fifo pipe out
-        o_pipe_out_spectrum_din   : out std_logic_vector(31 downto 0);
-        o_pipe_out_spectrum_wr_en : out std_logic;
-        o_spectrum_count_pulse    : out std_logic_vector(31 downto 0)
+        i_clk_slow                : in  std_logic; -- horloge systeme lente
+        i_reset                   : in  std_logic; -- reset actif a 1
+        i_filter_number           : in  unsigned; -- numero du filtre associe au paquet spectrum
+
+        -- synchronisation et identification du spectre
+        i_clk_synchro_spectrum    : in  std_logic; -- pulse/cycle demandant l'envoi du spectre vers le GSE
+        i_detector_number         : in  unsigned; -- numero du detecteur associe au paquet spectrum
+        i_set_synchro_spectrum    : in  std_logic_vector(0 downto 0); -- configuration/reserve pour synchronisation spectrum
+
+        -- interface RAM spectrum
+        o_we                      : out std_logic; -- write enable RAM
+        o_en                      : out std_logic; -- enable RAM
+        o_addr                    : out std_logic_vector(memory_add_size - 1 downto 0); -- adresse RAM du bin spectrum
+        o_di                      : out std_logic_vector(15 downto 0); -- donnee ecrite en RAM
+        i_do                      : in  std_logic_vector(15 downto 0); -- donnee lue depuis la RAM
+
+        -- entree depuis Energy_level ou detect_standard_energy
+        i_ready_energy_level_max  : in  std_logic; -- pulse indiquant que i_energy_level_max est valide
+        i_energy_level_max        : in  signed(15 downto 0); -- energie/bin a incrementer dans la RAM spectrum
+
+        -- sortie vers FIFO PipeOut spectrum
+        o_pipe_out_spectrum_din   : out std_logic_vector(31 downto 0); -- mot spectrum envoye vers le GSE
+        o_pipe_out_spectrum_wr_en : out std_logic; -- pulse d'ecriture vers la FIFO PipeOut spectrum
+        o_spectrum_count_pulse    : out std_logic_vector(31 downto 0) -- compteur de pulses accumules dans le spectre
     );
 end entity spectrum_FSM;
 

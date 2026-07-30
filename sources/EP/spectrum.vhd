@@ -18,25 +18,28 @@ use work.UT_EGSE_EP_Package.all;
 
 entity spectrum is
     generic(
-        memory_add_size : integer := 10;
-        depth_memory    : integer := 1024
+        memory_add_size : integer := 10; -- largeur adresse RAM: 10 pour 1024 bins, 3 pour 8 bins
+        depth_memory    : integer := 1024 -- profondeur RAM du spectre
     );
     port(
         -- global
-        i_clk_slow                : in  std_logic;
-        i_reset                   : in  std_logic;
-        -- global select spectrum
-        i_clk_synchro_spectrum    : in  std_logic;
-        i_detector_number         : in  unsigned;
-        i_filter_number           : in  unsigned;
-        -- input from detect Energy level
+        i_clk_slow                : in  std_logic; -- horloge systeme lente
+        i_reset                   : in  std_logic; -- reset actif a 1
+
+        -- synchronisation et identification du spectre
+        i_clk_synchro_spectrum    : in  std_logic; -- pulse/cycle de synchronisation pour vider ou lire le spectre
+        i_detector_number         : in  unsigned; -- numero du detecteur associe au paquet spectrum
+        i_filter_number           : in  unsigned; -- numero du filtre associe au paquet spectrum
+
+        -- entree depuis Energy_level ou detect_standard_energy
         --i_enable_erase            : in  std_logic;
-        i_Energy_level_max        : in  signed(15 downto 0);
-        i_readyEnergy_level_max   : in  std_logic;
-        -- out spectrum to fifo pipe out
-        o_pipe_out_spectrum_din   : out std_logic_vector(31 downto 0);
-        o_pipe_out_spectrum_wr_en : out std_logic;
-        o_spectrum_count_pulse    : out std_logic_vector(31 downto 0)
+        i_Energy_level_max        : in  signed(15 downto 0); -- energie/bin a incrementer dans la RAM spectrum
+        i_readyEnergy_level_max   : in  std_logic; -- pulse indiquant que i_Energy_level_max est valide
+
+        -- sortie vers FIFO PipeOut spectrum
+        o_pipe_out_spectrum_din   : out std_logic_vector(31 downto 0); -- mot spectrum: adresse/bin et compteur
+        o_pipe_out_spectrum_wr_en : out std_logic; -- pulse d'ecriture vers la FIFO PipeOut spectrum
+        o_spectrum_count_pulse    : out std_logic_vector(31 downto 0) -- compteur de pulses accumules dans le spectre
     );
 end entity spectrum;
 
@@ -100,21 +103,25 @@ begin
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
                 i_filter_number           => i_filter_number,
-                -- synchro_spectrum
+
+                -- synchronisation et identification du spectre
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
                 i_set_synchro_spectrum    => std_logic_vector(To_unsigned(N, 1)),
                 --i_enable_erase            => i_enable_erase,
-                -- RAM
+
+                -- interface RAM spectrum
                 o_we                      => we(N),
                 o_en                      => en(N),
                 o_addr                    => addr(N),
                 o_di                      => di(N),
                 i_do                      => do(N),
-                -- input from detect Energy level
+
+                -- entree depuis Energy_level ou detect_standard_energy
                 i_ready_energy_level_max  => i_readyEnergy_level_max,
                 i_energy_level_max        => i_Energy_level_max,
-                -- out spectrum to fifo pipe out
+
+                -- sortie vers FIFO PipeOut spectrum
                 o_pipe_out_spectrum_din   => pipe_out_spectrum_din(N),
                 o_pipe_out_spectrum_wr_en => pipe_out_spectrum_wr_en(N),
                 o_spectrum_count_pulse    => spectrum_pulse_by_filter(N)

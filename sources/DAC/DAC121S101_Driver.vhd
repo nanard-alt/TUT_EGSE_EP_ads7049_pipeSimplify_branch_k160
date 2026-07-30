@@ -43,17 +43,19 @@ use ieee.numeric_std.all;
 
 entity DAC121S101_Driver is
     port(
-        -- Reset and Clock
-        i_Rst_n      : in  std_logic;             -- General Reset, negative polarity
-        i_Clk        : in  std_logic;             -- State Machine clock, FSM_freq = 2*Converting_freq
-        -- Control
-        i_Start      : in  std_logic;             -- Start converting
-        o_Busy       : out std_logic;             -- Busy flag when data register is converted
-        i_Num_Data   : in  std_logic_vector(11 downto 0); -- Input data register to convert
-        -- DAC SPI
-        o_DAC_SCLK   : out std_logic;             -- SPI Serial Clock
-        o_DAC_SYNC_n : out std_logic;             -- SPI Frame synchronization input, negative polariry
-        o_DAC_DIN    : out std_logic              -- SPI Master Output Slave Input (MOSI)
+        -- global
+        i_Rst_n      : in  std_logic; -- reset actif a 0
+        i_Clk        : in  std_logic; -- horloge de la FSM DAC, frequence double de la frequence SPI
+
+        -- commande de conversion DAC
+        i_Start      : in  std_logic; -- pulse de demarrage d'une trame SPI DAC
+        o_Busy       : out std_logic; -- DAC occupe pendant l'envoi de la trame SPI
+        i_Num_Data   : in  std_logic_vector(11 downto 0); -- valeur DAC 12 bits a convertir
+
+        -- sortie SPI vers DAC121S101
+        o_DAC_SCLK   : out std_logic; -- horloge serie SPI du DAC
+        o_DAC_SYNC_n : out std_logic; -- synchronisation trame SPI active a 0
+        o_DAC_DIN    : out std_logic -- donnee serie SPI vers le DAC
     );
 end entity DAC121S101_Driver;
 

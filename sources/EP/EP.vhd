@@ -19,46 +19,46 @@ use work.UT_EGSE_EP_Package.all;
 entity EP is
     port(
         -- global
-        i_clk_slow                   : in  std_logic;
-        i_clk_fast                   : in  std_logic;
-        i_reset                      : in  std_logic;
-        -- ADC survey
-        --i_data_rx_keeped          : in  signed(15 downto 0);
-        -- global select spectrum
-        i_clk_synchro_spectrum       : in  std_logic;
-        i_detector_number            : in  unsigned;
-        --input param
-        i_gain                       : in  Array_config_16unsignedx2_type;
-        i_TH_ADC                     : in  std_logic_vector(15 downto 0);
-        i_TH_rise                    : in  std_logic_vector(15 downto 0);
-        i_TH_fall                    : in  std_logic_vector(15 downto 0);
-        --input param high frquency
-        i_TH_rise_high_frequency     : in  std_logic_vector(15 downto 0);
-        i_TH_fall_high_frequency     : in  std_logic_vector(15 downto 0);
-        --i_enable_erase            : in  std_logic;
-        -- input
-        i_ready_CDC                  : in  std_logic;
-        i_data_CDC                   : in  signed(15 downto 0);
-        -- out
-        --o_data_after_gain         : out signed(15 downto 0);
-        o_ready_after_gain           : out std_logic;
-        -- coef
-        i_enable_high_filter         : in  std_logic;
-        i_coef_fir                   : in  Array_Array_config_32x16_type;
-        i_coef_fir_ready             : in  std_logic;
-        o_data_before_filter         : out signed(15 downto 0);
-        -- param detect_standard_energy
-        i_standard_energy_threshold  : in  Array_Array_config_10x16_type;
-        -- out spectrum to fifo pipe out
-        o_pipe_out_spectrum_din      : out std_logic_vector(31 downto 0);
-        o_pipe_out_spectrum_wr_en    : out std_logic;
-        o_spectrum_count_pulse       : out std_logic_vector(31 downto 0);
-        --
-        o_data_after_energy_level    : out signed(15 downto 0);
-        -- out spectrum sd
-        o_pipe_out_spectrum_sd_din   : out std_logic_vector(31 downto 0);
-        o_pipe_out_spectrum_sd_wr_en : out std_logic;
-        o_spectrum_sd_count_pulse    : out std_logic_vector(31 downto 0)
+        i_clk_slow                   : in  std_logic; -- horloge systeme lente
+        i_clk_fast                   : in  std_logic; -- horloge rapide ADC/injection
+        i_reset                      : in  std_logic; -- reset actif a 1
+
+        -- synchronisation et identification du detecteur
+        i_clk_synchro_spectrum       : in  std_logic; -- signal periodique de synchronisation/lecture des spectres
+        i_detector_number            : in  unsigned; -- numero du detecteur courant
+
+        -- configuration gain et seuils Energy_level
+        i_gain                       : in  Array_config_16unsignedx2_type; -- gains 16 bits pour filtre basse et haute frequence
+        i_TH_ADC                     : in  std_logic_vector(15 downto 0); -- seuil de surveillance ADC avant filtrage
+        i_TH_rise                    : in  std_logic_vector(15 downto 0); -- seuil montee Energy_level basse frequence
+        i_TH_fall                    : in  std_logic_vector(15 downto 0); -- seuil descente Energy_level basse frequence
+        i_TH_rise_high_frequency     : in  std_logic_vector(15 downto 0); -- seuil montee Energy_level haute frequence
+        i_TH_fall_high_frequency     : in  std_logic_vector(15 downto 0); -- seuil descente Energy_level haute frequence
+
+        -- entree echantillon provenant de l'ADC ou injection
+        i_ready_CDC                  : in  std_logic; -- pulse indiquant que i_data_CDC est valide
+        i_data_CDC                   : in  signed(15 downto 0); -- echantillon 16 bits avant CDC optionnel
+
+        -- configuration FIR et selection filtre
+        i_enable_high_filter         : in  std_logic; -- selection sortie filtre: 0 basse frequence, 1 haute frequence
+        i_coef_fir                   : in  Array_Array_config_32x16_type; -- coefficients FIR pour les deux filtres du detecteur
+        i_coef_fir_ready             : in  std_logic; -- pulse indiquant que les coefficients FIR sont charges
+        i_standard_energy_threshold  : in  Array_Array_config_10x16_type; -- seuils standard energy pour les deux filtres du detecteur
+
+        -- sorties de surveillance chaine energie
+        o_data_before_filter         : out signed(15 downto 0); -- echantillon avant FIR du filtre selectionne
+        o_ready_after_gain           : out std_logic; -- pulse apres gain du filtre selectionne
+        o_data_after_energy_level    : out signed(15 downto 0); -- echantillon apres Energy_level du filtre selectionne
+
+        -- sortie spectrum haute definition vers FIFO PipeOut
+        o_pipe_out_spectrum_din      : out std_logic_vector(31 downto 0); -- mot spectrum HD 32 bits vers FIFO PipeOut
+        o_pipe_out_spectrum_wr_en    : out std_logic; -- demande d'ecriture spectrum HD dans FIFO PipeOut
+        o_spectrum_count_pulse       : out std_logic_vector(31 downto 0); -- compteur de pulses spectrum HD
+
+        -- sortie spectrum standard definition vers FIFO PipeOut
+        o_pipe_out_spectrum_sd_din   : out std_logic_vector(31 downto 0); -- mot spectrum SD 32 bits vers FIFO PipeOut
+        o_pipe_out_spectrum_sd_wr_en : out std_logic; -- demande d'ecriture spectrum SD dans FIFO PipeOut
+        o_spectrum_sd_count_pulse    : out std_logic_vector(31 downto 0) -- compteur de pulses spectrum SD
     );
 end entity EP;
 
@@ -103,14 +103,16 @@ begin
     label_generate_complex_clock : if ads_7049_complex_clock = '1' generate
         label_cdc : entity work.Fast_to_Slow_CDC
             port map(
-                --global
+                -- global
                 i_reset    => i_reset,
                 i_clk_fast => i_clk_fast,
                 i_clk_slow => i_clk_slow,
-                --ready
+
+                -- synchronisation ready
                 i_ready    => i_ready_CDC,
                 o_ready    => ready_before_filter_CDC, --ready_slow,
-                --data science
+
+                -- donnees ADC ou injection
                 i_data     => i_data_CDC,
                 o_data     => data_before_filter_CDC --data_slow
             );
@@ -136,15 +138,19 @@ begin
     generate_label_FIR_filter : for N in 0 to Filter_Number - 1 generate
         label_FIR_filter : entity work.FIR_filter
             port map(
-                --global
+                -- global
                 i_clk_slow       => i_clk_slow,
                 i_reset          => i_reset,
-                --input
+
+                -- configuration des coefficients FIR
                 i_coef_fir       => i_coef_fir(N),
                 i_coef_fir_ready => i_coef_fir_ready,
+
+                -- entree echantillon provenant de l'ADC ou injection
                 i_data           => data_before_filter(N),
                 i_ready          => ready_before_filter(N),
-                --out
+
+                -- sortie echantillon filtre vers gain
                 o_data           => data_after_filter(N),
                 o_ready          => ready_after_filter(N)
             );
@@ -164,12 +170,15 @@ begin
                 -- global
                 i_clk_slow           => i_clk_slow,
                 i_reset              => i_reset,
-                -- input gain
+
+                -- configuration du gain
                 i_gain               => i_gain(N),
-                -- input data
+
+                -- entree echantillon filtre provenant de FIR_filter
                 i_data_after_filter  => data_after_filter(N),
                 i_ready_after_filter => ready_after_filter(N),
-                -- output data
+
+                -- sortie echantillon amplifie vers Energy_level
                 o_data_after_gain    => data_after_gain(N),
                 o_ready_after_gain   => ready_after_gain(N)
             );
@@ -187,16 +196,24 @@ begin
     generate_label_energy_level : for N in 0 to Filter_Number - 1 generate
         label_energy_level : entity work.Energy_level
             port map(
+                -- global
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
-                -- ADC survey
+
+                -- surveillance ADC avant filtrage
                 i_data_before_filter      => data_before_filter(N),
+
+                -- entree detection energie apres filtrage
                 i_data_after_filter       => data_after_gain(N),
                 i_TH_ADC                  => i_TH_ADC,
                 i_TH_rise                 => TH_rise(N),
                 i_TH_fall                 => TH_fall(N),
+
+                -- sortie niveau d'energie
                 o_Energy_level_max        => Energy_level_max(N),
                 o_readyEnergy_level_max   => readyEnergy_level_max(N),
+
+                -- recopie du flux apres gain
                 i_data_after_gain         => data_after_gain(N),
                 o_data_after_energy_level => data_after_energy_level(N)
             );
@@ -222,15 +239,17 @@ begin
                 -- global
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
-                -- global select spectrum
+
+                -- synchronisation et identification du spectre
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
                 i_filter_number           => To_unsigned(N, Filter_Number_Width),
-                -- input from detect Energy level
-                --i_enable_erase            => i_enable_erase,
+
+                -- entree depuis Energy_level
                 i_Energy_level_max        => Energy_level_max(N),
                 i_readyEnergy_level_max   => readyEnergy_level_max(N),
-                -- out spectrum to fifo pipe out
+
+                -- sortie vers FIFO PipeOut spectrum HD
                 o_pipe_out_spectrum_din   => pipe_out_spectrum_din(N),
                 o_pipe_out_spectrum_wr_en => pipe_out_spectrum_wr_en(N),
                 o_spectrum_count_pulse    => spectrum_count_pulse(N)
@@ -247,11 +266,18 @@ begin
     generate_label_standard_energy : for N in 0 to Filter_Number - 1 generate
         label_standard_energy : entity work.detect_standard_energy
             port map(
+                -- global
                 i_clk_slow                  => i_clk_slow,
                 i_reset                     => i_reset,
+
+                -- configuration des seuils
                 i_standard_energy_threshold => i_standard_energy_threshold(N),
+
+                -- entree depuis Energy_level
                 i_ready_energy_level_max    => readyEnergy_level_max(N),
                 i_energy_level_max          => Energy_level_max(N),
+
+                -- sortie vers construction du spectrum standard definition
                 o_ready_energy_level_max_sd => ready_energy_level_max_sd(N),
                 o_energy_level_max_sd       => energy_level_max_sd(N)
             );
@@ -270,15 +296,17 @@ begin
                 -- global
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
-                -- global select spectrum
+
+                -- synchronisation et identification du spectre
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
                 i_filter_number           => To_unsigned(N, Filter_Number_Width),
-                -- input from detect Energy level
-                --i_enable_erase            => i_enable_erase,
+
+                -- entree depuis detect_standard_energy
                 i_Energy_level_max        => energy_level_max_sd(N),
                 i_readyEnergy_level_max   => ready_energy_level_max_sd(N),
-                -- out spectrum to fifo pipe out
+
+                -- sortie vers FIFO PipeOut spectrum SD
                 o_pipe_out_spectrum_din   => pipe_out_spectrum_sd_din(N),
                 o_pipe_out_spectrum_wr_en => pipe_out_spectrum_sd_wr_en(N),
                 o_spectrum_count_pulse    => spectrum_sd_count_pulse(N)

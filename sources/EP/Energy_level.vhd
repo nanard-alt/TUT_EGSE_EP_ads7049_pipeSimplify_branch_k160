@@ -16,22 +16,28 @@ use ieee.numeric_std.all;
 
 entity Energy_level is
     port(
-        i_clk_slow                : in  std_logic;
-        i_reset                   : in  std_logic;
-        -- ADC survey
-        i_data_before_filter      : in  signed(15 downto 0);
-        --input
-        i_data_after_filter       : in  signed(15 downto 0);
-        --input Th level
-        i_TH_ADC                  : in  std_logic_vector(15 downto 0);
-        i_TH_rise                 : in  std_logic_vector(15 downto 0);
-        i_TH_fall                 : in  std_logic_vector(15 downto 0);
-        --output
-        o_Energy_level_max        : out signed(15 downto 0);
-        o_readyEnergy_level_max   : out std_logic;
-        --
-        i_data_after_gain         : in  signed(15 downto 0);
-        o_data_after_energy_level : out signed(15 downto 0)
+        -- global
+        i_clk_slow                : in  std_logic; -- horloge systeme lente
+        i_reset                   : in  std_logic; -- reset actif a 1
+
+        -- surveillance ADC avant filtrage
+        i_data_before_filter      : in  signed(15 downto 0); -- echantillon avant filtre, utilise pour detecter la saturation ADC
+
+        -- entree detection energie apres filtrage
+        i_data_after_filter       : in  signed(15 downto 0); -- echantillon filtre utilise pour rechercher le maximum d'energie
+
+        -- seuils de detection
+        i_TH_ADC                  : in  std_logic_vector(15 downto 0); -- seuil saturation ADC, 0 desactive le test
+        i_TH_rise                 : in  std_logic_vector(15 downto 0); -- seuil de debut evenement, 0 desactive le test
+        i_TH_fall                 : in  std_logic_vector(15 downto 0); -- seuil de fin evenement, 0 desactive le test
+
+        -- sortie niveau d'energie
+        o_Energy_level_max        : out signed(15 downto 0); -- maximum d'energie mesure pendant l'evenement
+        o_readyEnergy_level_max   : out std_logic; -- pulse indiquant que o_Energy_level_max est valide
+
+        -- recopie du flux apres gain
+        i_data_after_gain         : in  signed(15 downto 0); -- echantillon apres gain
+        o_data_after_energy_level : out signed(15 downto 0) -- echantillon apres traitement Energy_level
     );
 end entity Energy_level;
 

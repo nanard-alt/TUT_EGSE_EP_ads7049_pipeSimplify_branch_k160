@@ -16,18 +16,23 @@ use ieee.numeric_std.all;
 
 entity Injection is
     port(
-        reset                  : in  std_logic;
-        i_clk_fast              : in  std_logic;
-        --fifo
-        i_continuous_injection : in  std_logic;
-        o_pipe_in_rd_en        : out std_logic;
-        i_pipe_in_empty        : in  std_logic;
-        i_pipe_in_valid        : in  std_logic;
-        i_pipe_in_dout         : in  signed(11 downto 0);
-        --output injection
-        o_injection_started    : out std_logic;
-        o_data                 : out signed(11 downto 0);
-        o_ready                : out std_logic
+        -- global
+        reset                  : in  std_logic; -- reset actif a 1
+        i_clk_fast             : in  std_logic; -- horloge rapide d'echantillonnage
+
+        -- commande injection
+        i_continuous_injection : in  std_logic; -- mode injection continue quand le PipeIn injection est vide
+
+        -- entree FIFO PipeIn injection
+        o_pipe_in_rd_en        : out std_logic; -- demande de lecture d'un echantillon dans la FIFO PipeIn
+        i_pipe_in_empty        : in  std_logic; -- FIFO PipeIn injection vide
+        i_pipe_in_valid        : in  std_logic; -- echantillon i_pipe_in_dout valide apres lecture FIFO
+        i_pipe_in_dout         : in  signed(11 downto 0); -- echantillon 12 bits lu depuis la FIFO PipeIn injection
+
+        -- sortie injection remplacant l'ADC
+        o_injection_started    : out std_logic; -- indique qu'au moins un echantillon a ete lu depuis le PipeIn injection
+        o_data                 : out signed(11 downto 0); -- echantillon injecte a la place de l'echantillon ADC
+        o_ready                : out std_logic -- pulse indiquant que o_data est valide
     );
 end entity Injection;
 
