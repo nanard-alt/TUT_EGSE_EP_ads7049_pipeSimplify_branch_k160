@@ -277,7 +277,6 @@ begin
                 clk_out1  => sys_clk,
                 clk_out2  => clk_32Mhz,
                 locked    => locked,
-
                 -- entree horloge differentielle carte
                 clk_in1_p => sys_clkp,
                 clk_in1_n => sys_clkn
@@ -291,7 +290,6 @@ begin
                 clk_out1  => sys_clk,
                 clk_out2  => open,
                 locked    => locked,
-
                 -- entree horloge differentielle carte
                 clk_in1_p => sys_clkp,
                 clk_in1_n => sys_clkn
@@ -309,7 +307,6 @@ begin
             -- global
             sys_clk                => sys_clk,
             reset                  => reset,
-
             -- synchronisation des spectres
             o_clk_synchro_spectrum => clk_synchro_spectrum
         );
@@ -395,18 +392,15 @@ begin
             rst         => reset,
             wr_clk      => okClk,
             rd_clk      => clk_32Mhz,
-
             -- ecriture depuis PipeIn ep80
             din         => pipe_in_injection_din_fifo,
             wr_en       => pipe_in_injection_wr_en_fifo,
-
             -- lecture vers bloc Injection
             rd_en       => pipe_in_injection_rd_en_fifo,
             dout        => pipe_in_injection_dout_fifo,
             full        => open,
             empty       => pipe_in_injection_empty_fifo,
             valid       => pipe_in_injection_valid_fifo,
-
             -- status reset FIFO inutilises
             wr_rst_busy => open,
             rd_rst_busy => open
@@ -421,16 +415,13 @@ begin
             -- global
             reset                  => reset,
             i_clk_fast             => clk_32Mhz,
-
             -- commande injection
             i_continuous_injection => continuous_injection,
-
             -- entree FIFO PipeIn injection
             o_pipe_in_rd_en        => pipe_in_injection_rd_en_fifo,
             i_pipe_in_empty        => pipe_in_injection_empty_fifo,
             i_pipe_in_valid        => pipe_in_injection_valid_fifo,
             i_pipe_in_dout         => signed(pipe_in_injection_dout_fifo(11 downto 0)),
-
             -- sortie injection remplacant l'ADC
             o_injection_started    => injection_started,
             o_data                 => data_fast_injection,
@@ -508,11 +499,9 @@ begin
                 i_clk_slow                   => sys_clk,
                 i_clk_fast                   => clk_32Mhz,
                 i_reset                      => reset,
-
                 -- synchronisation et identification du detecteur
                 i_clk_synchro_spectrum       => clk_synchro_spectrum,
                 i_detector_number            => To_unsigned(N, Detector_Number_Width),
-
                 -- configuration gain et seuils Energy_level
                 i_gain                       => i_gain(N),
                 i_TH_ADC                     => TH_ADC,
@@ -520,27 +509,22 @@ begin
                 i_TH_fall                    => TH_fall,
                 i_TH_rise_high_frequency     => TH_rise_high_frequency,
                 i_TH_fall_high_frequency     => TH_fall_high_frequency,
-
                 -- entree echantillon provenant de l'ADC ou injection
                 i_ready_CDC                  => i_ready_CDC(N),
                 i_data_CDC                   => i_data_CDC(N),
-
                 -- configuration FIR et selection filtre
                 i_enable_high_filter         => enable_high_filter(N),
                 i_coef_fir                   => coef_fir(N),
                 i_coef_fir_ready             => i_coef_fir_ready(N),
                 i_standard_energy_threshold  => standard_energy_threshold(N),
-
                 -- sorties de surveillance chaine energie
                 o_data_before_filter         => data_before_filter(N),
                 o_ready_after_gain           => ready_after_gain(N),
                 o_data_after_energy_level    => data_after_energy_level(N),
-
                 -- sortie spectrum haute definition vers FIFO PipeOut
                 o_pipe_out_spectrum_din      => o_pipe_out_spectrum_din(N),
                 o_pipe_out_spectrum_wr_en    => o_pipe_out_spectrum_wr_en(N),
                 o_spectrum_count_pulse       => spectrum_count_pulse(N),
-
                 -- sortie spectrum standard definition vers FIFO PipeOut
                 o_pipe_out_spectrum_sd_din   => o_pipe_out_spectrum_sd_din(N),
                 o_pipe_out_spectrum_sd_wr_en => o_pipe_out_spectrum_sd_wr_en(N),
@@ -640,16 +624,13 @@ begin
                 -- global
                 i_clk_slow                     => sys_clk,
                 i_reset                        => reset,
-
                 -- commandes de capture raw
                 i_continuous_injection         => continuous_injection,
                 i_level_trigger                => i_level_trigger(N),
                 i_Start_Capture                => i_Start_Capture(N),
-
                 -- entree echantillon raw
                 i_din_fifo_raw_data            => din_fifo_raw_data(N),
                 i_ready                        => ready_after_gain(N),
-
                 -- sortie vers FIFO PipeOut raw data
                 o_din_fifo_pipe_out_raw_data   => din_fifo_pipe_out_raw_data(N),
                 o_wr_en_fifo_pipe_out_raw_data => wr_en_fifo_pipe_out_raw_data(N),
@@ -705,10 +686,8 @@ begin
                 -- global
                 i_reset         => reset,
                 i_clk           => clk_1KHz,
-
                 -- configuration niveau DAC
                 i_level_DAC121S => level_DAC121S,
-
                 -- sortie SPI vers DAC121S101
                 o_DAC_SCLK      => o_DAC_SCLK(N),
                 o_DAC_SYNC_n    => o_DAC_SYNC_n(N),
@@ -728,11 +707,9 @@ begin
                 rst           => reset,
                 wr_clk        => sys_clk,
                 rd_clk        => okClk,
-
                 -- ecriture depuis FSM_raw_data
                 din           => std_logic_vector(din_fifo_pipe_out_raw_data(N)),
                 wr_en         => wr_en_fifo_pipe_out_raw_data(N),
-
                 -- lecture vers PipeOut raw data
                 rd_en         => rd_en_fifo_pipe_out_raw_data(N),
                 dout          => dout_fifo_pipe_out_raw_data(N),
@@ -740,7 +717,6 @@ begin
                 empty         => empty_fifo_pipe_out_raw_data(N),
                 valid         => open,
                 rd_data_count => rd_fifo_pipe_out_data_count_raw_data(N),
-
                 -- status reset FIFO inutilises
                 wr_rst_busy   => open,
                 rd_rst_busy   => open
@@ -756,11 +732,9 @@ begin
             rst           => reset,
             wr_clk        => sys_clk,
             rd_clk        => okClk,
-
             -- ecriture spectrum HD depuis EP
             din           => pipe_out_spectrum_din_fifo,
             wr_en         => pipe_out_spectrum_wr_en_fifo,
-
             -- lecture vers PipeOut spectrum HD
             rd_en         => pipe_out_spectrum_rd_en,
             dout          => pipe_out_spectrum_dout,
@@ -768,7 +742,6 @@ begin
             empty         => open,
             valid         => open,
             rd_data_count => pipe_out_rd_data_count_spectrum,
-
             -- status reset FIFO inutilises
             wr_rst_busy   => open,
             rd_rst_busy   => open
@@ -784,11 +757,9 @@ begin
             rst           => reset,
             wr_clk        => sys_clk,
             rd_clk        => okClk,
-
             -- ecriture spectrum SD depuis EP
             din           => pipe_out_spectrum_sd_din_fifo,
             wr_en         => pipe_out_spectrum_sd_wr_en_fifo,
-
             -- lecture vers PipeOut spectrum SD
             rd_en         => pipe_out_spectrum_sd_rd_en,
             dout          => pipe_out_spectrum_sd_dout,
@@ -796,7 +767,6 @@ begin
             empty         => open,
             valid         => open,
             rd_data_count => pipe_out_rd_data_count_spectrum_sd,
-
             -- status reset FIFO inutilises
             wr_rst_busy   => open,
             rd_rst_busy   => open
@@ -809,28 +779,23 @@ begin
     label_FSM_pipe_in_config : entity work.FSM_read_config
         port map(
             -- global
-            i_clk_slow              => sys_clk,
-            i_reset                 => reset,
-
+            i_clk_slow                  => sys_clk,
+            i_reset                     => reset,
             -- entree FIFO PipeIn config ep81
-            i_pipe_in_config_empty  => pipe_in_config_empty,
-            i_pipe_in_config_valid  => pipe_in_config_valid,
-            i_pipe_in_config_dout   => signed(pipe_in_config_dout),
-            i_pipe_in_rd_data_count => pipe_in_confi_rd_data_count,
-
+            i_pipe_in_config_empty      => pipe_in_config_empty,
+            i_pipe_in_config_valid      => pipe_in_config_valid,
+            i_pipe_in_config_dout       => signed(pipe_in_config_dout),
+            i_pipe_in_rd_data_count     => pipe_in_confi_rd_data_count,
             -- commande de lecture FIFO PipeIn config
-            o_pipe_in_config_rd_en  => pipe_in_config_rd_en,
-
+            o_pipe_in_config_rd_en      => pipe_in_config_rd_en,
             -- sortie coefficients FIR
-            o_coef_fir_ready        => coef_fir_ready,
-            o_coef_fir              => coef_fir,
-
+            o_coef_fir_ready            => coef_fir_ready,
+            o_coef_fir                  => coef_fir,
             -- sortie registres de configuration
-            o_reg_config            => reg_config,
+            o_reg_config                => reg_config,
             o_standard_energy_threshold => standard_energy_threshold,
-
             -- sortie gains
-            o_gain                  => i_gain
+            o_gain                      => i_gain
         );
 
     ------------------------------------------
@@ -861,11 +826,9 @@ begin
             rst           => reset,
             wr_clk        => okClk,
             rd_clk        => sys_clk,
-
             -- ecriture depuis PipeIn config ep81
             din           => pipe_in_config_din,
             wr_en         => pipe_in_config_wr_en,
-
             -- lecture vers FSM_read_config
             rd_en         => pipe_in_config_rd_en,
             dout          => pipe_in_config_dout,
@@ -873,7 +836,6 @@ begin
             empty         => pipe_in_config_empty,
             valid         => pipe_in_config_valid,
             rd_data_count => pipe_in_confi_rd_data_count,
-
             -- status reset FIFO inutilises
             wr_rst_busy   => open,
             rd_rst_busy   => open

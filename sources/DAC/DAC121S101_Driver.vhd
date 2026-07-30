@@ -44,18 +44,18 @@ use ieee.numeric_std.all;
 entity DAC121S101_Driver is
     port(
         -- global
-        i_Rst_n      : in  std_logic; -- reset actif a 0
-        i_Clk        : in  std_logic; -- horloge de la FSM DAC, frequence double de la frequence SPI
+        i_Rst_n      : in  std_logic;   -- reset actif a 0
+        i_Clk        : in  std_logic;   -- horloge de la FSM DAC, frequence double de la frequence SPI
 
         -- commande de conversion DAC
-        i_Start      : in  std_logic; -- pulse de demarrage d'une trame SPI DAC
-        o_Busy       : out std_logic; -- DAC occupe pendant l'envoi de la trame SPI
+        i_Start      : in  std_logic;   -- pulse de demarrage d'une trame SPI DAC
+        o_Busy       : out std_logic;   -- DAC occupe pendant l'envoi de la trame SPI
         i_Num_Data   : in  std_logic_vector(11 downto 0); -- valeur DAC 12 bits a convertir
 
         -- sortie SPI vers DAC121S101
-        o_DAC_SCLK   : out std_logic; -- horloge serie SPI du DAC
-        o_DAC_SYNC_n : out std_logic; -- synchronisation trame SPI active a 0
-        o_DAC_DIN    : out std_logic -- donnee serie SPI vers le DAC
+        o_DAC_SCLK   : out std_logic;   -- horloge serie SPI du DAC
+        o_DAC_SYNC_n : out std_logic;   -- synchronisation trame SPI active a 0
+        o_DAC_DIN    : out std_logic    -- donnee serie SPI vers le DAC
     );
 end entity DAC121S101_Driver;
 
@@ -68,70 +68,68 @@ architecture RTL of DAC121S101_Driver is
     -- DAC Control Registers
     signal SPI_Bit_Number_cnt : unsigned(3 downto 0); -- 16-bit standard SPI protocol, MSB first
     signal SPI_Sent_Data      : std_logic_vector(11 downto 0); -- 12-bit unsigned data
-    
-    
 
 begin
 
     p_DAC_SPI_Protocol : process(i_Rst_n, i_Clk)
     begin
         if i_Rst_n = '0' then
-            o_Busy             <= '0';            -- DAC not in operation
-            o_DAC_SCLK         <= '1';            -- No clock
-            o_DAC_SYNC_n       <= '1';            -- Chip not synchronized
-            o_DAC_DIN          <= '0';            -- No data sent
+            o_Busy             <= '0';  -- DAC not in operation
+            o_DAC_SCLK         <= '1';  -- No clock
+            o_DAC_SYNC_n       <= '1';  -- Chip not synchronized
+            o_DAC_DIN          <= '0';  -- No data sent
             SPI_Bit_Number_cnt <= (others => '1'); -- Send MSB first, init at max
             SPI_Sent_Data      <= (others => '0'); -- Empty buffer
-            state              <= S_Idle;         -- Start in idle state
+            state              <= S_Idle; -- Start in idle state
         elsif rising_edge(i_Clk) then
             -- FSM
-            case state is                         -- FSM_freq = 2 * Conversion_freq
+            case state is               -- FSM_freq = 2 * Conversion_freq
                 when S_Idle =>
                     -- Internal registers initialization
                     SPI_Bit_Number_cnt <= (others => '1'); -- Send MSB first, init at max
                     SPI_Sent_Data      <= (others => '0'); -- Empty buffer
 
                     -- Outputs initialization
-                    o_Busy       <= '0';          -- Not busy
-                    o_DAC_SCLK   <= '1';          -- No clock
-                    o_DAC_SYNC_n <= '1';          -- Chip not synchronized
-                    o_DAC_DIN    <= '0';          -- No data sent
+                    o_Busy       <= '0'; -- Not busy
+                    o_DAC_SCLK   <= '1'; -- No clock
+                    o_DAC_SYNC_n <= '1'; -- Chip not synchronized
+                    o_DAC_DIN    <= '0'; -- No data sent
 
                     -- Wait for the start flag
                     if i_Start = '1' then
                         SPI_Sent_Data <= i_Num_Data; -- Save input data to send on serial register
-                        o_Busy        <= '1';     -- DAC has started operations
+                        o_Busy        <= '1'; -- DAC has started operations
                         state         <= S_Synchronization;
                     end if;
                 ----------------------------------------------------------------------------------
                 when S_Synchronization =>
-                    o_DAC_SCLK <= '0';            -- Synchronize on clock low
-                    state      <= S_Writing;      -- Enter in writing state after synchronization
+                    o_DAC_SCLK <= '0';  -- Synchronize on clock low
+                    state      <= S_Writing; -- Enter in writing state after synchronization
                 ----------------------------------------------------------------------------------
                 when S_Writing =>
-                    o_DAC_SCLK   <= '1';          -- Write on clock high
-                    o_DAC_SYNC_n <= '0';          -- Chip synchronized on falling edge
+                    o_DAC_SCLK   <= '1'; -- Write on clock high
+                    o_DAC_SYNC_n <= '0'; -- Chip synchronized on falling edge
 
                     -- Send Control register bit on SPI Bus, MSB first
                     if SPI_Bit_Number_cnt(3 downto 2) = "11" then -- Four first cycles
-                        o_DAC_DIN <= '0';         -- SPI-Bits #15-14-13-12 are always set at zero
-                    else                          -- Normal operations
+                        o_DAC_DIN <= '0'; -- SPI-Bits #15-14-13-12 are always set at zero
+                    else                -- Normal operations
                         o_DAC_DIN     <= SPI_Sent_Data(11);
                         SPI_Sent_Data <= SPI_Sent_Data(10 downto 0) & "0"; -- Fill with zero
                     end if;
                     state <= S_Tranferring;
                 ----------------------------------------------------------------------------------
                 when S_Tranferring =>
-                    o_DAC_SCLK <= '0';            -- Transfer on clock low
+                    o_DAC_SCLK <= '0';  -- Transfer on clock low
 
                     -- Bits are sent in descending order from bit #15 to bit #0
                     SPI_Bit_Number_cnt <= SPI_Bit_Number_cnt - 1;
 
                     -- Check if end of conversion
                     if SPI_Bit_Number_cnt = X"0" then -- End of transfer
-                        state <= S_Idle;          -- All 16 bits have been sent, return to idle state
+                        state <= S_Idle; -- All 16 bits have been sent, return to idle state
                     else
-                        state <= S_Writing;       -- Some bits are still not sent
+                        state <= S_Writing; -- Some bits are still not sent
                     end if;
                 ----------------------------------------------------------------------------------
                 when others =>

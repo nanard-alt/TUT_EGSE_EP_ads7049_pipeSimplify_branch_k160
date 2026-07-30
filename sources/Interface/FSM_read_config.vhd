@@ -19,28 +19,28 @@ use work.UT_EGSE_EP_Package.all;
 entity FSM_read_config is
     port(
         -- global
-        i_clk_slow              : in  std_logic; -- horloge systeme lente
-        i_reset                 : in  std_logic; -- reset actif a 1
+        i_clk_slow                  : in  std_logic; -- horloge systeme lente
+        i_reset                     : in  std_logic; -- reset actif a 1
 
         -- entree FIFO PipeIn config ep81
-        i_pipe_in_config_empty  : in  std_logic; -- FIFO config vide
-        i_pipe_in_config_valid  : in  std_logic; -- mot i_pipe_in_config_dout valide apres lecture FIFO
-        i_pipe_in_config_dout   : in  signed(31 downto 0); -- mot 32 bits lu depuis la FIFO config, seuls les 16 bits faibles configurent les signaux internes
-        i_pipe_in_rd_data_count : in  STD_LOGIC_VECTOR(9 downto 0); -- nombre de mots disponibles dans la FIFO config
+        i_pipe_in_config_empty      : in  std_logic; -- FIFO config vide
+        i_pipe_in_config_valid      : in  std_logic; -- mot i_pipe_in_config_dout valide apres lecture FIFO
+        i_pipe_in_config_dout       : in  signed(31 downto 0); -- mot 32 bits lu depuis la FIFO config, seuls les 16 bits faibles configurent les signaux internes
+        i_pipe_in_rd_data_count     : in  STD_LOGIC_VECTOR(9 downto 0); -- nombre de mots disponibles dans la FIFO config
 
         -- commande de lecture FIFO PipeIn config
-        o_pipe_in_config_rd_en  : out std_logic; -- demande de lecture d'un mot dans la FIFO config
+        o_pipe_in_config_rd_en      : out std_logic; -- demande de lecture d'un mot dans la FIFO config
 
         -- sortie coefficients FIR
-        o_coef_fir_ready        : out std_logic; -- pulse indiquant que les coefficients FIR sont charges
-        o_coef_fir              : out Array_Array_config_32x16_type_32x16_type; -- coefficients FIR par detecteur, filtre et index coefficient
+        o_coef_fir_ready            : out std_logic; -- pulse indiquant que les coefficients FIR sont charges
+        o_coef_fir                  : out Array_Array_config_32x16_type_32x16_type; -- coefficients FIR par detecteur, filtre et index coefficient
 
         -- sortie registres de configuration
-        o_reg_config            : out Array_config_16stdx8_type; -- registres de configuration 16 bits lus depuis la trame ep81
+        o_reg_config                : out Array_config_16stdx8_type; -- registres de configuration 16 bits lus depuis la trame ep81
         o_standard_energy_threshold : out Array_Array_Array_config_10x16_type; -- seuils standard energy par detecteur, filtre et seuil
 
         -- sortie gains
-        o_gain                  : out Array_Array_config_16unsignedxDetector_Number_type -- gains 16 bits par detecteur et filtre
+        o_gain                      : out Array_Array_config_16unsignedxDetector_Number_type -- gains 16 bits par detecteur et filtre
         -- output gain
         --o_gain_high_frequency   : out Array_Array_config_32stdx2_type
     );
@@ -50,23 +50,23 @@ architecture RTL of FSM_read_config is
 
     --    type state_type is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, read_low_frequency, valid_low_frequency, read_trigger, valid_trigger);
     --    signal state    : state_type;
-    constant Config_End_Padding_Word_Count : natural := 3;
+    constant Config_End_Padding_Word_Count   : natural := 3;
     constant Standard_Energy_Threshold_Count : natural := 6;
-    constant Config_Read_Word_Count        : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + (Standard_Energy_Threshold_Count * Filter_Number * Detector_Number) + Config_End_Padding_Word_Count;
-    signal add_coef : integer;
+    constant Config_Read_Word_Count          : natural := (32 * Filter_Number * Detector_Number) + 7 + (Filter_Number * Detector_Number) + (Standard_Energy_Threshold_Count * Filter_Number * Detector_Number) + Config_End_Padding_Word_Count;
+    signal add_coef                          : integer;
 
     type state_type_config is (IDLE, read_low_frequency, valid_low_frequency, read_high_frequency, valid_high_frequency, read_trigger, valid_read_trigger,
                                read_TH_rise, valid_read_TH_rise, read_TL_fall, valid_read_TL_fall, read_TH_ADC, valid_read_TH_ADC, read_gain, valid_read_gain, read_gain_high_frequency,
                                read_standard_energy_threshold, valid_read_standard_energy_threshold,
                                valid_read_gain_high_frequency, read_level_DAC, valid_read_level_DAC, read_TH_rise_high_frequency, read_end_usb_buffer, valid_read_end_usb_buffer,
-                               read_TH_fall_high_frequency, valid_read_TH_fall_high_frequency, valid_read_TH_rise_high_frequency,stop);
+                               read_TH_fall_high_frequency, valid_read_TH_fall_high_frequency, valid_read_TH_rise_high_frequency, stop);
 
-    signal state_config            : state_type_config;
-    signal cnt_number_detector     : integer;
-    signal cnt_number_filter       : integer;
+    signal state_config                  : state_type_config;
+    signal cnt_number_detector           : integer;
+    signal cnt_number_filter             : integer;
     signal cnt_standard_energy_threshold : integer;
-    signal cnt_read_end_usb_buffer : integer;
-    signal count_wait_valid        : unsigned(5 downto 0);
+    signal cnt_read_end_usb_buffer       : integer;
+    signal count_wait_valid              : unsigned(5 downto 0);
 
 begin
 
@@ -78,23 +78,22 @@ begin
     begin
         if i_reset = '1' then
 
-            state_config           <= IDLE;
-            o_pipe_in_config_rd_en <= '0';
-            add_coef               <= 0;
-            o_coef_fir             <= (others => (others => (others => (others => '0'))));
-            o_gain                 <= (others => (others => (others => '0')));
+            state_config                <= IDLE;
+            o_pipe_in_config_rd_en      <= '0';
+            add_coef                    <= 0;
+            o_coef_fir                  <= (others => (others => (others => (others => '0'))));
+            o_gain                      <= (others => (others => (others => '0')));
             o_standard_energy_threshold <= (others => (others => (others => (others => '0'))));
-
 
             --o_gain_high_frequency(0) <= (others => (others => '0'));
             --o_gain_high_frequency(1) <= (others => (others => '0'));
-            o_coef_fir_ready        <= '0';
-            cnt_number_detector     <= 0;
-            cnt_number_filter       <= 0;
+            o_coef_fir_ready              <= '0';
+            cnt_number_detector           <= 0;
+            cnt_number_filter             <= 0;
             cnt_standard_energy_threshold <= 0;
-            cnt_read_end_usb_buffer <= 0;
-            o_reg_config            <= (others => (others => '0'));
-            count_wait_valid        <= (others => '0');
+            cnt_read_end_usb_buffer       <= 0;
+            o_reg_config                  <= (others => (others => '0'));
+            count_wait_valid              <= (others => '0');
 
         elsif rising_edge(i_clk_slow) then
 
@@ -103,22 +102,22 @@ begin
                 when IDLE =>
 
                     if i_pipe_in_config_empty = '0' and To_integer(unsigned(i_pipe_in_rd_data_count)) >= Config_Read_Word_Count then
-                        state_config            <= read_low_frequency;
-                        o_pipe_in_config_rd_en  <= '0';
-                        add_coef                <= 0;
-                        o_coef_fir              <= (others => (others => (others => (others => '0'))));
-                        o_gain                  <= (others => (others => (others => '0')));
+                        state_config                <= read_low_frequency;
+                        o_pipe_in_config_rd_en      <= '0';
+                        add_coef                    <= 0;
+                        o_coef_fir                  <= (others => (others => (others => (others => '0'))));
+                        o_gain                      <= (others => (others => (others => '0')));
                         o_standard_energy_threshold <= (others => (others => (others => (others => '0'))));
-                       
+
                         --o_gain_high_frequency(0) <= (others => (others => '0'));
                         --o_gain_high_frequency(1) <= (others => (others => '0'));
-                        o_coef_fir_ready        <= '0';
-                        cnt_number_detector     <= 0;
-                        cnt_number_filter       <= 0;
+                        o_coef_fir_ready              <= '0';
+                        cnt_number_detector           <= 0;
+                        cnt_number_filter             <= 0;
                         cnt_standard_energy_threshold <= 0;
-                        cnt_read_end_usb_buffer <= 0;
-                        o_reg_config            <= (others => (others => '0'));
-                        count_wait_valid        <= (others => '0');
+                        cnt_read_end_usb_buffer       <= 0;
+                        o_reg_config                  <= (others => (others => '0'));
+                        count_wait_valid              <= (others => '0');
                     end if;
 
                 when read_low_frequency =>
@@ -156,9 +155,7 @@ begin
                         state_config                                 <= read_low_frequency;
                     end if;
 
-
                 when read_high_frequency =>
-
 
                     if add_coef < 32 then
                         o_pipe_in_config_rd_en <= '1';
@@ -184,15 +181,14 @@ begin
                     end if;
 
                 when valid_high_frequency =>
-                
+
                     o_pipe_in_config_rd_en <= '0';
-                
+
                     if i_pipe_in_config_valid = '1' then
                         o_coef_fir(cnt_number_detector)(1)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
                         add_coef                                     <= add_coef + 1;
                         state_config                                 <= read_high_frequency;
-                end if;
-
+                    end if;
 
                 when read_trigger =>
 
@@ -317,10 +313,10 @@ begin
                 when read_gain_high_frequency =>
 
                     if cnt_number_detector = Detector_Number then
-                        state_config           <= read_standard_energy_threshold;
-                        o_pipe_in_config_rd_en <= '0';
-                        cnt_number_detector    <= 0;
-                        cnt_number_filter      <= 0;
+                        state_config                  <= read_standard_energy_threshold;
+                        o_pipe_in_config_rd_en        <= '0';
+                        cnt_number_detector           <= 0;
+                        cnt_number_filter             <= 0;
                         cnt_standard_energy_threshold <= 0;
 
                     else
@@ -343,10 +339,10 @@ begin
                 when read_standard_energy_threshold =>
 
                     if cnt_number_detector = Detector_Number then
-                        state_config           <= read_end_usb_buffer;
-                        o_pipe_in_config_rd_en <= '0';
-                        cnt_number_detector    <= 0;
-                        cnt_number_filter      <= 0;
+                        state_config                  <= read_end_usb_buffer;
+                        o_pipe_in_config_rd_en        <= '0';
+                        cnt_number_detector           <= 0;
+                        cnt_number_filter             <= 0;
                         cnt_standard_energy_threshold <= 0;
 
                     else

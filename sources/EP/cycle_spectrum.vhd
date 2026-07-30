@@ -27,8 +27,8 @@ end entity cycle_spectrum;
 
 architecture RTL of cycle_spectrum is
 
-    signal count_synchro_spectrum      : unsigned(26 downto 0);
-    signal clk_synchro_spectrum        : std_logic;
+    signal count_synchro_spectrum : unsigned(26 downto 0);
+    signal clk_synchro_spectrum   : std_logic;
 
 begin
 
@@ -42,7 +42,7 @@ begin
         elsif rising_edge(sys_clk) then
 
             count_synchro_spectrum <= count_synchro_spectrum + 1;
-            
+
             if To_integer(count_synchro_spectrum) >= 20000000 then
                 clk_synchro_spectrum   <= not clk_synchro_spectrum;
                 count_synchro_spectrum <= (others => '0');

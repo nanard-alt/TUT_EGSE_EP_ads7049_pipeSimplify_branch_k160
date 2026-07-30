@@ -17,12 +17,12 @@ use ieee.numeric_std.all;
 entity remote_DAC121S01_driver is
     port(
         -- global
-        i_Rst_n       : in  std_logic; -- reset actif a 0
-        i_Clk         : in  std_logic; -- horloge de la FSM de commande DAC
+        i_Rst_n       : in  std_logic;  -- reset actif a 0
+        i_Clk         : in  std_logic;  -- horloge de la FSM de commande DAC
 
         -- commande vers driver SPI DAC
-        o_Start       : out std_logic; -- pulse de demande d'envoi d'une nouvelle valeur DAC
-        i_Busy        : in  std_logic; -- driver SPI DAC occupe
+        o_Start       : out std_logic;  -- pulse de demande d'envoi d'une nouvelle valeur DAC
+        i_Busy        : in  std_logic;  -- driver SPI DAC occupe
         o_Num_Data    : out std_logic_vector(11 downto 0); -- valeur DAC 12 bits transmise au driver SPI
 
         -- configuration niveau DAC

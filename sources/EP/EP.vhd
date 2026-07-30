@@ -107,7 +107,6 @@ begin
                 i_reset    => i_reset,
                 i_clk_fast => i_clk_fast,
                 i_clk_slow => i_clk_slow,
-
                 -- synchronisation ready
                 i_ready    => i_ready_CDC,
                 o_ready    => ready_before_filter_CDC, --ready_slow,
@@ -141,15 +140,12 @@ begin
                 -- global
                 i_clk_slow       => i_clk_slow,
                 i_reset          => i_reset,
-
                 -- configuration des coefficients FIR
                 i_coef_fir       => i_coef_fir(N),
                 i_coef_fir_ready => i_coef_fir_ready,
-
                 -- entree echantillon provenant de l'ADC ou injection
                 i_data           => data_before_filter(N),
                 i_ready          => ready_before_filter(N),
-
                 -- sortie echantillon filtre vers gain
                 o_data           => data_after_filter(N),
                 o_ready          => ready_after_filter(N)
@@ -170,14 +166,11 @@ begin
                 -- global
                 i_clk_slow           => i_clk_slow,
                 i_reset              => i_reset,
-
                 -- configuration du gain
                 i_gain               => i_gain(N),
-
                 -- entree echantillon filtre provenant de FIR_filter
                 i_data_after_filter  => data_after_filter(N),
                 i_ready_after_filter => ready_after_filter(N),
-
                 -- sortie echantillon amplifie vers Energy_level
                 o_data_after_gain    => data_after_gain(N),
                 o_ready_after_gain   => ready_after_gain(N)
@@ -199,20 +192,16 @@ begin
                 -- global
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
-
                 -- surveillance ADC avant filtrage
                 i_data_before_filter      => data_before_filter(N),
-
                 -- entree detection energie apres filtrage
                 i_data_after_filter       => data_after_gain(N),
                 i_TH_ADC                  => i_TH_ADC,
                 i_TH_rise                 => TH_rise(N),
                 i_TH_fall                 => TH_fall(N),
-
                 -- sortie niveau d'energie
                 o_Energy_level_max        => Energy_level_max(N),
                 o_readyEnergy_level_max   => readyEnergy_level_max(N),
-
                 -- recopie du flux apres gain
                 i_data_after_gain         => data_after_gain(N),
                 o_data_after_energy_level => data_after_energy_level(N)
@@ -239,16 +228,13 @@ begin
                 -- global
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
-
                 -- synchronisation et identification du spectre
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
                 i_filter_number           => To_unsigned(N, Filter_Number_Width),
-
                 -- entree depuis Energy_level
                 i_Energy_level_max        => Energy_level_max(N),
                 i_readyEnergy_level_max   => readyEnergy_level_max(N),
-
                 -- sortie vers FIFO PipeOut spectrum HD
                 o_pipe_out_spectrum_din   => pipe_out_spectrum_din(N),
                 o_pipe_out_spectrum_wr_en => pipe_out_spectrum_wr_en(N),
@@ -269,14 +255,11 @@ begin
                 -- global
                 i_clk_slow                  => i_clk_slow,
                 i_reset                     => i_reset,
-
                 -- configuration des seuils
                 i_standard_energy_threshold => i_standard_energy_threshold(N),
-
                 -- entree depuis Energy_level
                 i_ready_energy_level_max    => readyEnergy_level_max(N),
                 i_energy_level_max          => Energy_level_max(N),
-
                 -- sortie vers construction du spectrum standard definition
                 o_ready_energy_level_max_sd => ready_energy_level_max_sd(N),
                 o_energy_level_max_sd       => energy_level_max_sd(N)
@@ -296,16 +279,13 @@ begin
                 -- global
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
-
                 -- synchronisation et identification du spectre
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
                 i_filter_number           => To_unsigned(N, Filter_Number_Width),
-
                 -- entree depuis detect_standard_energy
                 i_Energy_level_max        => energy_level_max_sd(N),
                 i_readyEnergy_level_max   => ready_energy_level_max_sd(N),
-
                 -- sortie vers FIFO PipeOut spectrum SD
                 o_pipe_out_spectrum_din   => pipe_out_spectrum_sd_din(N),
                 o_pipe_out_spectrum_wr_en => pipe_out_spectrum_sd_wr_en(N),

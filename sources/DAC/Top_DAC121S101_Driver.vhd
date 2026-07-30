@@ -48,12 +48,10 @@ begin
             -- global
             i_Rst_n      => Rst_n,
             i_Clk        => i_clk,
-
             -- commande de conversion DAC
             i_Start      => Start,
             o_Busy       => Busy,
             i_Num_Data   => Num_Data,
-
             -- sortie SPI vers DAC121S101
             o_DAC_SCLK   => o_DAC_SCLK,
             o_DAC_SYNC_n => o_DAC_SYNC_n,
@@ -65,12 +63,10 @@ begin
             -- global
             i_Rst_n       => Rst_n,
             i_Clk         => i_clk,
-
             -- commande vers driver SPI DAC
             o_Start       => Start,
             i_Busy        => Busy,
             o_Num_Data    => Num_Data,
-
             -- configuration niveau DAC
             level_DAC121S => i_level_DAC121S
         );

@@ -46,21 +46,21 @@ end entity spectrum;
 architecture RTL of spectrum is
 
     -- RAM 
-    type Array_addr_type is array (0 to Filter_Number-1) of std_logic_vector((memory_add_size - 1) downto 0);
+    type Array_addr_type is array (0 to Filter_Number - 1) of std_logic_vector((memory_add_size - 1) downto 0);
     signal addr : Array_addr_type;
-    type Array_di_type is array (0 to Filter_Number-1) of std_logic_vector(15 downto 0);
+    type Array_di_type is array (0 to Filter_Number - 1) of std_logic_vector(15 downto 0);
     signal di   : Array_di_type;
-    type Array_do_type is array (0 to Filter_Number-1) of std_logic_vector(15 downto 0);
+    type Array_do_type is array (0 to Filter_Number - 1) of std_logic_vector(15 downto 0);
     signal do   : Array_do_type;
-    signal we   : std_logic_vector(Filter_Number-1 downto 0);
-    signal en   : std_logic_vector(Filter_Number-1 downto 0);
+    signal we   : std_logic_vector(Filter_Number - 1 downto 0);
+    signal en   : std_logic_vector(Filter_Number - 1 downto 0);
 
     --signal stamp : unsigned(15 downto 0);
 
     -- out spectrum to fifo pipe out
-    type Array_din_type is array (0 to Filter_Number-1) of std_logic_vector(31 downto 0);
+    type Array_din_type is array (0 to Filter_Number - 1) of std_logic_vector(31 downto 0);
     signal pipe_out_spectrum_din    : Array_din_type;
-    signal pipe_out_spectrum_wr_en  : std_logic_vector(Filter_Number-1 downto 0);
+    signal pipe_out_spectrum_wr_en  : std_logic_vector(Filter_Number - 1 downto 0);
     signal spectrum_pulse_by_filter : Array_din_type;
 
 begin
@@ -70,7 +70,7 @@ begin
     -- File: rams_sp_nc.vhd 
     ------------------------------------------
 
-    generate_RAM : for N IN 0 to Filter_Number-1 generate
+    generate_RAM : for N IN 0 to Filter_Number - 1 generate
         label_rame_one : entity work.rams_sp_rf
             generic map(
                 memory_add_size => memory_add_size,
@@ -92,7 +92,7 @@ begin
     --
     ------------------------------------------
 
-    generate_label_spectrum_FSM : for N IN 0 to Filter_Number-1 generate
+    generate_label_spectrum_FSM : for N IN 0 to Filter_Number - 1 generate
         label_spectrum_FSM : entity work.spectrum_FSM
             generic map(
                 memory_add_size => memory_add_size,
@@ -103,7 +103,6 @@ begin
                 i_clk_slow                => i_clk_slow,
                 i_reset                   => i_reset,
                 i_filter_number           => i_filter_number,
-
                 -- synchronisation et identification du spectre
                 i_clk_synchro_spectrum    => i_clk_synchro_spectrum,
                 i_detector_number         => i_detector_number,
@@ -116,11 +115,9 @@ begin
                 o_addr                    => addr(N),
                 o_di                      => di(N),
                 i_do                      => do(N),
-
                 -- entree depuis Energy_level ou detect_standard_energy
                 i_ready_energy_level_max  => i_readyEnergy_level_max,
                 i_energy_level_max        => i_Energy_level_max,
-
                 -- sortie vers FIFO PipeOut spectrum
                 o_pipe_out_spectrum_din   => pipe_out_spectrum_din(N),
                 o_pipe_out_spectrum_wr_en => pipe_out_spectrum_wr_en(N),

@@ -55,14 +55,13 @@ end entity spectrum_FSM;
 architecture RTL of spectrum_FSM is
 
     type state_type is (init_ram, detect_energy_max_ready, read_ram, write_ram, wait_send_header, header_to_gse, first_data_to_gse, write_to_gse, last_data_to_gse, end_write_to_gse, init_ram_work, dispatch);
-    signal TM_Byte_index        : integer range 0 to 8;
-    signal state                : state_type;
-    signal addr                 : unsigned(memory_add_size - 1 downto 0);
-    signal old_addr             : unsigned(memory_add_size - 1 downto 0);
-    signal spectrum_count_pulse : std_logic_vector(31 downto 0);
-    signal clk_synchro_spectrum : std_logic;
+    signal TM_Byte_index               : integer range 0 to 8;
+    signal state                       : state_type;
+    signal addr                        : unsigned(memory_add_size - 1 downto 0);
+    signal old_addr                    : unsigned(memory_add_size - 1 downto 0);
+    signal spectrum_count_pulse        : std_logic_vector(31 downto 0);
+    signal clk_synchro_spectrum        : std_logic;
     signal init_count_synchro_spectrum : unsigned(26 downto 0);
-
 
 begin
 
@@ -70,18 +69,18 @@ begin
     begin
         if i_reset = '1' then
 
-            state                     <= init_ram;
-            o_we                      <= '1';
-            o_en                      <= '1';
-            addr                      <= (others => '1');
-            old_addr                  <= (others => '0');
-            o_di                      <= (others => '0');
-            o_pipe_out_spectrum_din   <= (others => '0');
-            o_pipe_out_spectrum_wr_en <= '0';
-            spectrum_count_pulse      <= (others => '0');
-            o_spectrum_count_pulse    <= (others => '0');
-            TM_Byte_index             <= 0;
-            clk_synchro_spectrum      <= '0';
+            state                       <= init_ram;
+            o_we                        <= '1';
+            o_en                        <= '1';
+            addr                        <= (others => '1');
+            old_addr                    <= (others => '0');
+            o_di                        <= (others => '0');
+            o_pipe_out_spectrum_din     <= (others => '0');
+            o_pipe_out_spectrum_wr_en   <= '0';
+            spectrum_count_pulse        <= (others => '0');
+            o_spectrum_count_pulse      <= (others => '0');
+            TM_Byte_index               <= 0;
+            clk_synchro_spectrum        <= '0';
             init_count_synchro_spectrum <= (others => '0');
 
         elsif rising_edge(i_clk_slow) then
@@ -144,7 +143,7 @@ begin
 
                     init_count_synchro_spectrum <= init_count_synchro_spectrum + 1;
                     if To_integer(init_count_synchro_spectrum) >= (2056 * To_integer(i_detector_number)) then
-                        state <= header_to_gse;
+                        state                       <= header_to_gse;
                         init_count_synchro_spectrum <= (others => '0');
                     end if;
 
