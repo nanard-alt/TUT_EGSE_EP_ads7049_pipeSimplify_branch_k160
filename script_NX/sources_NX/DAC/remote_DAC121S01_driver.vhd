@@ -1,0 +1,81 @@
+-- Copyright (C) 2026 Bernard BERTRAND
+--
+-- This file is part of TUT_EGSE_EP.
+--
+-- This software is governed by the CeCILL license under French law
+-- and abiding by the rules of distribution of free software.
+-- You can use, modify and/or redistribute the software under the terms
+-- of the CeCILL license as circulated by CEA, CNRS and Inria at:
+-- http://www.cecill.info
+--
+-- See LICENSE.txt for the full license text.
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity remote_DAC121S01_driver is
+    port(
+        -- global
+        i_Rst_n       : in  std_logic;  -- reset actif a 0
+        i_Clk         : in  std_logic;  -- horloge de la FSM de commande DAC
+
+        -- commande vers driver SPI DAC
+        o_Start       : out std_logic;  -- pulse de demande d'envoi d'une nouvelle valeur DAC
+        i_Busy        : in  std_logic;  -- driver SPI DAC occupe
+        o_Num_Data    : out std_logic_vector(11 downto 0); -- valeur DAC 12 bits transmise au driver SPI
+
+        -- configuration niveau DAC
+        level_DAC121S : in  std_logic_vector(11 downto 0) -- valeur DAC 12 bits
+    );
+end entity remote_DAC121S01_driver;
+
+architecture RTL of remote_DAC121S01_driver is
+
+    type state_type is (state0, state1, state2);
+    signal count_send_DAC_data : unsigned(7 downto 0);
+    signal state               : state_type := state0;
+
+begin
+
+    process(i_Clk, i_Rst_n) is
+    begin
+        if i_Rst_n = '0' then
+
+            state               <= state0;
+            count_send_DAC_data <= (others => '0');
+            o_Start             <= '0';
+            o_Num_Data          <= (others => '0');
+
+        elsif rising_edge(i_Clk) then
+            case state is
+                when state0 =>
+
+                    count_send_DAC_data <= count_send_DAC_data + 1;
+
+                    if To_integer(count_send_DAC_data) >= 100 then -- every ten ms
+                        count_send_DAC_data <= (others => '0');
+                        state               <= state1;
+                    end if;
+
+                when state1 =>
+
+                    if i_Busy = '0' then
+                        o_Start    <= '1';
+                        o_Num_Data <= level_DAC121S;
+                        state      <= state2;
+                    end if;
+
+                when state2 =>
+
+                    o_Start <= '0';
+
+                    if i_Busy = '1' then
+                        state <= state0;
+                    end if;
+
+            end case;
+        end if;
+    end process;
+
+end architecture RTL;
