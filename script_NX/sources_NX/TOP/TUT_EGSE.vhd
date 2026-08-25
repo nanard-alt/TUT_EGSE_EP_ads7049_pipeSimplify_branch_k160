@@ -42,11 +42,15 @@ entity TUT_EGSE is
         i_pipe_in_config_dout       : in  std_logic_vector(31 downto 0);
         i_pipe_in_config_data_count : in  std_logic_vector(9 downto 0);
 
-        -- Spectrum streams, replacing Opal Kelly PipeOut FIFOs.
-        pipe_out_spectrum_din      : out std_logic_vector(31 downto 0);
-        pipe_out_spectrum_wr_en    : out std_logic;
-        pipe_out_spectrum_sd_din   : out std_logic_vector(31 downto 0);
-        pipe_out_spectrum_sd_wr_en : out std_logic;
+        -- Serialized spectrum streams, replacing Opal Kelly PipeOut FIFOs.
+        o_spectrum_bit      : out std_logic;
+        o_spectrum_wr_en    : out std_logic;
+        o_spectrum_clk      : out std_logic;
+        o_spectrum_sof      : out std_logic;
+        o_spectrum_sd_bit   : out std_logic;
+        o_spectrum_sd_wr_en : out std_logic;
+        o_spectrum_sd_clk   : out std_logic;
+        o_spectrum_sd_sof   : out std_logic;
 
         -- DAC121S101 SPI outputs.
         o_DAC_SCLK   : out std_logic_vector(Detector_Number - 1 downto 0);
@@ -101,6 +105,14 @@ architecture nx of TUT_EGSE is
     signal o_pipe_out_spectrum_sd_wr_en  : std_logic_vector(Detector_Number - 1 downto 0);
     signal pipe_out_spectrum_sd_din_mux   : std_logic_vector(31 downto 0);
     signal pipe_out_spectrum_sd_wr_en_mux : std_logic;
+
+    signal fifo_spectrum_dout  : std_logic_vector(31 downto 0);
+    signal fifo_spectrum_empty : std_logic;
+    signal fifo_spectrum_rd_en : std_logic;
+
+    signal fifo_spectrum_sd_dout  : std_logic_vector(31 downto 0);
+    signal fifo_spectrum_sd_empty : std_logic;
+    signal fifo_spectrum_sd_rd_en : std_logic;
 begin
 
     clk_32Mhz <= i_sys_clk;
@@ -282,10 +294,59 @@ begin
         end if;
     end process lebel_process_mux_data_spectrum_packet_SD;
 
-    pipe_out_spectrum_din      <= pipe_out_spectrum_din_mux;
-    pipe_out_spectrum_wr_en    <= pipe_out_spectrum_wr_en_mux;
-    pipe_out_spectrum_sd_din   <= pipe_out_spectrum_sd_din_mux;
-    pipe_out_spectrum_sd_wr_en <= pipe_out_spectrum_sd_wr_en_mux;
+    label_fifo_spectrum : entity work.fifo_sync
+        generic map(
+            DATA_WIDTH => 32,
+            DEPTH      => 8192,
+            ADDR_WIDTH => 13
+        )
+        port map(
+            i_clk   => i_sys_clk,
+            i_reset => reset,
+            i_wr_en => pipe_out_spectrum_wr_en_mux,
+            i_din   => pipe_out_spectrum_din_mux,
+            o_full  => open,
+            i_rd_en => fifo_spectrum_rd_en,
+            o_dout  => fifo_spectrum_dout,
+            o_empty => fifo_spectrum_empty
+        );
+
+    label_fifo_spectrum_sd : entity work.fifo_sync
+        generic map(
+            DATA_WIDTH => 32,
+            DEPTH      => 128,
+            ADDR_WIDTH => 7
+        )
+        port map(
+            i_clk   => i_sys_clk,
+            i_reset => reset,
+            i_wr_en => pipe_out_spectrum_sd_wr_en_mux,
+            i_din   => pipe_out_spectrum_sd_din_mux,
+            o_full  => open,
+            i_rd_en => fifo_spectrum_sd_rd_en,
+            o_dout  => fifo_spectrum_sd_dout,
+            o_empty => fifo_spectrum_sd_empty
+        );
+
+    label_spectrum_serializer : entity work.spectrum_serializer
+        port map(
+            i_clk               => i_sys_clk,
+            i_reset             => reset,
+            i_spectrum_dout     => fifo_spectrum_dout,
+            i_spectrum_empty    => fifo_spectrum_empty,
+            o_spectrum_rd_en    => fifo_spectrum_rd_en,
+            i_spectrum_sd_dout  => fifo_spectrum_sd_dout,
+            i_spectrum_sd_empty => fifo_spectrum_sd_empty,
+            o_spectrum_sd_rd_en => fifo_spectrum_sd_rd_en,
+            o_spectrum_bit      => o_spectrum_bit,
+            o_spectrum_wr_en    => o_spectrum_wr_en,
+            o_spectrum_clk      => o_spectrum_clk,
+            o_spectrum_sof      => o_spectrum_sof,
+            o_spectrum_sd_bit   => o_spectrum_sd_bit,
+            o_spectrum_sd_wr_en => o_spectrum_sd_wr_en,
+            o_spectrum_sd_clk   => o_spectrum_sd_clk,
+            o_spectrum_sd_sof   => o_spectrum_sd_sof
+        );
 
     --------------------------------------------------------------------------
     -- DAC outputs.

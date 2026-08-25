@@ -5,6 +5,7 @@ set SCRIPT_NX_ROOT "C:/3utransat-k160/TUT_EGSE_EP_ads7049_pipeSimplify_branch_k1
 set SRC_NX        "$SCRIPT_NX_ROOT/sources_NX"
 set SRC_SIM       "$SCRIPT_NX_ROOT/sources_simulation"
 set QUESTA_DIR    "$SCRIPT_NX_ROOT/Questa"
+set NX_LIB_ULTRA  "$QUESTA_DIR/nxLibrary-Ultra.vhdp"
 
 cd $QUESTA_DIR
 
@@ -13,6 +14,19 @@ if {[file exists work]} {
 }
 vlib work
 vmap work work
+
+if {[file exists nx]} {
+    vdel -lib nx -all
+}
+vlib nx
+vmap nx nx
+
+if {[file exists "$NX_LIB_ULTRA"]} {
+    vcom -2008 -work nx "$NX_LIB_ULTRA"
+} else {
+    echo "ERROR: NanoXplore Ultra simulation library not found: $NX_LIB_ULTRA"
+    quit -code 1
+}
 
 file copy -force "$SRC_SIM/coef_HEX_V2.txt" "$QUESTA_DIR/coef_HEX_V2.txt"
 if {[file exists "$SRC_SIM/Signal_ADC.txt"]} {
@@ -41,6 +55,8 @@ vcom -2008 "$SRC_NX/EP/spectrum_FSM.vhd"
 vcom -2008 "$SRC_NX/EP/spectrum.vhd"
 vcom -2008 "$SRC_NX/EP/cycle_spectrum.vhd"
 vcom -2008 "$SRC_NX/EP/EP.vhd"
+vcom -2008 "$SRC_NX/Interface/fifo_sync.vhd"
+vcom -2008 "$SRC_NX/Interface/spectrum_serializer.vhd"
 vcom -2008 "$SRC_NX/Interface/Injection.vhd"
 vcom -2008 "$SRC_NX/Interface/FSM_read_config.vhd"
 vcom -2008 "$SRC_NX/ADC/Rx_fe_ads7049_and.vhd"
@@ -50,6 +66,7 @@ vcom -2008 "$SRC_NX/DAC/Top_DAC121S101_Driver.vhd"
 vcom -2008 "$SRC_NX/TOP/TUT_EGSE.vhd"
 
 vcom -2008 "$SRC_SIM/ADS7049_Emulators.vhd"
+vcom -2008 "$SRC_SIM/OBC_Emulator.vhd"
 vcom -2008 "$SRC_SIM/testbench.vhd"
 
 vsim -voptargs=+acc work.testbench
@@ -70,6 +87,16 @@ add wave -divider "ADS7049 interface"
 add wave -radix binary sim:/testbench/o_sck
 add wave -radix binary sim:/testbench/o_cs_n
 add wave -radix binary sim:/testbench/i_sdi
+
+add wave -divider "OBC serial spectrum"
+add wave -radix binary sim:/testbench/o_spectrum_clk
+add wave -radix binary sim:/testbench/o_spectrum_sof
+add wave -radix binary sim:/testbench/o_spectrum_wr_en
+add wave -radix binary sim:/testbench/o_spectrum_bit
+add wave -radix binary sim:/testbench/o_spectrum_sd_clk
+add wave -radix binary sim:/testbench/o_spectrum_sd_sof
+add wave -radix binary sim:/testbench/o_spectrum_sd_wr_en
+add wave -radix binary sim:/testbench/o_spectrum_sd_bit
 
 run 5 ms
 

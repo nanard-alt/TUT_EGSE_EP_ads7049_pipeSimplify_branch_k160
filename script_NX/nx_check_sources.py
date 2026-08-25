@@ -29,6 +29,8 @@ SOURCE_ORDER = [
     "EP/spectrum.vhd",
     "EP/cycle_spectrum.vhd",
     "EP/EP.vhd",
+    "Interface/fifo_sync.vhd",
+    "Interface/spectrum_serializer.vhd",
     "Interface/Injection.vhd",
     "Interface/FSM_read_config.vhd",
     "ADC/Rx_fe_ads7049_and.vhd",

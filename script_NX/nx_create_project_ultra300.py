@@ -34,6 +34,7 @@ from nxpython import *  # noqa: F401,F403
 def parse_args():
     parser = argparse.ArgumentParser(description="Create NanoXplore Ultra300 project")
     parser.add_argument("--variant", default=TARGET_VARIANT, help="NX variant name, for example NG-ULTRA or ULTRA300")
+    parser.add_argument("--package", default=None, help="NX package name, for example BGA-484")
     parser.add_argument("--project-dir", default=str(ROOT / PROJECT_NAME), help="Output project directory")
     parser.add_argument("--top-lib", default=TOP_CELL_LIB, help="Top cell library")
     parser.add_argument("--top", default=TOP_CELL_NAME, help="Top cell entity name")
@@ -86,6 +87,8 @@ def main():
     print("  board   :", TARGET_BOARD)
     print("  chip    :", TARGET_CHIP)
     print("  variant :", args.variant)
+    if args.package:
+        print("  package :", args.package)
     print("  top     : %s.%s" % (args.top_lib, args.top))
     print("  clock   : %s, %.3f ns" % (args.clock_name, args.clock_period_ns))
     print("  dir     :", project_dir)
@@ -94,7 +97,13 @@ def main():
     project = createProject(str(project_dir))
 
     # Project setup.
-    project.setVariantName(args.variant)
+    if args.package:
+        try:
+            project.setVariantName(args.variant, args.package)
+        except TypeError:
+            raise RuntimeError("This nxpython version does not accept a package argument in setVariantName(): %s" % args.package)
+    else:
+        project.setVariantName(args.variant)
     project.setTopCellName(args.top_lib, args.top)
 
     # Add VHDL files in deterministic dependency order.

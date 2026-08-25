@@ -43,7 +43,7 @@ begin
 
             count_synchro_spectrum <= count_synchro_spectrum + 1;
 
-            if To_integer(count_synchro_spectrum) >= 30000  then
+            if To_integer(count_synchro_spectrum) >= 499999 then
                 clk_synchro_spectrum   <= not clk_synchro_spectrum;
                 count_synchro_spectrum <= (others => '0');
             end if;

@@ -36,6 +36,15 @@ architecture simulation of testbench is
     signal i_pipe_in_config_dout       : std_logic_vector(31 downto 0) := (others => '0');
     signal i_pipe_in_config_data_count : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(C_CONFIG_WORD_COUNT, 10));
 
+    signal o_spectrum_bit      : std_logic;
+    signal o_spectrum_wr_en    : std_logic;
+    signal o_spectrum_clk      : std_logic;
+    signal o_spectrum_sof      : std_logic;
+    signal o_spectrum_sd_bit   : std_logic;
+    signal o_spectrum_sd_wr_en : std_logic;
+    signal o_spectrum_sd_clk   : std_logic;
+    signal o_spectrum_sd_sof   : std_logic;
+
 begin
 
     i_sys_clk <= not i_sys_clk after C_CLK_PERIOD / 2;
@@ -77,15 +86,36 @@ begin
             i_pipe_in_config_dout       => i_pipe_in_config_dout,
             i_pipe_in_config_data_count => i_pipe_in_config_data_count,
 
-            pipe_out_spectrum_din      => open,
-            pipe_out_spectrum_wr_en    => open,
-            pipe_out_spectrum_sd_din   => open,
-            pipe_out_spectrum_sd_wr_en => open,
+            o_spectrum_bit      => o_spectrum_bit,
+            o_spectrum_wr_en    => o_spectrum_wr_en,
+            o_spectrum_clk      => o_spectrum_clk,
+            o_spectrum_sof      => o_spectrum_sof,
+            o_spectrum_sd_bit   => o_spectrum_sd_bit,
+            o_spectrum_sd_wr_en => o_spectrum_sd_wr_en,
+            o_spectrum_sd_clk   => o_spectrum_sd_clk,
+            o_spectrum_sd_sof   => o_spectrum_sd_sof,
 
             o_DAC_SCLK   => open,
             o_DAC_SYNC_n => open,
             o_DAC_DIN    => open,
             o_DAC_on_off => open
+        );
+
+    label_OBC_Emulator : entity work.OBC_Emulator
+        generic map(
+            G_SPECTRUM_FILE    => "OBC_spectrum.hex",
+            G_SPECTRUM_SD_FILE => "OBC_spectrum_sd.hex"
+        )
+        port map(
+            i_reset             => i_reset,
+            i_spectrum_clk      => o_spectrum_clk,
+            i_spectrum_bit      => o_spectrum_bit,
+            i_spectrum_wr_en    => o_spectrum_wr_en,
+            i_spectrum_sof      => o_spectrum_sof,
+            i_spectrum_sd_clk   => o_spectrum_sd_clk,
+            i_spectrum_sd_bit   => o_spectrum_sd_bit,
+            i_spectrum_sd_wr_en => o_spectrum_sd_wr_en,
+            i_spectrum_sd_sof   => o_spectrum_sd_sof
         );
 
     label_config_fifo_model : process(i_sys_clk)
