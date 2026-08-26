@@ -23,12 +23,12 @@ architecture simulation of testbench is
     signal o_cs_n : std_logic_vector(Detector_Number - 1 downto 0);
     signal i_sdi  : std_logic_vector(Detector_Number - 1 downto 0);
 
-    signal i_reg_global : std_logic_vector(31 downto 0) := (others => '0');
+    --signal i_reg_global : std_logic_vector(31 downto 0) := (others => '0');
 
-    signal o_pipe_in_injection_rd_en : std_logic;
-    signal i_pipe_in_injection_empty : std_logic := '1';
-    signal i_pipe_in_injection_valid : std_logic := '0';
-    signal i_pipe_in_injection_dout  : std_logic_vector(31 downto 0) := (others => '0');
+    --signal o_pipe_in_injection_rd_en : std_logic;
+    --signal i_pipe_in_injection_empty : std_logic := '1';
+    --signal i_pipe_in_injection_valid : std_logic := '0';
+    --signal i_pipe_in_injection_dout  : std_logic_vector(31 downto 0) := (others => '0');
 
     signal o_pipe_in_config_rd_en      : std_logic;
     signal i_pipe_in_config_empty      : std_logic := '0';
@@ -58,11 +58,11 @@ begin
         wait;
     end process label_reset;
 
-    -- Bit 31 = 1 selects the ADS7049 path instead of injection.
-    i_reg_global(31) <= '1';
-    i_reg_global(30) <= '0';
-    i_reg_global(29) <= '0';
-    i_reg_global(0)  <= '0';
+    -- Former i_reg_global control removed from TUT_EGSE top.
+    --i_reg_global(31) <= '1';
+    --i_reg_global(30) <= '0';
+    --i_reg_global(29) <= '0';
+    --i_reg_global(0)  <= '0';
 
     label_TUT_EGSE : entity work.TUT_EGSE
         port map(
@@ -73,12 +73,12 @@ begin
             o_cs_n => o_cs_n,
             i_sdi  => i_sdi,
 
-            i_reg_global => i_reg_global,
+            --i_reg_global => i_reg_global,
 
-            o_pipe_in_injection_rd_en => o_pipe_in_injection_rd_en,
-            i_pipe_in_injection_empty => i_pipe_in_injection_empty,
-            i_pipe_in_injection_valid => i_pipe_in_injection_valid,
-            i_pipe_in_injection_dout  => i_pipe_in_injection_dout,
+            --o_pipe_in_injection_rd_en => o_pipe_in_injection_rd_en,
+            --i_pipe_in_injection_empty => i_pipe_in_injection_empty,
+            --i_pipe_in_injection_valid => i_pipe_in_injection_valid,
+            --i_pipe_in_injection_dout  => i_pipe_in_injection_dout,
 
             o_pipe_in_config_rd_en      => o_pipe_in_config_rd_en,
             i_pipe_in_config_empty      => i_pipe_in_config_empty,

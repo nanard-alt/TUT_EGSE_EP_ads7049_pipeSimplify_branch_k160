@@ -27,13 +27,13 @@ entity TUT_EGSE is
 
 
         -- Former ep00 WireIn content. Bit 0 remains a software reset.
-        i_reg_global : in std_logic_vector(31 downto 0);
+        --i_reg_global : in std_logic_vector(31 downto 0);
 
-        -- External injection stream, replacing Opal Kelly PipeIn ep80 and its FIFO.
-        o_pipe_in_injection_rd_en : out std_logic;
-        i_pipe_in_injection_empty : in  std_logic;
-        i_pipe_in_injection_valid : in  std_logic;
-        i_pipe_in_injection_dout  : in  std_logic_vector(31 downto 0);
+        -- External injection stream removed, kept here commented for rollback.
+        --o_pipe_in_injection_rd_en : out std_logic;
+        --i_pipe_in_injection_empty : in  std_logic;
+        --i_pipe_in_injection_valid : in  std_logic;
+        --i_pipe_in_injection_dout  : in  std_logic_vector(31 downto 0);
 
         -- External configuration stream, replacing Opal Kelly PipeIn ep81 and its FIFO.
         o_pipe_in_config_rd_en      : out std_logic;
@@ -70,12 +70,13 @@ architecture nx of TUT_EGSE is
     signal count_clock_1KHz       : unsigned(15 downto 0);
     signal clk_1KHz               : std_logic;
     signal enable_high_filter     : std_logic_vector(Detector_Number - 1 downto 0);
-    signal continuous_injection   : std_logic;
+    --signal continuous_injection   : std_logic;
 
     signal coef_fir                    : Array_Array_config_32x16_type_32x16_type;
     signal coef_fir_ready              : std_logic;
     signal i_coef_fir_ready            : std_logic_vector(Detector_Number - 1 downto 0);
     signal reg_config                  : Array_config_16stdx8_type;
+	signal config_control               : std_logic_vector(15 downto 0);
     signal standard_energy_threshold   : Array_Array_Array_config_10x16_type;
     signal i_gain                      : Array_Array_config_16unsignedxDetector_Number_type;
 
@@ -86,9 +87,14 @@ architecture nx of TUT_EGSE is
     signal TH_fall_high_frequency : std_logic_vector(15 downto 0);
     signal level_DAC121S          : std_logic_vector(11 downto 0);
 
-    signal data_fast_injection  : signed(11 downto 0);
-    signal ready_fast_injection : std_logic;
-    signal injection_started    : std_logic;
+    --signal start_capture_config         : std_logic;
+    --signal continuous_injection_config  : std_logic;
+    signal enable_high_filter_config    : std_logic;
+    --signal mode_adc_config              : std_logic;
+
+    --signal data_fast_injection  : signed(11 downto 0);
+    --signal ready_fast_injection : std_logic;
+    --signal injection_started    : std_logic;
 
     signal data_rx         : Array_config_12stdxDetector_Number_type;
     signal ready_rx        : std_logic_vector(Detector_Number - 1 downto 0);
@@ -106,6 +112,8 @@ architecture nx of TUT_EGSE is
     signal pipe_out_spectrum_sd_din_mux   : std_logic_vector(31 downto 0);
     signal pipe_out_spectrum_sd_wr_en_mux : std_logic;
 
+    --signal i_Start_Capture              : STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
+
     signal fifo_spectrum_dout  : std_logic_vector(31 downto 0);
     signal fifo_spectrum_empty : std_logic;
     signal fifo_spectrum_rd_en : std_logic;
@@ -117,11 +125,28 @@ begin
 
     clk_32Mhz <= i_sys_clk;
 
-    reset_wire <= i_reg_global(0);
+    reset_wire <= i_reset;
     reset      <= i_reset or reset_wire;
 
-    enable_high_filter <= (others => i_reg_global(30));
-    continuous_injection <= i_reg_global(29);
+    i_coef_fir_ready <= (others => coef_fir_ready);
+
+	config_control <= reg_config(0);
+	
+    --start_capture_config        <= config_control(0);
+    --continuous_injection_config <= config_control(1);
+	enable_high_filter_config   <= config_control(2);
+    --mode_adc_config             <= config_control(3);
+	
+    TH_rise                <= reg_config(2);
+    TH_fall                <= reg_config(3);
+    TH_ADC                 <= reg_config(4);
+    level_DAC121S          <= reg_config(5)(11 downto 0);
+    TH_rise_high_frequency <= reg_config(6);
+    TH_fall_high_frequency <= reg_config(7);
+
+    --i_Start_Capture    <= (others => start_capture_config); remove raw data is not use
+    enable_high_filter <= (others => enable_high_filter_config);
+    --continuous_injection <= continuous_injection_config;
 
     --------------------------------------------------------------------------
     -- Spectrum cycle and DAC clocking
@@ -149,26 +174,26 @@ begin
     end process;
 
     ------------------------------------------
-    --  Injection
+    --  Injection removed, kept commented for rollback
     ------------------------------------------  
 
-    label_Injection : entity work.Injection
-        port map(
-            -- global
-            reset                  => reset,
-            i_clk_fast             => clk_32Mhz,
-            -- commande injection
-            i_continuous_injection => continuous_injection,
-            -- entree FIFO PipeIn injection
-            o_pipe_in_rd_en        => o_pipe_in_injection_rd_en,
-            i_pipe_in_empty        => i_pipe_in_injection_empty,
-            i_pipe_in_valid        => i_pipe_in_injection_valid,
-            i_pipe_in_dout         => signed(i_pipe_in_injection_dout(11 downto 0)),
-            -- sortie injection remplacant l'ADC
-            o_injection_started    => injection_started,
-            o_data                 => data_fast_injection,
-            o_ready                => ready_fast_injection
-        );
+    --label_Injection : entity work.Injection
+    --    port map(
+    --        -- global
+    --        reset                  => reset,
+    --        i_clk_fast             => clk_32Mhz,
+    --        -- commande injection
+    --        i_continuous_injection => continuous_injection,
+    --        -- entree FIFO PipeIn injection
+    --        o_pipe_in_rd_en        => o_pipe_in_injection_rd_en,
+    --        i_pipe_in_empty        => i_pipe_in_injection_empty,
+    --        i_pipe_in_valid        => i_pipe_in_injection_valid,
+    --        i_pipe_in_dout         => signed(i_pipe_in_injection_dout(11 downto 0)),
+    --        -- sortie injection remplacant l'ADC
+    --        o_injection_started    => injection_started,
+    --        o_data                 => data_fast_injection,
+    --        o_ready                => ready_fast_injection
+    --    );
 
     ------------------------------------------
     -- ADS7049 receivers
@@ -209,15 +234,17 @@ begin
     end generate generate_label_keep_data_from_ADC;
 
     ------------------------------------------
-    --  MUX ADC OR Injection
+    --  ADC science data path
     ------------------------------------------  
-    generate_label_mux_science_data : for N in 0 to Detector_Number - 1 generate
-        label_mux_science_data : i_data_CDC(N) <= signed(data_rx_keeped(N)) when i_reg_global(31) = '1' else ('0' & data_fast_injection & b"000");
-    end generate generate_label_mux_science_data;
+    generate_label_science_data : for N in 0 to Detector_Number - 1 generate
+        label_science_data : i_data_CDC(N) <= signed(data_rx_keeped(N));
+        --label_mux_science_data : i_data_CDC(N) <= signed(data_rx_keeped(N)) when mode_adc_config = '1' else ('0' & data_fast_injection & b"000");
+    end generate generate_label_science_data;
 
-    generate_label : for N in 0 to Detector_Number - 1 generate
-        label_mux_science_ready : i_ready_CDC(N) <= ready_rx_keeped(N) when i_reg_global(31) = '1' else ready_fast_injection;
-    end generate generate_label;
+    generate_label_science_ready : for N in 0 to Detector_Number - 1 generate
+        label_science_ready : i_ready_CDC(N) <= ready_rx_keeped(N);
+        --label_mux_science_ready : i_ready_CDC(N) <= ready_rx_keeped(N) when mode_adc_config = '1' else ready_fast_injection;
+    end generate generate_label_science_ready;
 
 
     --------------------------------------------------------------------------
@@ -385,13 +412,13 @@ begin
             o_gain                      => i_gain
         );
 
-    i_coef_fir_ready <= (others => coef_fir_ready);
+--    i_coef_fir_ready <= (others => coef_fir_ready);
 
-    TH_rise                <= reg_config(2);
-    TH_fall                <= reg_config(3);
-    TH_ADC                 <= reg_config(4);
-    level_DAC121S          <= reg_config(5)(11 downto 0);
-    TH_rise_high_frequency <= reg_config(6);
-    TH_fall_high_frequency <= reg_config(7);
+--    TH_rise                <= reg_config(2);
+--    TH_fall                <= reg_config(3);
+--    TH_ADC                 <= reg_config(4);
+--    level_DAC121S          <= reg_config(5)(11 downto 0);
+--    TH_rise_high_frequency <= reg_config(6);
+--    TH_fall_high_frequency <= reg_config(7);
 
 end architecture nx;
