@@ -1,10 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.std_logic_textio.all;
-
-library std;
-use std.textio.all;
 
 use work.UT_EGSE_EP_Package.all;
 
@@ -30,11 +26,10 @@ architecture simulation of testbench is
     --signal i_pipe_in_injection_valid : std_logic := '0';
     --signal i_pipe_in_injection_dout  : std_logic_vector(31 downto 0) := (others => '0');
 
-    signal o_pipe_in_config_rd_en      : std_logic;
-    signal i_pipe_in_config_empty      : std_logic := '0';
-    signal i_pipe_in_config_valid      : std_logic := '0';
-    signal i_pipe_in_config_dout       : std_logic_vector(31 downto 0) := (others => '0');
-    signal i_pipe_in_config_data_count : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(C_CONFIG_WORD_COUNT, 10));
+    signal config_spectrum_clk   : std_logic;
+    signal config_spectrum_bit   : std_logic;
+    signal config_spectrum_wr_en : std_logic;
+    signal config_spectrum_sof   : std_logic;
 
     signal o_spectrum_bit      : std_logic;
     signal o_spectrum_wr_en    : std_logic;
@@ -80,11 +75,10 @@ begin
             --i_pipe_in_injection_valid => i_pipe_in_injection_valid,
             --i_pipe_in_injection_dout  => i_pipe_in_injection_dout,
 
-            o_pipe_in_config_rd_en      => o_pipe_in_config_rd_en,
-            i_pipe_in_config_empty      => i_pipe_in_config_empty,
-            i_pipe_in_config_valid      => i_pipe_in_config_valid,
-            i_pipe_in_config_dout       => i_pipe_in_config_dout,
-            i_pipe_in_config_data_count => i_pipe_in_config_data_count,
+            i_config_clk   => config_spectrum_clk,
+            i_config_bit   => config_spectrum_bit,
+            i_config_wr_en => config_spectrum_wr_en,
+            i_config_sof   => config_spectrum_sof,
 
             o_spectrum_bit      => o_spectrum_bit,
             o_spectrum_wr_en    => o_spectrum_wr_en,
@@ -104,10 +98,18 @@ begin
     label_OBC_Emulator : entity work.OBC_Emulator
         generic map(
             G_SPECTRUM_FILE    => "OBC_spectrum.hex",
-            G_SPECTRUM_SD_FILE => "OBC_spectrum_sd.hex"
+            G_SPECTRUM_SD_FILE => "OBC_spectrum_sd.hex",
+            G_CONFIG_FILE      => "coef_HEX_V2.txt",
+            G_CONFIG_WORD_COUNT => C_CONFIG_WORD_COUNT
         )
         port map(
-            i_reset             => i_reset,
+            i_reset          => i_reset,
+            i_config_clk     => i_sys_clk,
+            o_spectrum_clk   => config_spectrum_clk,
+            o_spectrum_bit   => config_spectrum_bit,
+            o_spectrum_wr_en => config_spectrum_wr_en,
+            o_spectrum_sof   => config_spectrum_sof,
+
             i_spectrum_clk      => o_spectrum_clk,
             i_spectrum_bit      => o_spectrum_bit,
             i_spectrum_wr_en    => o_spectrum_wr_en,
@@ -117,54 +119,6 @@ begin
             i_spectrum_sd_wr_en => o_spectrum_sd_wr_en,
             i_spectrum_sd_sof   => o_spectrum_sd_sof
         );
-
-    label_config_fifo_model : process(i_sys_clk)
-        file coef_file           : text open read_mode is "coef_HEX_V2.txt";
-        variable line_buffer     : line;
-        variable hex_word_16     : std_logic_vector(15 downto 0);
-        variable pending_valid   : std_logic := '0';
-        variable pending_dout    : std_logic_vector(31 downto 0) := (others => '0');
-        variable remaining_words : natural := C_CONFIG_WORD_COUNT;
-    begin
-        if rising_edge(i_sys_clk) then
-            if i_reset = '1' then
-                i_pipe_in_config_valid      <= '0';
-                i_pipe_in_config_dout       <= (others => '0');
-                i_pipe_in_config_empty      <= '0';
-                i_pipe_in_config_data_count <= std_logic_vector(to_unsigned(C_CONFIG_WORD_COUNT, 10));
-                pending_valid               := '0';
-                pending_dout                := (others => '0');
-                remaining_words             := C_CONFIG_WORD_COUNT;
-            else
-                i_pipe_in_config_valid <= pending_valid;
-                i_pipe_in_config_dout  <= pending_dout;
-                pending_valid          := '0';
-
-                if o_pipe_in_config_rd_en = '1' and remaining_words > 0 then
-                    if not endfile(coef_file) then
-                        readline(coef_file, line_buffer);
-                        hread(line_buffer, hex_word_16);
-                        pending_dout              := (others => '0');
-                        pending_dout(15 downto 0) := hex_word_16;
-                        pending_valid             := '1';
-                        remaining_words           := remaining_words - 1;
-                    else
-                        pending_dout     := (others => '0');
-                        pending_valid    := '0';
-                        remaining_words  := 0;
-                    end if;
-                end if;
-
-                if remaining_words = 0 then
-                    i_pipe_in_config_empty <= '1';
-                else
-                    i_pipe_in_config_empty <= '0';
-                end if;
-
-                i_pipe_in_config_data_count <= std_logic_vector(to_unsigned(remaining_words, 10));
-            end if;
-        end if;
-    end process label_config_fifo_model;
 
     generate_label_ADS7049_Emulators : for N in 0 to Detector_Number - 1 generate
         label_ADS7049_Emulators : entity work.ADS7049_Emulators

@@ -57,6 +57,8 @@ vcom -2008 "$SRC_NX/EP/cycle_spectrum.vhd"
 vcom -2008 "$SRC_NX/EP/EP.vhd"
 vcom -2008 "$SRC_NX/Interface/fifo_sync.vhd"
 vcom -2008 "$SRC_NX/Interface/spectrum_serializer.vhd"
+vcom -2008 "$SRC_NX/Interface/config_unserializer.vhd"
+vcom -2008 "$SRC_NX/Interface/config_fifo.vhd"
 vcom -2008 "$SRC_NX/Interface/Injection.vhd"
 vcom -2008 "$SRC_NX/Interface/FSM_read_config.vhd"
 vcom -2008 "$SRC_NX/ADC/Rx_fe_ads7049_and.vhd"
@@ -74,14 +76,29 @@ vsim -voptargs=+acc work.testbench
 add wave -divider "Top clock reset"
 add wave -radix binary sim:/testbench/i_sys_clk
 add wave -radix binary sim:/testbench/i_reset
-add wave -radix hexadecimal sim:/testbench/i_reg_global
 
-add wave -divider "Config FIFO model"
-add wave -radix binary sim:/testbench/o_pipe_in_config_rd_en
-add wave -radix binary sim:/testbench/i_pipe_in_config_empty
-add wave -radix binary sim:/testbench/i_pipe_in_config_valid
-add wave -radix hexadecimal sim:/testbench/i_pipe_in_config_dout
-add wave -radix unsigned sim:/testbench/i_pipe_in_config_data_count
+add wave -divider "Serial config input"
+add wave -radix binary sim:/testbench/config_spectrum_clk
+add wave -radix binary sim:/testbench/config_spectrum_sof
+add wave -radix binary sim:/testbench/config_spectrum_wr_en
+add wave -radix binary sim:/testbench/config_spectrum_bit
+add wave -radix hexadecimal sim:/testbench/label_TUT_EGSE/config_word
+add wave -radix binary sim:/testbench/label_TUT_EGSE/config_word_valid
+add wave -radix binary sim:/testbench/label_TUT_EGSE/pipe_in_config_rd_en
+add wave -radix binary sim:/testbench/label_TUT_EGSE/pipe_in_config_empty
+add wave -radix binary sim:/testbench/label_TUT_EGSE/pipe_in_config_valid
+add wave -radix hexadecimal sim:/testbench/label_TUT_EGSE/pipe_in_config_dout
+add wave -radix unsigned sim:/testbench/label_TUT_EGSE/pipe_in_config_data_count
+add wave -radix binary sim:/testbench/label_TUT_EGSE/coef_fir_ready
+add wave -radix hexadecimal sim:/testbench/label_TUT_EGSE/coef_fir
+add wave -radix hexadecimal sim:/testbench/label_TUT_EGSE/reg_config
+add wave -radix unsigned sim:/testbench/label_TUT_EGSE/i_gain
+add wave -radix signed sim:/testbench/label_TUT_EGSE/generate_EP(0)/label_Ep/data_after_filter
+add wave -radix signed sim:/testbench/label_TUT_EGSE/generate_EP(0)/label_Ep/data_after_gain
+add wave -radix signed sim:/testbench/label_TUT_EGSE/generate_EP(0)/label_Ep/generate_label_gain(0)/label_gain/i_data_after_filter
+add wave -radix unsigned sim:/testbench/label_TUT_EGSE/generate_EP(0)/label_Ep/generate_label_gain(0)/label_gain/i_gain
+add wave -radix signed sim:/testbench/label_TUT_EGSE/generate_EP(0)/label_Ep/generate_label_gain(0)/label_gain/o_data_after_gain
+add wave -radix binary sim:/testbench/label_TUT_EGSE/generate_EP(0)/label_Ep/generate_label_gain(0)/label_gain/o_ready_after_gain
 
 add wave -divider "ADS7049 interface"
 add wave -radix binary sim:/testbench/o_sck

@@ -35,12 +35,11 @@ entity TUT_EGSE is
         --i_pipe_in_injection_valid : in  std_logic;
         --i_pipe_in_injection_dout  : in  std_logic_vector(31 downto 0);
 
-        -- External configuration stream, replacing Opal Kelly PipeIn ep81 and its FIFO.
-        o_pipe_in_config_rd_en      : out std_logic;
-        i_pipe_in_config_empty      : in  std_logic;
-        i_pipe_in_config_valid      : in  std_logic;
-        i_pipe_in_config_dout       : in  std_logic_vector(31 downto 0);
-        i_pipe_in_config_data_count : in  std_logic_vector(9 downto 0);
+        -- Serialized configuration stream from the OBC emulator.
+        i_config_clk   : in std_logic;
+        i_config_bit   : in std_logic;
+        i_config_wr_en : in std_logic;
+        i_config_sof   : in std_logic;
 
         -- Serialized spectrum streams, replacing Opal Kelly PipeOut FIFOs.
         o_spectrum_bit      : out std_logic;
@@ -121,6 +120,15 @@ architecture nx of TUT_EGSE is
     signal fifo_spectrum_sd_dout  : std_logic_vector(31 downto 0);
     signal fifo_spectrum_sd_empty : std_logic;
     signal fifo_spectrum_sd_rd_en : std_logic;
+
+    signal config_word                    : std_logic_vector(31 downto 0);
+    signal config_word_valid              : std_logic;
+    signal config_fifo_full               : std_logic;
+    signal pipe_in_config_rd_en           : std_logic;
+    signal pipe_in_config_empty           : std_logic;
+    signal pipe_in_config_valid           : std_logic;
+    signal pipe_in_config_dout            : std_logic_vector(31 downto 0);
+    signal pipe_in_config_data_count      : std_logic_vector(9 downto 0);
 begin
 
     clk_32Mhz <= i_sys_clk;
@@ -376,6 +384,41 @@ begin
         );
 
     --------------------------------------------------------------------------
+    -- Configuration serial input path.
+    --------------------------------------------------------------------------
+
+    label_config_unserializer : entity work.config_unserializer
+        port map(
+            i_clk        => i_config_clk,
+            i_reset      => reset,
+            i_serial_bit => i_config_bit,
+            i_wr_en      => i_config_wr_en,
+            i_sof        => i_config_sof,
+            o_word       => config_word,
+            o_word_valid => config_word_valid
+        );
+
+    label_fifo_config : entity work.config_fifo
+        generic map(
+            DATA_WIDTH => 32,
+            DEPTH      => 1024,
+            ADDR_WIDTH => 10
+        )
+        port map(
+            i_wr_clk        => i_config_clk,
+            i_rd_clk        => i_sys_clk,
+            i_reset         => reset,
+            i_wr_en         => config_word_valid,
+            i_din           => config_word,
+            o_full          => config_fifo_full,
+            i_rd_en         => pipe_in_config_rd_en,
+            o_dout          => pipe_in_config_dout,
+            o_empty         => pipe_in_config_empty,
+            o_valid         => pipe_in_config_valid,
+            o_rd_data_count => pipe_in_config_data_count
+        );
+
+    --------------------------------------------------------------------------
     -- DAC outputs.
     --------------------------------------------------------------------------
 
@@ -400,11 +443,11 @@ begin
         port map(
             i_clk_slow                  => i_sys_clk,
             i_reset                     => reset,
-            i_pipe_in_config_empty      => i_pipe_in_config_empty,
-            i_pipe_in_config_valid      => i_pipe_in_config_valid,
-            i_pipe_in_config_dout       => signed(i_pipe_in_config_dout),
-            i_pipe_in_rd_data_count     => i_pipe_in_config_data_count,
-            o_pipe_in_config_rd_en      => o_pipe_in_config_rd_en,
+            i_pipe_in_config_empty      => pipe_in_config_empty,
+            i_pipe_in_config_valid      => pipe_in_config_valid,
+            i_pipe_in_config_dout       => signed(pipe_in_config_dout),
+            i_pipe_in_rd_data_count     => pipe_in_config_data_count,
+            o_pipe_in_config_rd_en      => pipe_in_config_rd_en,
             o_coef_fir_ready            => coef_fir_ready,
             o_coef_fir                  => coef_fir,
             o_reg_config                => reg_config,
