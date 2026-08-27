@@ -30,6 +30,8 @@ SOURCE_ORDER = [
     "EP/cycle_spectrum.vhd",
     "EP/EP.vhd",
     "Interface/fifo_sync.vhd",
+    "Interface/config_unserializer.vhd",
+    "Interface/config_fifo.vhd",
     "Interface/spectrum_serializer.vhd",
     "Interface/Injection.vhd",
     "Interface/FSM_read_config.vhd",
