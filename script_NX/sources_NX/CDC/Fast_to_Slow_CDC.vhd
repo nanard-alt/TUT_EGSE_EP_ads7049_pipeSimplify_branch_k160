@@ -74,14 +74,14 @@ begin
         end if;
     end process;
 
-    reset_ready <= ready_4 or i_reset;
+    reset_ready <= ready_4 or (not i_reset);
 
     --ready_out <= ready_3 and not ready_4;
     --o_ready   <= ready_out;
 
     process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             o_data  <= (others => '0');
             o_ready <= '0';
         elsif rising_edge(i_clk_slow) then
@@ -100,7 +100,7 @@ begin
 
     --    label_cdc : process(i_clk_slow, i_reset) is
     --    begin
-    --        if i_reset = '1' then
+    --        if i_reset = '0' then
     --            --  meta
     --            ready_1 <= '0';
     --            ready_2 <= '0';

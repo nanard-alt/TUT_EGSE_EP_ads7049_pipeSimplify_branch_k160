@@ -63,7 +63,7 @@ begin
 
     serialize_spectrum : process(i_clk, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             spectrum_state     <= IDLE;
             spectrum_shift_reg <= (others => '0');
             spectrum_bit_count <= (others => '0');
@@ -109,7 +109,7 @@ begin
 
     serialize_spectrum_sd : process(i_clk, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             spectrum_sd_state     <= IDLE;
             spectrum_sd_shift_reg <= (others => '0');
             spectrum_sd_bit_count <= (others => '0');

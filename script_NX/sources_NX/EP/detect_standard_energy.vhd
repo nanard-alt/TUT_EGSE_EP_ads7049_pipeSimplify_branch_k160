@@ -20,7 +20,7 @@ entity detect_standard_energy is
     port(
         -- global
         i_clk_slow                  : in  std_logic; -- horloge systeme lente
-        i_reset                     : in  std_logic; -- reset actif a 1
+        i_reset                     : in  std_logic; -- reset actif a 0
 
         -- configuration des seuils
         i_standard_energy_threshold : in  Array_config_10x16_type; -- 6 seuils 16 bits pour classer l'energie standard
@@ -45,7 +45,7 @@ begin
 
     label_detect_standard_energy : process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
 
             o_energy_level_max_sd       <= (others => '0');
             o_ready_energy_level_max_sd <= '0';

@@ -26,7 +26,7 @@ entity spectrum_FSM is
     port(
         -- global
         i_clk_slow                : in  std_logic; -- horloge systeme lente
-        i_reset                   : in  std_logic; -- reset actif a 1
+        i_reset                   : in  std_logic; -- reset actif a 0
         i_filter_number           : in  unsigned; -- numero du filtre associe au paquet spectrum
 
         -- synchronisation et identification du spectre
@@ -65,7 +65,7 @@ begin
 
     process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
 
             state                       <= init_ram;
             o_we                        <= '1';

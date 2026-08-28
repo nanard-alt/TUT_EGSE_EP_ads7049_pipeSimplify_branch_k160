@@ -24,7 +24,7 @@ entity spectrum is
     port(
         -- global
         i_clk_slow                : in  std_logic; -- horloge systeme lente
-        i_reset                   : in  std_logic; -- reset actif a 1
+        i_reset                   : in  std_logic; -- reset actif a 0
 
         -- synchronisation et identification du spectre
         i_clk_synchro_spectrum    : in  std_logic; -- pulse/cycle de synchronisation pour vider ou lire le spectre

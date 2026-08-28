@@ -9,16 +9,20 @@
 -- - ADS7049 inputs are active and feed the EP processing chain.
 
 library ieee;
+library nx;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.UT_EGSE_EP_Package.all;
 
+library nx;
+use nx.nxPackage.all;
+
 entity TUT_EGSE is
     port(
         -- Global clock/reset for the NX project.
         i_sys_clk : in std_logic;
-        i_reset   : in std_logic;
+        i_reset   : in std_logic; -- reset externe actif bas
 
         -- interface ADS7049
         o_sck        : out   STD_LOGIC_VECTOR(Detector_Number - 1 downto 0);
@@ -62,7 +66,9 @@ end entity TUT_EGSE;
 architecture nx of TUT_EGSE is
 
     signal reset      : std_logic;
-    signal reset_wire : std_logic;
+    constant C_RESET_CYCLES_MAX : unsigned(15 downto 0) := to_unsigned(1024, 16);
+    signal Rst_n   : std_logic;
+    signal Rst_cnt : unsigned(15 downto 0);
 
     signal clk_32Mhz              : std_logic;
     signal clk_synchro_spectrum   : std_logic;
@@ -133,8 +139,46 @@ begin
 
     clk_32Mhz <= i_sys_clk;
 
-    reset_wire <= i_reset;
-    reset      <= i_reset or reset_wire;
+
+    ---------------------------------------------------------------------------------------------------------------------------------
+    --
+    -- Reset generation, negative polarity, fixed time delay to ensure VDD3V3 stability
+    --
+    ---------------------------------------------------------------------------------------------------------------------------------
+
+    -- Synchronize general reset on the slower clock
+    p_Reset_Generator : process(i_reset, i_sys_clk)
+    begin
+        if i_reset = '0' then
+            Rst_n   <= '0';
+            Rst_cnt <= (others => '0');
+        elsif rising_edge(i_sys_clk) then
+            if Rst_cnt < C_RESET_CYCLES_MAX then
+                Rst_n   <= '0';
+                Rst_cnt <= Rst_cnt + 1;
+            else
+                Rst_n <= '1';
+            end if;
+        end if;
+    end process p_Reset_Generator;
+
+    ---------------------------------------------------------------------------------------------------------------------------------
+    --
+    -- NX-BD IpCore (NG-MEDIUM)
+    --
+    ---------------------------------------------------------------------------------------------------------------------------------
+    -- The NX Buffer Driver circuit forces internally generated reset signal to be reinjected in low skew routing network
+
+/*     inst_NX_BD_Rst_n : NX_BD
+        generic map(
+            mode => "global_lowskew"
+        )
+        port map(
+            I => Rst_n,
+            O => reset
+        ); */
+
+	reset <= Rst_n;
 
     i_coef_fir_ready <= (others => coef_fir_ready);
 
@@ -169,7 +213,7 @@ begin
 
     label_clock_1KHz : process(i_sys_clk, reset) is
     begin
-        if reset = '1' then
+        if reset = '0' then
             count_clock_1KHz <= (others => '0');
             clk_1KHz         <= '0';
         elsif rising_edge(i_sys_clk) then
@@ -227,7 +271,7 @@ begin
     generate_label_keep_data_from_ADC : for N in 0 to Detector_Number - 1 generate
         label_keep_data_from_ADC : process(clk_32Mhz, reset) is
         begin
-            if reset = '1' then
+            if reset = '0' then
                 data_rx_keeped(N)  <= (others => '0');
                 ready_rx_keeped(N) <= '0';
             elsif rising_edge(clk_32Mhz) then
@@ -295,7 +339,7 @@ begin
 
     lebel_process_mux_data_spectrum_packet : process(i_sys_clk, reset) is
     begin
-        if reset = '1' then
+        if reset = '0' then
             pipe_out_spectrum_wr_en_mux <= '0';
             pipe_out_spectrum_din_mux   <= (others => '0');
         elsif rising_edge(i_sys_clk) then
@@ -313,7 +357,7 @@ begin
 
     lebel_process_mux_data_spectrum_packet_SD : process(i_sys_clk, reset) is
     begin
-        if reset = '1' then
+        if reset = '0' then
             pipe_out_spectrum_sd_wr_en_mux <= '0';
             pipe_out_spectrum_sd_din_mux   <= (others => '0');
         elsif rising_edge(i_sys_clk) then
@@ -449,7 +493,7 @@ begin
             i_pipe_in_rd_data_count     => pipe_in_config_data_count,
             o_pipe_in_config_rd_en      => pipe_in_config_rd_en,
             o_coef_fir_ready            => coef_fir_ready,
-            o_coef_fir                  => coef_fir,
+            o_coef_fir_buf              => coef_fir,
             o_reg_config                => reg_config,
             o_standard_energy_threshold => standard_energy_threshold,
             o_gain                      => i_gain

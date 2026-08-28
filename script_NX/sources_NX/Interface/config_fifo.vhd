@@ -71,7 +71,7 @@ begin
     write_side : process(i_wr_clk, i_reset) is
         variable wr_ptr_next : ptr_type;
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             wr_ptr_bin          <= (others => '0');
             wr_ptr_gray         <= (others => '0');
             rd_ptr_gray_wr_meta <= (others => '0');
@@ -105,7 +105,7 @@ begin
     read_side : process(i_rd_clk, i_reset) is
         variable rd_ptr_next : ptr_type;
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             rd_ptr_bin          <= (others => '0');
             rd_ptr_gray         <= (others => '0');
             wr_ptr_gray_rd_meta <= (others => '0');

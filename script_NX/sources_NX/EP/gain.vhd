@@ -18,7 +18,7 @@ entity gain is
     port(
         -- global
         i_clk_slow           : in  std_logic; -- horloge systeme lente
-        i_reset              : in  std_logic; -- reset actif a 1
+        i_reset              : in  std_logic; -- reset actif a 0
 
         -- configuration du gain
         i_gain               : in  unsigned(15 downto 0); -- gain applique sous forme de decalage 2^i_gain
@@ -45,7 +45,7 @@ begin
 
     label_resize : process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             data_after_gain_resize  <= (others => '0');
             ready_after_gain_resize <= '0';
         elsif rising_edge(i_clk_slow) then
@@ -61,7 +61,7 @@ begin
 
     label_gain : process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             data_after_gain  <= (others => '0');
             ready_after_gain <= '0';
         elsif rising_edge(i_clk_slow) then
@@ -76,7 +76,7 @@ begin
 
     label_stop_overflow_gain : process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             o_data_after_gain  <= (others => '0');
             o_ready_after_gain <= '0';
         elsif rising_edge(i_clk_slow) then

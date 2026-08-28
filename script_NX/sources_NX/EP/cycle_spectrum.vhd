@@ -18,7 +18,7 @@ entity cycle_spectrum is
     port(
         -- global
         sys_clk                : in  std_logic; -- horloge systeme
-        reset                  : in  std_logic; -- reset actif a 1
+        reset                  : in  std_logic; -- reset actif a 0
 
         -- synchronisation des spectres
         o_clk_synchro_spectrum : out std_logic -- signal periodique de synchronisation/lecture des spectres
@@ -34,7 +34,7 @@ begin
 
     process(sys_clk, reset) is
     begin
-        if reset = '1' then
+        if reset = '0' then
 
             count_synchro_spectrum <= (others => '0');
             clk_synchro_spectrum   <= '0';

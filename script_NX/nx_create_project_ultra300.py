@@ -73,6 +73,18 @@ def read_ordered_sources():
     return files
 
 
+def apply_io_constraints(project, package_name):
+    if package_name != "BGA-484":
+        return
+
+    constraint_dir = ROOT / "constraint"
+    sys.path.insert(0, str(constraint_dir))
+    from nx_ios_ultra300_bga484 import add_io_constraints_bga484
+
+    print("  io pads : constraint/nx_ios_ultra300_bga484.py")
+    add_io_constraints_bga484(project)
+
+
 def main():
     args = parse_args()
     project_dir = Path(args.project_dir).resolve()
@@ -105,6 +117,7 @@ def main():
     else:
         project.setVariantName(args.variant)
     project.setTopCellName(args.top_lib, args.top)
+    apply_io_constraints(project, args.package)
 
     # Add VHDL files in deterministic dependency order.
     for source in sources:

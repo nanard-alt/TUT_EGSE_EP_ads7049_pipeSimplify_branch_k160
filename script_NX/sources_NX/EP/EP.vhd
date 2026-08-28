@@ -21,7 +21,7 @@ entity EP is
         -- global
         i_clk_slow                   : in  std_logic; -- horloge systeme lente
         i_clk_fast                   : in  std_logic; -- horloge rapide ADC/injection
-        i_reset                      : in  std_logic; -- reset actif a 1
+        i_reset                      : in  std_logic; -- reset actif a 0
 
         -- synchronisation et identification du detecteur
         i_clk_synchro_spectrum       : in  std_logic; -- signal periodique de synchronisation/lecture des spectres

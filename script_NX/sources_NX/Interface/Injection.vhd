@@ -17,7 +17,7 @@ use ieee.numeric_std.all;
 entity Injection is
     port(
         -- global
-        reset                  : in  std_logic; -- reset actif a 1
+        reset                  : in  std_logic; -- reset actif a 0
         i_clk_fast             : in  std_logic; -- horloge rapide d'echantillonnage
 
         -- commande injection
@@ -49,7 +49,7 @@ begin
 
     label_process_Injection : process(i_clk_fast, reset) is
     begin
-        if reset = '1' then
+        if reset = '0' then
             state <= wait_sampling_time;
 
             pipe_in_rd_en <= '0';
@@ -132,7 +132,7 @@ begin
 
     --    label_process_Injection : process(i_clk_fast, reset) is
     --    begin
-    --        if reset = '1' then
+    --        if reset = '0' then
     --
     --            pipe_in_rd_en <= '0';
     --

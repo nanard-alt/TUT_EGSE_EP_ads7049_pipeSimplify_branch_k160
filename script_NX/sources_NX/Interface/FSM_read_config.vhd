@@ -29,7 +29,7 @@ entity FSM_read_config is
         --output
         o_pipe_in_config_rd_en  : out std_logic;
         o_coef_fir_ready        : out std_logic;
-        o_coef_fir              : out Array_Array_config_32x16_type_32x16_type;
+        o_coef_fir_buf          : out Array_Array_config_32x16_type_32x16_type;
         --output reg 
         o_reg_config            : out Array_config_16stdx8_type;
         o_standard_energy_threshold : out Array_Array_Array_config_10x16_type;
@@ -62,6 +62,7 @@ architecture RTL of FSM_read_config is
     signal cnt_standard_energy_threshold : integer;
     signal cnt_read_end_usb_buffer : integer;
     signal count_wait_valid        : unsigned(5 downto 0);
+    signal coef_fir                : Array_Array_config_32x16_type_32x16_type;
 
 begin
 
@@ -71,12 +72,12 @@ begin
 
     read_config_FSM : process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
 
             state_config           <= IDLE;
             o_pipe_in_config_rd_en <= '0';
             add_coef               <= 0;
-            o_coef_fir             <= (others => (others => (others => (others => '0'))));
+            coef_fir               <= (others => (others => (others => (others => '0'))));
             o_gain                 <= (others => (others => (others => '0')));
             o_standard_energy_threshold <= (others => (others => (others => (others => '0'))));
 
@@ -101,7 +102,7 @@ begin
                         state_config            <= read_low_frequency;
                         o_pipe_in_config_rd_en  <= '0';
                         add_coef                <= 0;
-                        o_coef_fir              <= (others => (others => (others => (others => '0'))));
+                        coef_fir                <= (others => (others => (others => (others => '0'))));
                         o_gain                  <= (others => (others => (others => '0')));
                         o_standard_energy_threshold <= (others => (others => (others => (others => '0'))));
                        
@@ -146,7 +147,7 @@ begin
                     o_pipe_in_config_rd_en <= '0';
 
                     if i_pipe_in_config_valid = '1' then
-                        o_coef_fir(cnt_number_detector)(0)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
+                        coef_fir(cnt_number_detector)(0)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
                         add_coef                                     <= add_coef + 1;
                         state_config                                 <= read_low_frequency;
                     end if;
@@ -183,7 +184,7 @@ begin
                     o_pipe_in_config_rd_en <= '0';
                 
                     if i_pipe_in_config_valid = '1' then
-                        o_coef_fir(cnt_number_detector)(1)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
+                        coef_fir(cnt_number_detector)(1)(add_coef) <= i_pipe_in_config_dout(15 downto 0);
                         add_coef                                     <= add_coef + 1;
                         state_config                                 <= read_high_frequency;
                 end if;
@@ -426,6 +427,18 @@ begin
 
             end case;
 
+        end if;
+    end process;
+
+    process(i_clk_slow, i_reset) is
+    begin
+        if i_reset = '0' then
+		o_coef_fir_buf<=(others => (others => (others => (others => '0'))));
+		
+        elsif rising_edge(i_clk_slow) then
+		
+		o_coef_fir_buf <= coef_fir;
+		
         end if;
     end process;
 

@@ -43,7 +43,7 @@ begin
 
     process(clk, rst) is
     begin
-        if rst = '1' then
+        if rst = '0' then
 
             state         <= cs_falling;
             -- out to ADC

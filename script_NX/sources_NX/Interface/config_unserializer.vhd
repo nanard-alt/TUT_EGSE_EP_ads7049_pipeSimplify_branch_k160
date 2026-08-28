@@ -25,7 +25,7 @@ begin
     deserialize_config : process(i_clk, i_reset) is
         variable next_word : std_logic_vector(31 downto 0);
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             shift_reg    <= (others => '0');
             bit_count    <= (others => '0');
             frame_active <= '0';

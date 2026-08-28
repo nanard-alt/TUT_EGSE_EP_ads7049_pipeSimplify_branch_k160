@@ -55,7 +55,7 @@ begin
     process(clk) is
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if rst = '0' then
                 state       <= start_frame;
                 sck_reg     <= '0';
                 cs_n_reg    <= '1';

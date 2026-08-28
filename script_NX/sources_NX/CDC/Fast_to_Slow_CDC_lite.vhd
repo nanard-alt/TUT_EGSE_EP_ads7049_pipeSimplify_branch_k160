@@ -48,7 +48,7 @@ begin
 
     process(i_clk_fast, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             count      <= (others => '0');
             ready_fast <= '0';
         elsif rising_edge(i_clk_fast) then
@@ -71,7 +71,7 @@ begin
 
     process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             ready_1 <= '0';
             ready_2 <= '0';
             o_ready <= '0';

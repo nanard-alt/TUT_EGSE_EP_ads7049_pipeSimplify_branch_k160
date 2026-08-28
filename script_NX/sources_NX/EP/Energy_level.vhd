@@ -18,7 +18,7 @@ entity Energy_level is
     port(
         -- global
         i_clk_slow                : in  std_logic; -- horloge systeme lente
-        i_reset                   : in  std_logic; -- reset actif a 1
+        i_reset                   : in  std_logic; -- reset actif a 0
 
         -- surveillance ADC avant filtrage
         i_data_before_filter      : in  signed(15 downto 0); -- echantillon avant filtre, utilise pour detecter la saturation ADC
@@ -52,7 +52,7 @@ begin
 
     process(i_clk_slow, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
 
             state                          <= init;
             max_research                   <= (others => '0');

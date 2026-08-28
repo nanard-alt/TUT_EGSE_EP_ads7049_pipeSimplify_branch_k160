@@ -13,7 +13,7 @@ architecture simulation of testbench is
     constant C_CONFIG_WORD_COUNT : natural := 556;
 
     signal i_sys_clk : std_logic := '0';
-    signal i_reset   : std_logic := '1';
+    signal i_reset   : std_logic := '0';
 
     signal o_sck  : std_logic_vector(Detector_Number - 1 downto 0);
     signal o_cs_n : std_logic_vector(Detector_Number - 1 downto 0);
@@ -46,10 +46,10 @@ begin
 
     label_reset : process
     begin
-        i_reset <= '1';
+        i_reset <= '0';
         wait for 500 ns;
         wait until rising_edge(i_sys_clk);
-        i_reset <= '0';
+        i_reset <= '1';
         wait;
     end process label_reset;
 
@@ -123,7 +123,7 @@ begin
     generate_label_ADS7049_Emulators : for N in 0 to Detector_Number - 1 generate
         label_ADS7049_Emulators : entity work.ADS7049_Emulators
             port map(
-                i_Rst_n => not i_reset,
+                i_Rst_n => i_reset,
                 i_sck   => o_sck(N),
                 i_cs_n  => o_cs_n(N),
                 o_sdo   => i_sdi(N)

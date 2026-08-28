@@ -41,6 +41,8 @@ architecture simulation of OBC_Emulator is
     signal config_shift_reg : std_logic_vector(31 downto 0) := (others => '0');
     signal config_bit_count : unsigned(5 downto 0) := (others => '0');
     signal config_word_count : natural range 0 to G_CONFIG_WORD_COUNT := 0;
+    constant C_CONFIG_START_DELAY_CYCLES : natural := 1200;
+    signal config_start_delay_count : natural range 0 to C_CONFIG_START_DELAY_CYCLES := 0;
     signal config_bit       : std_logic := '0';
     signal config_wr_en     : std_logic := '0';
     signal config_sof       : std_logic := '0';
@@ -53,11 +55,12 @@ begin
         variable config_word_32 : std_logic_vector(31 downto 0);
     begin
         if rising_edge(i_config_clk) then
-            if i_reset = '1' then
+            if i_reset = '0' then
                 config_state     <= CONFIG_IDLE;
                 config_shift_reg <= (others => '0');
                 config_bit_count <= (others => '0');
                 config_word_count <= 0;
+                config_start_delay_count <= 0;
                 config_bit       <= '0';
                 config_wr_en     <= '0';
                 config_sof       <= '0';
@@ -66,7 +69,10 @@ begin
                 config_wr_en <= '0';
                 config_sof   <= '0';
 
-                case config_state is
+                if config_start_delay_count < C_CONFIG_START_DELAY_CYCLES then
+                    config_start_delay_count <= config_start_delay_count + 1;
+                else
+                    case config_state is
                     when CONFIG_IDLE =>
                         if config_word_count < G_CONFIG_WORD_COUNT and not endfile(config_file) then
                             readline(config_file, line_buffer);
@@ -99,7 +105,8 @@ begin
 
                     when CONFIG_DONE =>
                         config_state <= CONFIG_DONE;
-                end case;
+                    end case;
+                end if;
             end if;
         end if;
     end process label_send_config;
@@ -113,7 +120,7 @@ begin
         variable frame_is_active : boolean := false;
     begin
         if rising_edge(i_spectrum_clk) then
-            if i_reset = '1' then
+            if i_reset = '0' then
                 shift_reg       := (others => '0');
                 bit_count       := 0;
                 frame_is_active := false;
@@ -152,7 +159,7 @@ begin
         variable frame_is_active : boolean := false;
     begin
         if rising_edge(i_spectrum_sd_clk) then
-            if i_reset = '1' then
+            if i_reset = '0' then
                 shift_reg       := (others => '0');
                 bit_count       := 0;
                 frame_is_active := false;

@@ -49,7 +49,7 @@ begin
 
     fifo_process : process(i_clk, i_reset) is
     begin
-        if i_reset = '1' then
+        if i_reset = '0' then
             wr_addr  <= (others => '0');
             rd_addr  <= (others => '0');
             count    <= (others => '0');

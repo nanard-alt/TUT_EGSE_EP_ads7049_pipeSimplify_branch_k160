@@ -17,7 +17,7 @@ use ieee.numeric_std.all;
 entity Top_DAC121S101_Driver is
     port(
         -- global
-        i_reset         : in  std_logic; -- reset actif a 1
+        i_reset         : in  std_logic; -- reset actif a 0
         i_clk           : in  std_logic; -- horloge de commande DAC
 
         -- configuration niveau DAC
@@ -41,7 +41,7 @@ architecture RTL of Top_DAC121S101_Driver is
 
 begin
 
-    Rst_n <= not i_reset;
+    Rst_n <= i_reset;
 
     label_DAC121S101_Driver : entity work.DAC121S101_Driver
         port map(

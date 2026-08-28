@@ -20,7 +20,7 @@ entity FIR_filter is
     port(
         -- global
         i_clk_slow       : in  std_logic; -- horloge systeme lente
-        i_reset          : in  std_logic; -- reset actif a 1
+        i_reset          : in  std_logic; -- reset actif a 0
 
         -- configuration des coefficients FIR
         i_coef_fir       : in  Array_config_32x16_type; -- 32 coefficients FIR signes 16 bits
@@ -149,44 +149,44 @@ begin
     -- Flip flop trunk
     -------------------------------------------------------------------
 
-    process(i_clk_slow) is
+    process(i_clk_slow, i_reset) is
     begin
-        if rising_edge(i_clk_slow) then
-            if i_reset = '1' then
-                data0  <= (others => '0');
-                data1  <= (others => '0');
-                data2  <= (others => '0');
-                data3  <= (others => '0');
-                data4  <= (others => '0');
-                data5  <= (others => '0');
-                data6  <= (others => '0');
-                data7  <= (others => '0');
-                data8  <= (others => '0');
-                data9  <= (others => '0');
-                data10 <= (others => '0');
-                data11 <= (others => '0');
-                data12 <= (others => '0');
-                data13 <= (others => '0');
-                data14 <= (others => '0');
-                data15 <= (others => '0');
-                data16 <= (others => '0');
-                data17 <= (others => '0');
-                data18 <= (others => '0');
-                data19 <= (others => '0');
-                data20 <= (others => '0');
-                data21 <= (others => '0');
-                data22 <= (others => '0');
-                data23 <= (others => '0');
-                data24 <= (others => '0');
-                data25 <= (others => '0');
-                data26 <= (others => '0');
-                data27 <= (others => '0');
-                data28 <= (others => '0');
-                data29 <= (others => '0');
-                data30 <= (others => '0');
-                data31 <= (others => '0');
+        if i_reset = '0' then
+            data0  <= (others => '0');
+            data1  <= (others => '0');
+            data2  <= (others => '0');
+            data3  <= (others => '0');
+            data4  <= (others => '0');
+            data5  <= (others => '0');
+            data6  <= (others => '0');
+            data7  <= (others => '0');
+            data8  <= (others => '0');
+            data9  <= (others => '0');
+            data10 <= (others => '0');
+            data11 <= (others => '0');
+            data12 <= (others => '0');
+            data13 <= (others => '0');
+            data14 <= (others => '0');
+            data15 <= (others => '0');
+            data16 <= (others => '0');
+            data17 <= (others => '0');
+            data18 <= (others => '0');
+            data19 <= (others => '0');
+            data20 <= (others => '0');
+            data21 <= (others => '0');
+            data22 <= (others => '0');
+            data23 <= (others => '0');
+            data24 <= (others => '0');
+            data25 <= (others => '0');
+            data26 <= (others => '0');
+            data27 <= (others => '0');
+            data28 <= (others => '0');
+            data29 <= (others => '0');
+            data30 <= (others => '0');
+            data31 <= (others => '0');
 
-            elsif i_ready = '1' and i_coef_fir_ready = '1' then
+        elsif rising_edge(i_clk_slow) then
+            if i_ready = '1' and i_coef_fir_ready = '1' then
                 data0  <= i_data;
                 data1  <= data0;
                 data2  <= data1;
@@ -228,44 +228,44 @@ begin
     -- Mult
     -------------------------------------------------------------------
 
-    process(i_clk_slow) is
+    process(i_clk_slow, i_reset) is
     begin
-        if rising_edge(i_clk_slow) then
-            if i_reset = '1' then
-                data0_out_mult  <= (others => '0');
-                data1_out_mult  <= (others => '0');
-                data2_out_mult  <= (others => '0');
-                data3_out_mult  <= (others => '0');
-                data4_out_mult  <= (others => '0');
-                data5_out_mult  <= (others => '0');
-                data6_out_mult  <= (others => '0');
-                data7_out_mult  <= (others => '0');
-                data8_out_mult  <= (others => '0');
-                data9_out_mult  <= (others => '0');
-                data10_out_mult <= (others => '0');
-                data11_out_mult <= (others => '0');
-                data12_out_mult <= (others => '0');
-                data13_out_mult <= (others => '0');
-                data14_out_mult <= (others => '0');
-                data15_out_mult <= (others => '0');
-                data16_out_mult <= (others => '0');
-                data17_out_mult <= (others => '0');
-                data18_out_mult <= (others => '0');
-                data19_out_mult <= (others => '0');
-                data20_out_mult <= (others => '0');
-                data21_out_mult <= (others => '0');
-                data22_out_mult <= (others => '0');
-                data23_out_mult <= (others => '0');
-                data24_out_mult <= (others => '0');
-                data25_out_mult <= (others => '0');
-                data26_out_mult <= (others => '0');
-                data27_out_mult <= (others => '0');
-                data28_out_mult <= (others => '0');
-                data29_out_mult <= (others => '0');
-                data30_out_mult <= (others => '0');
-                data31_out_mult <= (others => '0');
+        if i_reset = '0' then
+            data0_out_mult  <= (others => '0');
+            data1_out_mult  <= (others => '0');
+            data2_out_mult  <= (others => '0');
+            data3_out_mult  <= (others => '0');
+            data4_out_mult  <= (others => '0');
+            data5_out_mult  <= (others => '0');
+            data6_out_mult  <= (others => '0');
+            data7_out_mult  <= (others => '0');
+            data8_out_mult  <= (others => '0');
+            data9_out_mult  <= (others => '0');
+            data10_out_mult <= (others => '0');
+            data11_out_mult <= (others => '0');
+            data12_out_mult <= (others => '0');
+            data13_out_mult <= (others => '0');
+            data14_out_mult <= (others => '0');
+            data15_out_mult <= (others => '0');
+            data16_out_mult <= (others => '0');
+            data17_out_mult <= (others => '0');
+            data18_out_mult <= (others => '0');
+            data19_out_mult <= (others => '0');
+            data20_out_mult <= (others => '0');
+            data21_out_mult <= (others => '0');
+            data22_out_mult <= (others => '0');
+            data23_out_mult <= (others => '0');
+            data24_out_mult <= (others => '0');
+            data25_out_mult <= (others => '0');
+            data26_out_mult <= (others => '0');
+            data27_out_mult <= (others => '0');
+            data28_out_mult <= (others => '0');
+            data29_out_mult <= (others => '0');
+            data30_out_mult <= (others => '0');
+            data31_out_mult <= (others => '0');
 
-            elsif i_ready = '1' and i_coef_fir_ready = '1' then
+        elsif rising_edge(i_clk_slow) then
+            if i_ready = '1' and i_coef_fir_ready = '1' then
                 data0_out_mult  <= i_coef_fir(31) * data0;
                 data1_out_mult  <= i_coef_fir(30) * data1;
                 data2_out_mult  <= i_coef_fir(29) * data2;
@@ -306,14 +306,14 @@ begin
     -- SUM
     -------------------------------------------------------------------
 
-    process(i_clk_slow) is
+    process(i_clk_slow, i_reset) is
     begin
-        if rising_edge(i_clk_slow) then
-            if i_reset = '1' then
-                o_data  <= (others => '0');
-                o_ready <= '0';
+        if i_reset = '0' then
+            o_data  <= (others => '0');
+            o_ready <= '0';
 
-            elsif i_ready = '1' and i_coef_fir_ready = '1' then
+        elsif rising_edge(i_clk_slow) then
+            if i_ready = '1' and i_coef_fir_ready = '1' then
                 --if i_ready = '1' and i_coef_fir_ready = '1' and init_FIR_filter = '1' then
                 o_data  <= (data0_out_mult(31 downto 16)) + (data1_out_mult(31 downto 16)) + (data2_out_mult(31 downto 16)) + (data3_out_mult(31 downto 16)) + (data4_out_mult(31 downto 16)) + (data5_out_mult(31 downto 16)) + (data6_out_mult(31 downto 16)) + (data7_out_mult(31 downto 16)) + (data8_out_mult(31 downto 16)) + (data9_out_mult(31 downto 16)) + (data10_out_mult(31 downto 16)) + (data11_out_mult(31 downto 16)) + (data12_out_mult(31 downto 16)) + (data13_out_mult(31 downto 16)) + (data14_out_mult(31 downto 16)) + (data15_out_mult(31 downto 16)) + (data16_out_mult(31 downto 16)) + (data17_out_mult(31 downto 16)) + (data18_out_mult(31 downto 16)) + (data19_out_mult(31 downto 16)) + (data20_out_mult(31 downto 16)) + (data21_out_mult(31 downto 16)) + (data22_out_mult(31 downto 16)) + (data23_out_mult(31 downto 16)) + (data24_out_mult(31 downto 16)) + (data25_out_mult(31 downto 16)) + (data26_out_mult(31 downto 16)) + (data27_out_mult(31 downto 16)) + (data28_out_mult(31 downto 16)) + (data29_out_mult(31 downto 16)) + (data30_out_mult(31 downto 16)) + (data31_out_mult(31 downto 16));
                 o_ready <= i_ready;
@@ -328,30 +328,30 @@ begin
     -------------------------------------------------------------------
     -- unlock FIR filter
     -------------------------------------------------------------------
-    process(i_clk_slow) is
+    process(i_clk_slow, i_reset) is
     begin
-        if rising_edge(i_clk_slow) then
-            if i_reset = '1' then
-                null;
-            elsif data31_out_mult /= 0 then
+        if i_reset = '0' then
+            null;
+        elsif rising_edge(i_clk_slow) then
+            if data31_out_mult /= 0 then
 
                 --enable_FIR_filter <= '1';
 
             end if;
-
         end if;
+
     end process;
 
     -------------------------------------------------------------------
     -- unlock FIR filter
     -------------------------------------------------------------------
-    process(i_clk_slow) is
+    process(i_clk_slow, i_reset) is
     begin
-        if rising_edge(i_clk_slow) then
-            if i_reset = '1' then
-                init_FIR_filter <= '0';
-                count           <= (others => '0');
-            elsif i_ready = '1' and i_coef_fir_ready = '1' then
+        if i_reset = '0' then
+            init_FIR_filter <= '0';
+            count           <= (others => '0');
+        elsif rising_edge(i_clk_slow) then
+            if i_ready = '1' and i_coef_fir_ready = '1' then
                 count <= count + 1;
                 if To_integer(count) = (32) then
                     init_FIR_filter <= '1';
@@ -363,20 +363,18 @@ begin
     -------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------
-    process(i_clk_slow) is
+    process(i_clk_slow, i_reset) is
     begin
-        if rising_edge(i_clk_slow) then
-            if i_reset = '1' then
+        if i_reset = '0' then
+            count_inter_ready <= (others => '0');
+        elsif rising_edge(i_clk_slow) then
+            count_inter_ready <= count_inter_ready + 1;
+
+            if i_ready = '1' then
                 count_inter_ready <= (others => '0');
-            else
-                count_inter_ready <= count_inter_ready + 1;
-
-                if i_ready = '1' then
-                    count_inter_ready <= (others => '0');
-                end if;
-
             end if;
         end if;
+
     end process;
 
 end architecture RTL;
